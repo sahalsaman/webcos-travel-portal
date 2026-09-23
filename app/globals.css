@@ -1,26 +1,200 @@
 @import "tailwindcss";
 
+/* Class-based dark mode (driven by next-themes adding `.dark` on <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   Design tokens — Voibee
+   Blue primary + cyan accent. Premium travel aesthetic.
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f9fd;
+  --foreground: #001c47;
+
+  --card: #ffffff;
+  --card-foreground: #001c47;
+
+  --popover: #ffffff;
+  --popover-foreground: #001c47;
+
+  --primary: #0060e6; /* deep blue */
+  --primary-foreground: #ffffff;
+
+  --secondary: #e0f7fc; /* light cyan tint */
+  --secondary-foreground: #001c47;
+
+  --muted: #eaf2f8;
+  --muted-foreground: #343e4b; /* charcoal */
+
+  --accent: #00b6f0; /* bright cyan/blue */
+  --accent-foreground: #ffffff;
+
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+
+  --success: #16a34a;
+  --warning: #f59e0b;
+
+  --border: #dbe6f2;
+  --input: #dbe6f2;
+  --ring: #0060e6;
+
+  --radius: 0.85rem;
+
+  /* glass surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(155, 180, 205, 0.42);
 }
 
+.dark {
+  --background: #000c1a;
+  --foreground: #e0f7fc;
+
+  --card: #001633;
+  --card-foreground: #e0f7fc;
+
+  --popover: #001633;
+  --popover-foreground: #e0f7fc;
+
+  --primary: #00b6f0; /* vibrant blue/cyan */
+  --primary-foreground: #001c47;
+
+  --secondary: #001c47;
+  --secondary-foreground: #e0f7fc;
+
+  --muted: #00224d;
+  --muted-foreground: #a4bfdb;
+
+  --accent: #00b6f0;
+  --accent-foreground: #000c1a;
+
+  --destructive: #fb7185;
+  --destructive-foreground: #2a0a10;
+
+  --success: #4ade80;
+  --warning: #fbbf24;
+
+  --border: #002b5c;
+  --input: #002b5c;
+  --ring: #00b6f0;
+
+  --glass-bg: rgba(0, 12, 26, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Expose tokens to Tailwind utilities (bg-primary, text-muted-foreground, ...) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 0.25rem);
+  --radius-sm: calc(var(--radius) - 0.4rem);
+  --radius-xl: calc(var(--radius) + 0.4rem);
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 10%, transparent), transparent 32rem),
+      var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 25%, transparent);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Glassmorphism surface */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 12px 36px color-mix(in srgb, var(--foreground) 8%, transparent);
+  }
+
+  .dark .glass {
+    box-shadow: none;
+  }
+
+  /* Brand gradient text + surfaces */
+  .text-gradient {
+    background: linear-gradient(
+      120deg,
+      var(--primary),
+      color-mix(in srgb, var(--accent) 80%, var(--primary))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--primary),
+      color-mix(in srgb, var(--accent) 75%, var(--primary))
+    );
+  }
+
+  /* Hide scrollbar (carousels) */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Shimmer used by skeletons */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.animate-shimmer::after {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--foreground) 6%, transparent),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+  content: "";
+}
+
+html {
+  scroll-behavior: smooth;
 }

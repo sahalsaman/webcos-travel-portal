@@ -1,0 +1,2 @@
+import { tenantModel } from "@/lib/tenant-db";
+import {connectDB} from "@/lib/db";import {handleError,ok,requireApiRole} from "@/lib/api";import {performanceReviewSchema} from "@/lib/validations";import PerformanceReview from "@/models/PerformanceReview";export async function POST(r:Request){try{await requireApiRole(["admin"]);const d=performanceReviewSchema.parse(await r.json());await connectDB();const x=await (await tenantModel(PerformanceReview)).create({...d,employee:d.employeeId});return ok({id:String(x._id)},201)}catch(e){return handleError(e)}}

@@ -1,0 +1,3 @@
+import { AdminSectionNav } from "@/components/admin/admin-section-nav";
+import { getHrmAccess } from "@/lib/hr-access";
+export default async function HrmLayout({ children }: { children: React.ReactNode }) { const {canManage}=await getHrmAccess(); const items=[{ href: "/admin/hrm", label: "Dashboard", exact: true },{ href: "/admin/hrm/tasks", label: "Tasks" },{ href: "/admin/hrm/attendance", label: "Attendance" },...(canManage?[{ href: "/admin/hrm/performance", label: "Performance" }]:[]),{ href: "/admin/hrm/leaves", label: "Leave" },{ href: "/admin/hrm/payroll", label: "Payroll" },{ href: "/admin/hrm/employees", label: "Employees" }]; return <div className="space-y-5"><AdminSectionNav items={items}/>{children}</div>; }

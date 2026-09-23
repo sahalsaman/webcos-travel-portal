@@ -1,0 +1,4 @@
+import { tenantModel } from "@/lib/tenant-db";
+import { connectDB } from "@/lib/db"; import { handleError, ok, requireApiRole } from "@/lib/api"; import { expenseSchema } from "@/lib/validations"; import { shortId } from "@/lib/utils"; import Expense from "@/models/Expense";
+export async function GET() { try { await requireApiRole(["admin"]); await connectDB(); return ok(await (await tenantModel(Expense)).find({}).sort({ expenseDate: -1 }).lean()); } catch (error) { return handleError(error); } }
+export async function POST(request: Request) { try { await requireApiRole(["admin"]); const data = expenseSchema.parse(await request.json()); await connectDB(); const record = await (await tenantModel(Expense)).create({ ...data, expenseNumber: shortId("EXP-"), expenseDate: new Date(data.expenseDate) }); return ok({ id: String(record._id) }, 201); } catch (error) { return handleError(error); } }

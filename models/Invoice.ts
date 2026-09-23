@@ -1,0 +1,5 @@
+import { Schema, model, models, type InferSchemaType } from "mongoose";
+import { INVOICE_STATUSES } from "@/lib/constants";
+const InvoiceSchema = new Schema({ invoiceNumber: { type: String, required: true, unique: true, index: true }, customerName: { type: String, required: true, trim: true, index: true }, customerEmail: { type: String, default: "", lowercase: true, trim: true }, customerPhone: { type: String, default: "", trim: true }, description: { type: String, required: true, trim: true }, amount: { type: Number, required: true, min: 0 }, issueDate: { type: Date, required: true, index: true }, dueDate: { type: Date, required: true, index: true }, status: { type: String, enum: INVOICE_STATUSES, default: "draft", index: true }, bookingNumber: { type: String, default: "", trim: true }, notes: { type: String, default: "", trim: true } }, { timestamps: true });
+export type InvoiceDoc = InferSchemaType<typeof InvoiceSchema> & { _id: string };
+export default models.Invoice || model("Invoice", InvoiceSchema);
