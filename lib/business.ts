@@ -2,6 +2,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import mongoose, { Schema } from "mongoose";
 import { configuredPlatformDatabase, connectDB } from "@/lib/db";
+import { getToken } from "next-auth/jwt";
 
 const businessSchema = new Schema({
   name: { type: String, required: true },
@@ -30,7 +31,11 @@ export const getBusiness = cache(async (): Promise<BusinessRecord> => {
   const slug = h.get("x-business-slug");
   const host = (h.get("host") || "").toLowerCase();
   const businesses = await businessModel();
-  const business = await businesses.findOne(slug ? { slug, status: "active" } : { hosts: host, status: "active" }).lean();
+  let business = await businesses.findOne(slug ? { slug, status: "active" } : { hosts: host, status: "active" }).lean();
+  if (!business && !slug) {
+    const token = await getToken({ req: { headers: h } as never, secret: process.env.AUTH_SECRET });
+    if (token?.businessId) business = await businesses.findOne({ _id: token.businessId, status: "active" }).lean();
+  }
   if (!business) throw new Error("Unknown or suspended business. Use your agency's portal address.");
   return business as unknown as BusinessRecord;
 });
