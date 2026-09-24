@@ -11,6 +11,7 @@ const BusinessSchema = new Schema(
       index: true,
     },
     mobile: { type: String, trim: true },
+    adrress: { type: String, trim: true },
     businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     logo: String,
     emailVerified: Date,

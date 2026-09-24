@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { COUNTRY_OPTIONS, PACKAGE_SERVICES, PACKAGE_SERVICE_LABELS, PACKAGE_TYPES, TRIP_CATEGORIES, TRIP_STATUSES, tripThemeLabel, type PackageService, type PackageType, type TripCategory } from "@/lib/constants";
+import { COUNTRY_OPTIONS, PACKAGE_EXCLUSION_OPTIONS, PACKAGE_INCLUSION_OPTIONS, PACKAGE_SERVICES, PACKAGE_SERVICE_LABELS, PACKAGE_TYPES, TRIP_CATEGORIES, TRIP_STATUSES, tripThemeLabel, type PackageService, type PackageType, type TripCategory } from "@/lib/constants";
 import { resolveIncludedServices } from "@/components/trip/package-service-icons";
 import { emptyItineraryDay, ItineraryEditor, normalizeItineraryDay } from "@/components/admin/itinerary-editor";
 import type { DestinationDTO, ItineraryItem, TripDTO } from "@/types";
@@ -139,6 +139,14 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
         ? current.includedServices.filter((item) => item !== service)
         : [...current.includedServices, service],
     }));
+  }
+
+  function togglePackageItem(kind: "inclusions" | "exclusions", item: string) {
+    setForm((current) => {
+      const values = lines(current[kind]);
+      const next = values.includes(item) ? values.filter((value) => value !== item) : [...values, item];
+      return { ...current, [kind]: next.join("\n") };
+    });
   }
 
   const lines = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean);
@@ -391,13 +399,9 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
               Paste Cloudinary/Unsplash URLs. (Cloudinary upload widget can be wired via the configured preset.)
             </p>
           </div>
-          <div>
-            <Label className="mb-1.5 block">Inclusions (one per line)</Label>
-            <Textarea value={form.inclusions} onChange={(e) => set("inclusions", e.target.value)} className="min-h-28" />
-          </div>
-          <div>
-            <Label className="mb-1.5 block">Exclusions (one per line)</Label>
-            <Textarea value={form.exclusions} onChange={(e) => set("exclusions", e.target.value)} className="min-h-28" />
+          <div className="sm:col-span-2 grid gap-6 lg:grid-cols-2">
+            <PackageChecklist title="Package inclusions" options={PACKAGE_INCLUSION_OPTIONS} selected={lines(form.inclusions)} onToggle={(item) => togglePackageItem("inclusions", item)} />
+            <PackageChecklist title="Package exclusions" options={PACKAGE_EXCLUSION_OPTIONS} selected={lines(form.exclusions)} onToggle={(item) => togglePackageItem("exclusions", item)} />
           </div>
         </CardContent>
       </Card>
@@ -417,6 +421,10 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       </div>
     </form>
   );
+}
+
+function PackageChecklist({ title, options, selected, onToggle }: { title: string; options: readonly string[]; selected: string[]; onToggle: (item: string) => void }) {
+  return <div><Label className="mb-1.5 block">{title}</Label><p className="mb-3 text-xs text-muted-foreground">Tick the items that should appear on the public package page.</p><div className="max-h-80 space-y-2 overflow-y-auto rounded-xl border border-border p-3">{options.map((item) => <label key={item} className="flex cursor-pointer items-start gap-2 rounded-lg p-2 text-sm transition-colors hover:bg-secondary/50 has-checked:bg-primary/5"><input type="checkbox" checked={selected.includes(item)} onChange={() => onToggle(item)} className="mt-0.5 size-4 shrink-0 accent-[var(--primary)]" /> <span>{item}</span></label>)}</div></div>;
 }
 
 function RequirementFields({kind,country,enabled,note,documents,fee,onEnabled,onNote,onDocuments,onFee}:{kind:"Visa"|"Permit";country:string;enabled:boolean;note:string;documents:string;fee:number;onEnabled:(value:boolean)=>void;onNote:(value:string)=>void;onDocuments:(value:string)=>void;onFee:(value:number)=>void}){return <section className="space-y-4 rounded-xl border p-4"><label className="flex items-center gap-2 font-semibold"><input type="checkbox" checked={enabled} onChange={(event)=>onEnabled(event.target.checked)} className="size-4 accent-[var(--primary)]"/>{kind} mandatory for {country}</label>{enabled&&<><div><Label className="mb-1.5 block">{kind} fee per traveler (₹)</Label><Input type="number" min={0} step={1} value={fee} onChange={(event)=>onFee(Number(event.target.value))}/><p className="mt-1 text-xs text-muted-foreground">Applied when the traveler selects No.</p></div><div><Label className="mb-1.5 block">Note shown to travelers</Label><Textarea value={note} onChange={(event)=>onNote(event.target.value)} placeholder={`Explain the ${kind.toLowerCase()} requirement and next steps.`} required className="min-h-20"/></div><div><Label className="mb-1.5 block">Required documents (one per line)</Label><Textarea value={documents} onChange={(event)=>onDocuments(event.target.value)} placeholder={kind==="Visa"?"Passport copy\nPassport-size photo\nBank statement":"Passport copy\nExisting visa copy\nApplication form"} required className="min-h-28"/><p className="mt-1 text-xs text-muted-foreground">Travelers who answer No must upload every listed document.</p></div></>}</section>}

@@ -198,6 +198,51 @@ export const PACKAGE_SERVICE_LABELS: Record<PackageService, string> = {
   "travel-insurance": "Travel Insurance",
 };
 
+export const PACKAGE_INCLUSION_OPTIONS = [
+  "🚍 AC Premium Transportation from Kochi and back",
+  "🏨 1 Night Accommodation at a selected Munnar resort",
+  "🍹 Welcome Drink on arrival",
+  "🍽️ Day 1 Breakfast",
+  "🍛 Day 1 Lunch",
+  "🍽️ Day 1 Dinner",
+  "🍳 Day 2 Breakfast",
+  "🍛 Day 2 Lunch",
+  "🌿 Munnar Sightseeing as per itinerary",
+  "🎯 Voibee Ice-Breaking Activities",
+  "🤝 Stranger-to-Friends Social Games",
+  "🏆 Team Challenges & Fun Activities",
+  "🔥 Campfire Evening subject to resort/weather conditions",
+  "🎤 Antakshari / Open Mic / Group Activities",
+  "📸 Group Photography & Trip Moments",
+  "🎥 Reel & Photo Challenges",
+  "🏅 Voibee Team Awards",
+  "☕ Chai & Conversations Session",
+  "🧑‍💼 Professional Trip Coordinator",
+  "🩹 Basic First-Aid Support",
+  "💧 Drinking Water during the trip",
+  "🧳 Luggage Assistance/Handling at the resort, where provided by the property",
+] as const;
+
+export const PACKAGE_EXCLUSION_OPTIONS = [
+  "Personal expenses",
+  "Expenses incurred outside the itinerary",
+  "Alcoholic beverages",
+  "Cigarettes, tobacco or other personal consumables",
+  "Room service",
+  "Laundry",
+  "Additional food or beverages outside the included meals",
+  "Resort-paid activities or facilities not specifically mentioned",
+  "Boating / adventure activities unless specifically mentioned as included",
+  "Entry fees not specifically mentioned in the package",
+  "Shopping expenses",
+  "Personal photography/videography expenses",
+  "Travel insurance",
+  "Medical expenses and personal medication",
+  "Any expenses arising due to weather, roadblocks, natural calamities or other circumstances beyond Voibee’s control",
+  "Any additional transportation required due to personal reasons",
+  "Anything not specifically mentioned under “Package Inclusions”",
+] as const;
+
 export const FIXED_DEPARTURE_TRIP_CATEGORIES = [
   "Holiday Package",
   "Strangers",
