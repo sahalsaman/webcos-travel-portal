@@ -1,4 +1,4 @@
-import { getBusiness } from "@/lib/business";
+import { businessModel, getBusiness } from "@/lib/business";
 import type { NextAuthConfig } from "next-auth";
 
 /** JWT sessions are bound to the active business on every request. */
@@ -21,7 +21,11 @@ export const authConfig = {
     },
     async session({ session, token }) {
       const platformAdmin = token.role === "admin" && !token.businessId;
-      const business = platformAdmin ? null : await getBusiness().catch(() => null);
+      const business = platformAdmin ? null : await getBusiness().catch(async () => {
+        if (!token.businessId) return null;
+        const model = await businessModel();
+        return model.findOne({ _id: token.businessId, status: "active" }).lean();
+      });
       if (!platformAdmin && (!business || String(business._id) !== token.businessId)) {
         return { ...session, user: undefined } as unknown as typeof session;
       }
