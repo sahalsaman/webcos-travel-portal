@@ -33,7 +33,8 @@ export const getBusiness = cache(async (): Promise<BusinessRecord> => {
   const businesses = await businessModel();
   let business = await businesses.findOne(slug ? { slug, status: "active" } : { hosts: host, status: "active" }).lean();
   if (!business && !slug) {
-    const token = await getToken({ req: { headers: h } as never, secret: process.env.AUTH_SECRET });
+    const secureCookie = process.env.NODE_ENV === "production" || h.get("cookie")?.includes("__Secure-authjs.session-token");
+    const token = await getToken({ req: { headers: h } as never, secret: process.env.AUTH_SECRET, secureCookie });
     if (token?.businessId) business = await businesses.findOne({ _id: token.businessId, status: "active" }).lean();
   }
   if (!business) throw new Error("Unknown or suspended business. Use your agency's portal address.");
