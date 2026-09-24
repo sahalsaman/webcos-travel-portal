@@ -18,6 +18,19 @@ declare global {
 const cached: MongooseCache = global._mongoose ?? { conn: null, promise: null };
 global._mongoose = cached;
 
+/** Resolve the platform database without falling back to the retired name. */
+export function configuredPlatformDatabase() {
+  const explicit = process.env.PLATFORM_DATABASE?.trim();
+  if (explicit) return explicit;
+  try {
+    const database = new URL(process.env.MONGODB_URI || "").pathname.replace(/^\/+/, "");
+    if (database) return decodeURIComponent(database);
+  } catch {
+    // The connection function below will report a missing/invalid URI.
+  }
+  return "TRAVELPORTAL_DEV";
+}
+
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 

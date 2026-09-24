@@ -1,9 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/db";
+import { configuredPlatformDatabase, connectDB } from "@/lib/db";
 export async function platformAdminModel() {
   await connectDB();
-  const db = mongoose.connection.useDb(process.env.PLATFORM_DATABASE || "travels_platform", { useCache: true });
+  const db = mongoose.connection.useDb(configuredPlatformDatabase(), { useCache: true });
   return db.models.PlatformAdmin || db.model("PlatformAdmin", new Schema({
     email: { type: String, required: true, unique: true }, name: String, password: { type: String, required: true },
   }, { timestamps: true }));

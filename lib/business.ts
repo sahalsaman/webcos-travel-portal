@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { headers } from "next/headers";
 import mongoose, { Schema } from "mongoose";
-import { connectDB } from "@/lib/db";
+import { configuredPlatformDatabase, connectDB } from "@/lib/db";
 
 const businessSchema = new Schema({
   name: { type: String, required: true },
@@ -22,7 +22,7 @@ export interface BusinessRecord {
 }
 export async function businessModel() {
   await connectDB();
-  const db = mongoose.connection.useDb(process.env.PLATFORM_DATABASE || "travels_platform", { useCache: true });
+  const db = mongoose.connection.useDb(configuredPlatformDatabase(), { useCache: true });
   return db.models.Business || db.model("Business", businessSchema);
 }
 export const getBusiness = cache(async (): Promise<BusinessRecord> => {
