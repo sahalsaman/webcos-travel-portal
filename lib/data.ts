@@ -417,7 +417,7 @@ export async function getHomeStats() {
         (await tenantModel(Trip)).countDocuments({ status: "active" }),
         (await tenantModel(Partner)).countDocuments({ status: "approved" }),
         (await tenantModel(Booking)).countDocuments({ status: { $in: ["confirmed", "completed"] } }),
-        (await tenantModel(User)).countDocuments({ role: "traveler" }),
+        (await tenantModel(User)).countDocuments({ role: "vendor_traveler" }),
       ]);
       return { trips, partners, bookings, travelers };
     },

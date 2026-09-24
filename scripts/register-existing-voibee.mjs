@@ -20,13 +20,11 @@ try {
   await businesses.createIndex({ slug: 1 }, { unique: true });
   await businesses.createIndex({ databaseName: 1 }, { unique: true });
   await businesses.createIndex({ hosts: 1 }, { unique: true });
-  const localHosts = VOIBEE_PORTAL_HOST.includes("localhost")
-    ? [VOIBEE_PORTAL_HOST, "localhost:3001", "127.0.0.1:3001"]
-    : [VOIBEE_PORTAL_HOST];
+  const localHosts = [VOIBEE_PORTAL_HOST];
   const result = await businesses.updateOne(
     { slug: "voibee" },
     {
-      $setOnInsert: {
+      $set: {
         name: "Voibee Holidays",
         slug: "voibee",
         databaseName: VOIBEE_DATABASE,
@@ -36,7 +34,6 @@ try {
         primaryColor: "#0060e6",
         status: "active",
         provisioned: true,
-        createdAt: new Date(),
         updatedAt: new Date(),
       },
     },

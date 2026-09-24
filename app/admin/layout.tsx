@@ -10,7 +10,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const { user, accessPages, designation } = await requireAdminPortalAccess();
-  const role = user.role === "employee" ? "employee" : "admin";
+  const role = user.role === "vendor_employee" ? "employee" : "admin";
   return (
     <BusinessBrand brand={await getBrand()}><RoleShell
       role={role}

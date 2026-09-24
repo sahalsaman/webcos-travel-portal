@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     const travelEndDate = new Date(travelStartDate.getTime() + configuredDuration);
 
     let travelerId: string;
-    if (user?.role === "traveler") {
+    if (user?.role === "vendor_traveler") {
       const traveler = await (await tenantModel(User)).findByIdAndUpdate(
         user.id,
         {

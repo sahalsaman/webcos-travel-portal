@@ -20,8 +20,9 @@ export const authConfig = {
       return token;
     },
     async session({ session, token }) {
-      const business = token.role === "super_admin" ? null : await getBusiness().catch(() => null);
-      if (token.role !== "super_admin" && (!business || String(business._id) !== token.businessId)) {
+      const platformAdmin = token.role === "admin" && !token.businessId;
+      const business = platformAdmin ? null : await getBusiness().catch(() => null);
+      if (!platformAdmin && (!business || String(business._id) !== token.businessId)) {
         return { ...session, user: undefined } as unknown as typeof session;
       }
       if (session.user) {

@@ -30,8 +30,8 @@ try {
     businesses[slug] = id;
     await platform.collection('businesses').insertOne({ _id: id, name: slug, slug, databaseName: `integration_${slug}`, hosts: [`${slug}.localhost:${port}`], siteUrl: siteBase, logoUrl: '', primaryColor: '#0060e6', status: 'active', provisioned: true });
     const db = mongoose.connection.useDb(`integration_${slug}`);
-    await db.collection('users').insertOne({ name: slug, email: 'admin@example.test', password: passwordHash, role: 'admin' });
-    await db.collection('users').insertOne({ name: `${slug} traveler`, email: 'traveler@example.test', password: passwordHash, role: 'traveler' });
+    await db.collection('users').insertOne({ name: slug, email: 'admin@example.test', password: passwordHash, role: 'vendor' });
+    await db.collection('users').insertOne({ name: `${slug} traveler`, email: 'traveler@example.test', password: passwordHash, role: 'vendor_traveler' });
     await db.collection('trips').insertOne({ title: `${slug} trip`, slug: 'same-slug', status: 'active', images: [], basePrice: 100, category: 'Family', createdAt: new Date() });
     await db.collection('settings').insertOne({ key: 'global', defaultCommission: slug === 'alpha' ? 100 : 200 });
   }
@@ -42,7 +42,7 @@ try {
     });
     child.stdout.pipe(log); child.stderr.pipe(log); children.push(child); return child;
   }
-  start(root, port, {}, 'portal');
+  const portalChild = start(root, port, {}, 'portal');
   start(path.resolve(root, '../voibee'), sitePort, { PORTAL_API_URL: base, PORTAL_BUSINESS_SLUG: 'alpha', NEXT_PUBLIC_PORTAL_URL: base }, 'website');
   async function ready(url) {
     for (let attempt = 0; attempt < 120; attempt++) {
@@ -73,9 +73,10 @@ try {
     }
   }
   const alpha = new Client(base, 'alpha'); const beta = new Client(base, 'beta'); const owner = new Client(base);
-  assert.equal((await alpha.login('admin@example.test')).user.businessId, String(businesses.alpha));
+  assert.equal((await alpha.login('admin@example.test')).user.role, 'vendor');
+  assert.equal((await alpha.json('/api/auth/session')).body.user.businessId, String(businesses.alpha));
   assert.equal((await beta.login('admin@example.test')).user.businessId, String(businesses.beta));
-  assert.equal((await owner.login('owner@example.test')).user.role, 'super_admin');
+  assert.equal((await owner.login('owner@example.test')).user.role, 'admin');
   assert.equal((await alpha.json('/api/platform/businesses')).status, 403);
   assert.equal((await new Client(base, 'alpha').json('/api/admin/settings')).status, 401);
   const crossSession = await alpha.json('/api/auth/session', { headers: { 'x-business-slug': 'beta' } });
@@ -94,7 +95,7 @@ try {
   const created = await owner.json('/api/platform/businesses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Gamma Agency', slug: 'gamma', host: `gamma.localhost:${port}`, siteUrl: siteBase, adminName: 'Gamma Admin', adminEmail: 'gamma@example.test', adminPassword: password }) });
   assert.equal(created.status, 201, JSON.stringify(created.body));
   const gamma = new Client(base, 'gamma');
-  assert.equal((await gamma.login('gamma@example.test')).user.role, 'admin');
+  assert.equal((await gamma.login('gamma@example.test')).user.role, 'vendor');
   assert.equal((await rpc(gamma, 'getTrips')).body.data.items.length, 0);
   // Test real same-origin website rewrites, Auth.js cookies, and server-rendered session access.
   const website = new Client(siteBase);
@@ -108,7 +109,10 @@ try {
   assert.equal(suspend.status, 200);
   assert.ok(!(await alpha.json('/api/auth/session')).body.user);
   assert.equal((await alpha.json('/api/admin/settings')).status, 401);
-  console.log('PASS: agency isolation, settings writes, session binding, super-admin authorization, business onboarding, private RPC authorization, input limits, website proxy login/cookies, header spoofing, server rendering, and suspension.');
+  portalChild.kill('SIGTERM');
+  await once(portalChild, 'exit');
+  assert.equal((await website.request('/')).status, 200, 'Public website should degrade gracefully while the portal is unavailable');
+  console.log('PASS: agency isolation, settings writes, session binding, super-admin authorization, business onboarding, private RPC authorization, input limits, website proxy login/cookies, header spoofing, server rendering, suspension, and public-site outage fallback.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
   await Promise.all(children.map(child => child.exitCode === null ? once(child, 'exit') : Promise.resolve()));

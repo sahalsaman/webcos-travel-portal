@@ -20,9 +20,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const superAdmin = await authorizeSuperAdmin(parsed.data.email, parsed.data.password);
-        if (superAdmin) return superAdmin;
-        const business = await getBusiness();
+        // Resolve the request host first. The same email may exist as a
+        // platform admin and as an agency owner; the portal host decides which
+        // account is being used.
+        let business;
+        try { business = await getBusiness(); } catch {
+          const superAdmin = await authorizeSuperAdmin(parsed.data.email, parsed.data.password);
+          if (superAdmin) return superAdmin;
+          return null;
+        }
         await connectDB();
         const user = await (await tenantModel(User)).findOne({ email: parsed.data.email })
           .select("+password")
@@ -42,14 +48,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // Attach partner slug so white-label links are one hop away in the UI.
         let partnerSlug: string | undefined;
-        if (user.role === "partner") {
+        if (user.role === "vendor_partner" || user.role === "partner") {
           const partner = await (await tenantModel(Partner)).findOne({ user: user._id })
             .select("slug")
             .lean<{ slug: string }>();
           partnerSlug = partner?.slug;
         }
 
-        if (user.role === "employee") {
+        if (user.role === "vendor_employee" || user.role === "employee") {
           const employee = await (await tenantModel(Employee)).findOne({
             user: user._id,
             status: "active",

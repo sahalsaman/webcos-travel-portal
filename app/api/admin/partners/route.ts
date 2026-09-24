@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       email: data.email,
       mobile: data.mobile,
       password: passwordHash,
-      role: "partner",
+      role: "vendor_partner",
     });
 
     const slug = await uniquePartnerSlug(data.businessName);

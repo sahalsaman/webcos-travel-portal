@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       {
         $setOnInsert: {
           email: travelerEmail,
-          role: "traveler",
+          role: "vendor_traveler",
         },
         $set: {
           name: body.travelerDetails.name,

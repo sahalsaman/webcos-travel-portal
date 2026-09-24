@@ -32,7 +32,7 @@ export async function requireUser(callbackUrl?: string): Promise<SessionUser> {
 }
 
 /** Redirect home if the signed-in user lacks one of the allowed roles. */
-export async function requireRole(roles: Role[]): Promise<SessionUser> {
+export async function requireRole(roles: readonly string[]): Promise<SessionUser> {
   const user = await requireUser();
   if (!roles.includes(user.role)) redirect("/");
   return user;
@@ -40,8 +40,8 @@ export async function requireRole(roles: Role[]): Promise<SessionUser> {
 
 
 export async function requireAdminPortalAccess() {
-  const user = await requireRole(["admin", "employee"]);
-  if (user.role === "admin") {
+  const user = await requireRole(["vendor", "vendor_employee", "admin"]);
+  if (user.role === "vendor" || user.role === "admin") {
     return {
       user,
       accessPages: ADMIN_PORTAL_PAGES.map((page) => page.key),

@@ -13,8 +13,7 @@ import { Label } from "@/components/ui/label";
 import { loginSchema, type LoginInput } from "@/lib/validations";
 
 function dashboardPath(role?: string) {
-  if (role === "super_admin") return "/super-admin";
-  if (role === "admin" || role === "employee") return "/admin";
+  if (role === "admin" || role === "vendor" || role === "vendor_employee" || role === "employee") return role === "admin" ? "/super-admin" : "/admin";
   return "/";
 }
 

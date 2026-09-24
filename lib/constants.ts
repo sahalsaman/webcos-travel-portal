@@ -1,6 +1,6 @@
 /** Shared enums & option lists used by models, forms and UI. */
 
-export const ROLES = ["admin", "employee", "partner", "traveler"] as const;
+export const ROLES = ["admin","vendor", "vendor_employee", "vendor_partner", "vendor_traveler"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const PARTNER_TYPES = [

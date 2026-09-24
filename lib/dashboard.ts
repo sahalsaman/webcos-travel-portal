@@ -45,7 +45,7 @@ async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 async function hrEmployeeScope() {
   const user = await getCurrentUser();
   if (!user || user.role === "admin") return null;
-  if (user.role !== "employee") return { _id: null };
+  if (user.role !== "vendor_employee") return { _id: null };
   const employee = await (await tenantModel(Employee)).findOne({ user: user.id, status: "active", portalAccess: true })
     .select("_id hrAccess")
     .lean<{ _id: unknown; hrAccess?: "self" | "manage" }>();
@@ -85,7 +85,7 @@ export async function getAdminStats() {
           (await tenantModel(Trip)).countDocuments({ status: "active" }),
           (await tenantModel(Booking)).countDocuments({ paymentStatus: "paid" }),
           (await tenantModel(Partner)).countDocuments({}),
-          (await tenantModel(User)).countDocuments({ role: "traveler" }),
+          (await tenantModel(User)).countDocuments({ role: "vendor_traveler" }),
           (await tenantModel(Booking)).aggregate([
             { $match: { paymentStatus: "paid" } },
             {
@@ -256,7 +256,7 @@ export async function getAdminDestinationById(id: string) {
 
 export async function listAdminTravelers() {
   return safe(async () => {
-    const travelers = await (await tenantModel(User)).find({ role: "traveler" }).sort({ createdAt: -1 }).select("name email mobile image status createdAt").lean();
+    const travelers = await (await tenantModel(User)).find({ role: "vendor_traveler" }).sort({ createdAt: -1 }).select("name email mobile image status createdAt").lean();
     const ids = travelers.map((traveler) => traveler._id);
     const bookingAgg = await (await tenantModel(Booking)).aggregate([
       { $match: { traveler: { $in: ids } } },

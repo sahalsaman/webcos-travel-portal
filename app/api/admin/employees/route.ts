@@ -29,14 +29,14 @@ export async function POST(request: Request) {
     if (data.portalAccess) {
       if (!data.portalPassword) return fail("Portal password is required", 422);
       const existingUser = await (await tenantModel(User)).findOne({ email });
-      if (existingUser && existingUser.role !== "employee") {
+      if (existingUser && existingUser.role !== "vendor_employee" && existingUser.role !== "employee") {
         return fail("This email already belongs to another portal account", 409);
       }
       const password = await bcrypt.hash(data.portalPassword, 10);
       const user = await (await tenantModel(User)).findOneAndUpdate(
         { email },
         {
-          $set: { email, name: data.name, mobile: data.mobile, password, role: "employee" },
+          $set: { email, name: data.name, mobile: data.mobile, password, role: "vendor_employee" },
         },
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
       );

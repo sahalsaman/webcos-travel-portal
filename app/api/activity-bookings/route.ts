@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const booking = await (await tenantModel(ActivityBooking)).create({
       ...data,
       activity: activity._id,
-      traveler: user?.role === "traveler" ? user.id : null,
+      traveler: user?.role === "vendor_traveler" ? user.id : null,
       activityDate: new Date(`${data.activityDate}T00:00:00.000Z`),
       totalParticipants,
       unitPrice: activity.basePrice,

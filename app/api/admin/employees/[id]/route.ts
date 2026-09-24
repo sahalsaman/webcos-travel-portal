@@ -25,7 +25,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     if (data.portalAccess === true || (data.portalAccess === undefined && current.portalAccess)) {
       if (!userId && !data.portalPassword) return fail("Portal password is required", 422);
       const existingUser = await (await tenantModel(User)).findOne({ email: nextEmail });
-      if (existingUser && String(existingUser._id) !== String(userId ?? "") && existingUser.role !== "employee") {
+      if (existingUser && String(existingUser._id) !== String(userId ?? "") && existingUser.role !== "vendor_employee" && existingUser.role !== "employee") {
         return fail("This email already belongs to another portal account", 409);
       }
 
@@ -33,7 +33,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
         name: data.name ?? current.name,
         email: nextEmail,
         mobile: data.mobile ?? current.mobile,
-        role: "employee",
+        role: "vendor_employee",
       };
       if (data.portalPassword) update.password = await bcrypt.hash(data.portalPassword, 10);
 
@@ -69,7 +69,7 @@ export async function DELETE(_request: Request, { params }: Ctx) {
     const employee = await (await tenantModel(Employee)).findByIdAndDelete(id);
     if (!employee) return fail("Employee not found", 404);
     if (employee.user) {
-      await (await tenantModel(User)).updateOne({ _id: employee.user, role: "employee" }, { $unset: { password: "" } });
+      await (await tenantModel(User)).updateOne({ _id: employee.user, role: "vendor_employee" }, { $unset: { password: "" } });
     }
     return ok({ deleted: true });
   } catch (err) {

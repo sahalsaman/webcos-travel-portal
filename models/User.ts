@@ -15,7 +15,8 @@ const UserSchema = new Schema(
     // Hidden by default; explicitly .select('+password') when authenticating.
     password: { type: String, select: false },
     mobile: { type: String, trim: true },
-    role: { type: String, enum: ROLES, default: "traveler", index: true },
+    role: { type: String, enum: ROLES, default: "vendor_traveler", index: true },
+    businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     image: String,
     emailVerified: Date,
   },

@@ -23,7 +23,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
 
     const travelerEmail = data.travelerDetails.email.toLowerCase();
     const existingTraveler = await (await tenantModel(User)).findOne({ email: travelerEmail });
-    if (existingTraveler && existingTraveler.role !== "traveler") {
+    if (existingTraveler && existingTraveler.role !== "vendor_traveler" && existingTraveler.role !== "traveler") {
       return fail("This email already belongs to an admin or partner account", 409);
     }
 
@@ -32,7 +32,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
       {
         $setOnInsert: {
           email: travelerEmail,
-          role: "traveler",
+          role: "vendor_traveler",
         },
         $set: {
           name: data.travelerDetails.name,

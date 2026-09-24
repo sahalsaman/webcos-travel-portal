@@ -16,7 +16,7 @@ function indiaDateParts() {
 export default async function Page() {
   const user=await getCurrentUser();
   await connectDB();
-  const profile=user?.role==="employee" ? await (await tenantModel(Employee)).findOne({user:user.id,status:"active",portalAccess:true}).select("_id hrAccess").lean<{_id:unknown;hrAccess?:"self"|"manage"}>() : null;
+  const profile=user?.role==="vendor_employee" ? await (await tenantModel(Employee)).findOne({user:user.id,status:"active",portalAccess:true}).select("_id hrAccess").lean<{_id:unknown;hrAccess?:"self"|"manage"}>() : null;
   const canManage=user?.role==="admin"||profile?.hrAccess==="manage";
   const currentEmployeeId=profile?String(profile._id):undefined;
   const [records,employees,requests]=await Promise.all([

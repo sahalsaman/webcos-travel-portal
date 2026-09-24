@@ -55,9 +55,16 @@ export async function currentUser() {
 }
 
 /** Throws a 401/403 Response if the user is missing or lacks a role. */
-export async function requireApiRole(roles?: Role[]) {
+export async function requireApiRole(roles?: readonly string[]) {
   const user = await currentUser();
   if (!user) throw fail("Authentication required", 401);
-  if (roles && !roles.includes(user.role)) throw fail("Forbidden", 403);
+  const actualRole = String(user.role);
+  if (roles && !roles.some((role) => {
+    if (role === "admin") return actualRole === "vendor" || actualRole === "admin";
+    if (role === "employee") return actualRole === "vendor_employee" || actualRole === "employee";
+    if (role === "partner") return actualRole === "vendor_partner" || actualRole === "partner";
+    if (role === "traveler") return actualRole === "vendor_traveler" || actualRole === "traveler";
+    return role === actualRole;
+  })) throw fail("Forbidden", 403);
   return user;
 }

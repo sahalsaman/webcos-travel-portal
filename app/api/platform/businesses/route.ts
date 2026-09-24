@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const db = mongoose.connection.useDb(business.databaseName, { useCache: true });
     const users = db.model("User", User.schema);
     await users.init();
-    await users.create({ name: input.adminName, email: input.adminEmail, password: await bcrypt.hash(input.adminPassword, 12), role: "admin" });
+    await users.create({ name: input.adminName, email: input.adminEmail, password: await bcrypt.hash(input.adminPassword, 12), role: "vendor", businessId: business._id });
     business.provisioned = true;
     business.status = "active";
     await business.save();
