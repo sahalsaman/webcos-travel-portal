@@ -2,6 +2,7 @@ import type {
   Role,
   TripStatus,
   TripCategory,
+  Climate,
   PackageType,
   PackageService,
   PartnerStatus,
@@ -37,10 +38,17 @@ export interface ItineraryItem {
   day: number;
   title: string;
   description: string;
+  schedule?: ItineraryScheduleItem[];
   transports?: ItineraryTransport[];
   hotels?: ItineraryHotel[];
   meals?: ItineraryMeal[];
   sightseeing?: SightseeingPlace[];
+}
+
+export interface ItineraryScheduleItem {
+  time: string;
+  title: string;
+  description: string;
 }
 
 export interface ItineraryTransport {
@@ -94,6 +102,7 @@ export interface TripDTO {
   departureCities?: string[];
   category: TripCategory;
   packageType: PackageType;
+  climate?: Climate | "";
   status: TripStatus;
   featured: boolean;
   tags: string[];

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  TRIP_CATEGORIES, PACKAGE_TYPES,
+  CLIMATE_OPTIONS, TRIP_CATEGORIES, PACKAGE_TYPES,
   PACKAGE_SERVICES,
   TRIP_STATUSES,
   OFFER_CARD_STATUSES,
@@ -93,6 +93,7 @@ const tripBaseSchema = z.object({
         day: z.number().int().positive(),
         title: z.string(),
         description: z.string().default(""),
+        schedule: z.array(z.object({ time: z.string().trim().min(1), title: z.string().trim().min(1), description: z.string().default("") })).default([]),
         transports: z.array(z.object({ title: z.string().trim().min(1), description: z.string().default("") })).default([]),
         hotels: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default(""), verified: z.boolean().default(true) })).default([]),
         meals: z.array(z.enum(["breakfast", "lunch", "dinner"])).default([]),
@@ -114,6 +115,7 @@ const tripBaseSchema = z.object({
   departureCities: z.array(z.string().trim().min(2)).default([]),
   category: z.enum(TRIP_CATEGORIES).default("Holiday Package"),
   packageType: z.enum(PACKAGE_TYPES).default("Standard"),
+  climate: z.enum(CLIMATE_OPTIONS).or(z.literal("")).default(""),
   status: z.enum(TRIP_STATUSES).default("draft"),
   featured: z.boolean().default(false),
   tags: z.array(z.string()).default([]),

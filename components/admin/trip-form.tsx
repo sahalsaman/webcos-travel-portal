@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { COUNTRY_OPTIONS, PACKAGE_EXCLUSION_OPTIONS, PACKAGE_INCLUSION_OPTIONS, PACKAGE_SERVICES, PACKAGE_SERVICE_LABELS, PACKAGE_TYPES, TRIP_CATEGORIES, TRIP_STATUSES, tripThemeLabel, type PackageService, type PackageType, type TripCategory } from "@/lib/constants";
+import { CLIMATE_OPTIONS, COUNTRY_OPTIONS, PACKAGE_EXCLUSION_OPTIONS, PACKAGE_INCLUSION_OPTIONS, PACKAGE_SERVICES, PACKAGE_SERVICE_LABELS, PACKAGE_TYPES, TRIP_CATEGORIES, TRIP_STATUSES, tripThemeLabel, type PackageService, type PackageType, type TripCategory } from "@/lib/constants";
 import { resolveIncludedServices } from "@/components/trip/package-service-icons";
 import { emptyItineraryDay, ItineraryEditor, normalizeItineraryDay } from "@/components/admin/itinerary-editor";
 import type { DestinationDTO, ItineraryItem, TripDTO } from "@/types";
@@ -75,6 +75,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
     departureCities: (trip?.departureCities ?? []).join("\n"),
     category: normalizeTripCategory(trip?.category),
     packageType: trip?.packageType ?? "Standard" as PackageType,
+    climate: trip?.climate ?? "",
     status: trip?.status ?? "draft",
     featured: trip?.featured ?? false,
     images: (trip?.images ?? []).join("\n"),
@@ -178,6 +179,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       departureCities: lines(form.departureCities),
       category: form.category,
       packageType: form.packageType,
+      climate: form.climate,
       status: form.status,
       featured: form.featured,
       images: lines(form.images),
@@ -280,6 +282,13 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
             <Label className="mb-1.5 block">Category</Label>
             <Select value={form.packageType} onChange={(e) => set("packageType", e.target.value as PackageType)}>
               {PACKAGE_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+            </Select>
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Climate <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
+            <Select value={form.climate} onChange={(e) => set("climate", e.target.value as typeof form.climate)}>
+              <option value="">Select climate</option>
+              {CLIMATE_OPTIONS.map((climate) => <option key={climate} value={climate}>{climate}</option>)}
             </Select>
           </div>
           <div>

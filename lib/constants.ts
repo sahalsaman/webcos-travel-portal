@@ -16,6 +16,8 @@ export const PARTNER_STATUSES = ["pending", "approved", "suspended"] as const;
 export type PartnerStatus = (typeof PARTNER_STATUSES)[number];
 
 export const TRIP_STATUSES = ["draft", "active", "inactive", "soldout"] as const;
+export const CLIMATE_OPTIONS = ["Tropical", "Warm", "Cool", "Cold", "Rainy / Monsoon", "Dry", "Moderate"] as const;
+export type Climate = (typeof CLIMATE_OPTIONS)[number];
 export const DESTINATION_STATUSES = ["active", "inactive"] as const;
 export const ACTIVITY_STATUSES = ["draft", "active", "inactive"] as const;
 export const ACTIVITY_TYPE_STATUSES = ["active", "inactive"] as const;
@@ -152,6 +154,7 @@ export const TRIP_CATEGORIES = [
   "Wellness",
   "Spiritual",
   "Festival",
+  "Work Escape",
   "Golden Horizons (Senior Care)",
   "Limitless Access (Mobility Support)",
   "Bespoke Private Journeys",
@@ -183,31 +186,48 @@ export const PACKAGE_SERVICES = [
   "visa",
   "meals",
   "tour-manager",
-  "transfers",
+  "ac-premium-transportation",
+  "transportation",
   "travel-insurance",
+  "cam-fire",
+  "swimming-pool",
+  "activities",
+  "photography",
+  "first-aid",
+  "drinking-water",
+  "luggage-assistance",
+  "welcome-drink",
 ] as const;
 export type PackageService = (typeof PACKAGE_SERVICES)[number];
 export const PACKAGE_SERVICE_LABELS: Record<PackageService, string> = {
   flights: "Flights",
-  hotels: "Hotels",
+  hotels: "Hotel / Resort",
   sightseeing: "Sightseeing",
   visa: "Visa",
   meals: "Meals",
   "tour-manager": "Tour Manager",
-  transfers: "Transfers",
+  "ac-premium-transportation": "AC Premium Transportation",
+  transportation: "Transportation",
   "travel-insurance": "Travel Insurance",
+  "cam-fire": "Campfire",
+  "swimming-pool": "Swimming Pool",
+  activities: "Activities & Games",
+  photography: "Photography & Reels",
+  "first-aid": "Basic First Aid",
+  "drinking-water": "Drinking Water",
+  "luggage-assistance": "Luggage Assistance",
+  "welcome-drink": "Welcome Drink",
 };
 
 export const PACKAGE_INCLUSION_OPTIONS = [
-  "🚍 AC Premium Transportation from Kochi and back",
-  "🏨 1 Night Accommodation at a selected Munnar resort",
+  "🚍 AC Premium Transportation",
+  "🚍 Transportation",
+  "🏨 Accommodation",
   "🍹 Welcome Drink on arrival",
-  "🍽️ Day 1 Breakfast",
-  "🍛 Day 1 Lunch",
-  "🍽️ Day 1 Dinner",
-  "🍳 Day 2 Breakfast",
-  "🍛 Day 2 Lunch",
-  "🌿 Munnar Sightseeing as per itinerary",
+  "🍽️ Breakfast",
+  "🍛 Lunch",
+  "🍽️ Dinner",
+  "🌿 Sightseeing as per itinerary",
   "🎯 Voibee Ice-Breaking Activities",
   "🤝 Stranger-to-Friends Social Games",
   "🏆 Team Challenges & Fun Activities",

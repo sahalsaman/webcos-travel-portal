@@ -7,6 +7,13 @@ import {
   ShieldCheck,
   Utensils,
   UserRoundCheck,
+  Waves,
+  Gamepad2,
+  Camera,
+  HeartPulse,
+  Droplets,
+  Luggage,
+  GlassWater,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,8 +26,18 @@ const SERVICE_DETAILS: Record<PackageService, { label: string; icon: LucideIcon;
   visa: { label: PACKAGE_SERVICE_LABELS.visa, icon: FileCheck2, pattern: /\bvisa\b/i },
   meals: { label: PACKAGE_SERVICE_LABELS.meals, icon: Utensils, pattern: /\b(meals?|breakfast|lunch|dinner)\b/i },
   "tour-manager": { label: PACKAGE_SERVICE_LABELS["tour-manager"], icon: UserRoundCheck, pattern: /\b(tour manager|trip captain|tour guide|guide)\b/i },
-  transfers: { label: PACKAGE_SERVICE_LABELS.transfers, icon: BusFront, pattern: /\b(transfers?|transport|cab|vehicle)\b/i },
+  transportation: { label: PACKAGE_SERVICE_LABELS.transportation, icon: BusFront, pattern: /\b(transportation?|transport|cab|vehicle)\b/i },
+  transfers: { label: PACKAGE_SERVICE_LABELS.transfers, icon: BusFront, pattern: /\b(transfers?)\b/i },
   "travel-insurance": { label: PACKAGE_SERVICE_LABELS["travel-insurance"], icon: ShieldCheck, pattern: /\b(travel insurance|insurance)\b/i },
+  "ac-premium-transportation": { label: PACKAGE_SERVICE_LABELS["ac-premium-transportation"], icon: BusFront, pattern: /\b(ac premium transportation|ac premium transport|ac transport)\b/i },
+  "cam-fire": { label: PACKAGE_SERVICE_LABELS["cam-fire"], icon: Binoculars, pattern: /\b(campfire|camp fire|bonfire)\b/i },
+  "swimming-pool": { label: PACKAGE_SERVICE_LABELS["swimming-pool"], icon: Waves, pattern: /\b(swimming pool|pool)\b/i },
+  activities: { label: PACKAGE_SERVICE_LABELS.activities, icon: Gamepad2, pattern: /\b(activities|games|ice-breaking|social games|team challenges)\b/i },
+  photography: { label: PACKAGE_SERVICE_LABELS.photography, icon: Camera, pattern: /\b(photography|photograph|photo|reel|videography)\b/i },
+  "first-aid": { label: PACKAGE_SERVICE_LABELS["first-aid"], icon: HeartPulse, pattern: /\b(first[- ]aid)\b/i },
+  "drinking-water": { label: PACKAGE_SERVICE_LABELS["drinking-water"], icon: Droplets, pattern: /\bdrinking water\b/i },
+  "luggage-assistance": { label: PACKAGE_SERVICE_LABELS["luggage-assistance"], icon: Luggage, pattern: /\b(luggage|baggage)\b/i },
+  "welcome-drink": { label: PACKAGE_SERVICE_LABELS["welcome-drink"], icon: GlassWater, pattern: /\b(welcome drink|mocktail)\b/i },
 };
 
 export function resolveIncludedServices(includedServices: PackageService[] = [], inclusions: string[] = []) {

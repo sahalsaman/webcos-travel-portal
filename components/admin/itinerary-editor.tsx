@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Binoculars, BusFront, ChevronDown, Hotel, Plus, Trash2, Utensils } from "lucide-react";
+import { Binoculars, BusFront, ChevronDown, Clock3, Hotel, Plus, Trash2, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,13 +15,14 @@ const MEALS: Array<{ value: ItineraryMeal; label: string }> = [
 ];
 
 export function emptyItineraryDay(day: number): ItineraryItem {
-  return { day, title: "", description: "", transports: [], hotels: [], meals: [], sightseeing: [] };
+  return { day, title: "", description: "", schedule: [], transports: [], hotels: [], meals: [], sightseeing: [] };
 }
 
 export function normalizeItineraryDay(item: ItineraryItem, index: number): ItineraryItem {
   return {
     ...item,
     day: index + 1,
+    schedule: item.schedule ?? [],
     transports: item.transports ?? [],
     hotels: item.hotels ?? [],
     meals: item.meals ?? [],
@@ -74,6 +75,15 @@ export function ItineraryEditor({ value, onChange }: { value: ItineraryItem[]; o
 
           <div id={`itinerary-day-${dayIndex}`} hidden={!openDays.has(dayIndex)} className="space-y-5 p-4 sm:p-5">
             <div><Label className="mb-1.5 block">Day overview</Label><Textarea value={day.description} onChange={(event) => updateDay(dayIndex, { description: event.target.value })} placeholder="Short summary of the day" className="min-h-20" /></div>
+
+            <DayGroup icon={Clock3} title="Time schedule" action="Add time" onAdd={() => updateDay(dayIndex, { schedule: [...(day.schedule ?? []), { time: "", title: "", description: "" }] })}>
+              {(day.schedule ?? []).map((item, itemIndex) => (
+                <ItemBox key={itemIndex} onRemove={() => updateDay(dayIndex, { schedule: day.schedule?.filter((_, index) => index !== itemIndex) })}>
+                  <div className="grid gap-3 sm:grid-cols-[150px_1fr]"><Input type="time" required value={item.time} onChange={(event) => updateDay(dayIndex, { schedule: day.schedule?.map((entry, index) => index === itemIndex ? { ...entry, time: event.target.value } : entry) })} aria-label="Schedule time" /><Input required value={item.title} onChange={(event) => updateDay(dayIndex, { schedule: day.schedule?.map((entry, index) => index === itemIndex ? { ...entry, title: event.target.value } : entry) })} placeholder="Activity, e.g. Meet & greet" /></div>
+                  <Textarea value={item.description} onChange={(event) => updateDay(dayIndex, { schedule: day.schedule?.map((entry, index) => index === itemIndex ? { ...entry, description: event.target.value } : entry) })} placeholder="What happens at this time?" className="min-h-16" />
+                </ItemBox>
+              ))}
+            </DayGroup>
 
             <DayGroup icon={BusFront} title="Transport" action="Add transport" onAdd={() => updateDay(dayIndex, { transports: [...(day.transports ?? []), { title: "", description: "" }] })}>
               {(day.transports ?? []).map((item, itemIndex) => (

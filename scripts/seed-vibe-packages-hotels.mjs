@@ -16,7 +16,7 @@ const tenantDatabase = mongoose.connection.useDb(business.databaseName).db;
 const db = tenantDatabase;
 const now = new Date();
 const common = {
-  status: "active", featured: true, packageType: "Standard", includedServices: ["hotels", "sightseeing", "meals", "transfers", "travel-insurance"],
+  status: "active", featured: true, packageType: "Standard", includedServices: ["hotels", "sightseeing", "meals", "transportation", "travel-insurance"],
   visaRequired: false, visaNote: "", visaDocuments: [], visaFee: 0, permitRequired: false, permitNote: "", permitDocuments: [], permitFee: 0,
   exclusions: ["Flights unless specifically mentioned", "Personal expenses", "Anything not listed under inclusions"], rating: 4.8, reviewCount: 0,
 };
@@ -26,7 +26,7 @@ const packages = [
     description: "A social fixed-departure escape for travelers who want river adventures, mountain views and a welcoming new travel circle.",
     images: ["https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1600&q=85"], basePrice: 18900, durationDays: 4, totalSeats: 18, availableSeats: 18,
     startDate: new Date("2026-11-12T00:00:00.000Z"), endDate: new Date("2026-11-15T00:00:00.000Z"), pickupLocation: "Dehradun Airport / Haridwar Railway Station", departureCities: ["Delhi", "Mumbai", "Bengaluru"], tags: ["Voibee Circles", "adventure", "fixed departure"],
-    inclusions: ["Three nights verified accommodation", "Daily breakfast and dinner", "Guided rafting and local experiences", "All scheduled transfers"],
+    inclusions: ["Three nights verified accommodation", "Daily breakfast and dinner", "Guided rafting and local experiences", "All scheduled transportation"],
     itinerary: [
       { day: 1, title: "Arrive and meet your circle", description: "Arrive in Rishikesh, settle in and join a hosted welcome evening by the Ganges.", transports: [{ title: "Arrival transfer", description: "Shared pickup from Dehradun or Haridwar." }], hotels: [{ name: "Aloha on the Ganges", description: "River-facing premium stay with hosted group spaces.", image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80", verified: true }], meals: ["dinner"], sightseeing: [] },
       { day: 2, title: "Rafting and riverside stories", description: "Guided rafting followed by a relaxed café trail and evening circle session.", transports: [], hotels: [], meals: ["breakfast", "dinner"], sightseeing: [{ name: "Ganges rafting", description: "Professionally guided rafting experience.", image: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?auto=format&fit=crop&w=1000&q=80" }] },
@@ -50,10 +50,10 @@ const packages = [
   },
   {
     title: "Accessible Dubai Discovery", slug: "accessible-dubai-discovery", destination: "Dubai", country: "United Arab Emirates", category: "Limitless Access (Mobility Support)", holidayPackage: true,
-    description: "A barrier-aware Dubai holiday with accessible transfers, verified accommodation and thoughtfully selected attractions.",
+    description: "A barrier-aware Dubai holiday with accessible transportation, verified accommodation and thoughtfully selected attractions.",
     images: ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=85"], basePrice: 68500, durationDays: 5, totalSeats: 0, availableSeats: 0,
     startDate: new Date("2026-10-01T00:00:00.000Z"), endDate: new Date("2026-10-05T00:00:00.000Z"), pickupLocation: "Dubai International Airport", departureCities: ["Dubai"], tags: ["accessible travel", "mobility support", "Dubai"], packageType: "Premium",
-    inclusions: ["Four nights verified accessible accommodation", "Wheelchair-friendly private transfers", "Daily breakfast", "Accessible attraction tickets", "Local support coordinator"],
+    inclusions: ["Four nights verified accessible accommodation", "Wheelchair-friendly private transportation", "Daily breakfast", "Accessible attraction tickets", "Local support coordinator"],
     itinerary: [
       { day: 1, title: "Accessible arrival", description: "Meet-and-assist arrival with an accessible vehicle transfer.", transports: [{ title: "Accessible airport transfer", description: "Pre-arranged vehicle based on mobility requirements." }], hotels: [{ name: "Sofitel Dubai Downtown", description: "Central verified property with step-free access and accessible room options.", image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1200&q=80", verified: true }], meals: [], sightseeing: [] },
       { day: 2, title: "Burj Khalifa and Dubai Mall", description: "Step-free city highlights with reserved assistance windows.", transports: [], hotels: [], meals: ["breakfast"], sightseeing: [{ name: "Burj Khalifa", description: "Accessible observation deck experience.", image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1000&q=80" }] },
