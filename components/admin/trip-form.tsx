@@ -380,8 +380,8 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       <Card>
         <CardContent className="grid gap-5 p-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Label className="mb-1.5 block">Package includes</Label>
-            <p className="mb-3 text-xs text-muted-foreground">Select the services included in this package. They will appear with icons on the website.</p>
+            <Label className="mb-1.5 block">Highlights</Label>
+            <p className="mb-3 text-xs text-muted-foreground">Select the Highlights in this package. They will appear with icons on the website.</p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {PACKAGE_SERVICES.map((service) => (
                 <label key={service} className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary/50 has-checked:border-primary/40 has-checked:bg-primary/5">

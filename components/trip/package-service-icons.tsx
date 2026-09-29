@@ -40,8 +40,15 @@ const SERVICE_DETAILS: Record<PackageService, { label: string; icon: LucideIcon;
   "welcome-drink": { label: PACKAGE_SERVICE_LABELS["welcome-drink"], icon: GlassWater, pattern: /\b(welcome drink|mocktail)\b/i },
 };
 
-export function resolveIncludedServices(includedServices: PackageService[] = [], inclusions: string[] = []) {
-  const selected = new Set<PackageService>(includedServices);
+export function resolveIncludedServices(includedServices: PackageService[] | undefined, inclusions: string[] = []) {
+  // A saved checkbox selection is authoritative, including an intentionally empty
+  // selection. Only packages created before this field existed use text inference.
+  if (includedServices !== undefined) {
+    const selected = new Set<PackageService>(includedServices);
+    return PACKAGE_SERVICES.filter((service) => selected.has(service));
+  }
+
+  const selected = new Set<PackageService>();
   const inclusionText = inclusions.join(" ");
   for (const service of PACKAGE_SERVICES) {
     if (SERVICE_DETAILS[service].pattern.test(inclusionText)) selected.add(service);
