@@ -6,6 +6,11 @@ const ItinerarySchema = new Schema(
     day: { type: Number, required: true },
     title: { type: String, required: true },
     description: { type: String, default: "" },
+    specials: { type: [String], default: [] },
+    highlights: {
+      type: [{ type: { type: String, enum: ["hotel", "resort", "activity", "vibes", "other"], required: true }, label: { type: String, required: true, trim: true }, image: { type: String, default: "" }, _id: false }],
+      default: [],
+    },
     schedule: {
       type: [{ time: { type: String, required: true, trim: true }, title: { type: String, required: true, trim: true }, description: { type: String, default: "" }, _id: false }],
       default: [],
@@ -45,7 +50,10 @@ const TripSchema = new Schema(
     includedServices: { type: [String], enum: PACKAGE_SERVICES, default: [] },
     exclusions: { type: [String], default: [] },
     holidayPackage: { type: Boolean, default: true, index: true },
+    supplierPackage: { type: Boolean, default: false, index: true },
+    supplier: { type: Schema.Types.ObjectId, ref: "Supplier", default: null, index: true },
     basePrice: { type: Number, required: true, min: 0 },
+    fixedPrice: { type: Boolean, default: false },
     durationDays: { type: Number, required: true, min: 1, default: 1 },
     totalSeats: { type: Number, default: 0, min: 0 },
     availableSeats: { type: Number, default: 0, min: 0 },

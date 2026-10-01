@@ -1,4 +1,4 @@
-import { InventorySuppliers } from "@/components/admin/inventory-suppliers";
-import { listAdminSuppliers } from "@/lib/dashboard";
-import type { SupplierDTO } from "@/types";
-export default async function VehiclesPage() { const supplierOptions = await listAdminSuppliers() as SupplierDTO[]; const suppliers = supplierOptions.filter((item) => item.type === "Transport"); return <InventorySuppliers suppliers={suppliers} supplierOptions={supplierOptions} kind="Transport" />; }
+import { InventoryAssetManager } from "@/components/admin/inventory-asset-manager";
+import { listAdminInventoryAssets, listAdminSuppliers } from "@/lib/dashboard";
+import type { InventoryAssetDTO, SupplierDTO } from "@/types";
+export default async function VehiclesPage() { const [items, suppliers] = await Promise.all([listAdminInventoryAssets("vehicle"), listAdminSuppliers()]); return <InventoryAssetManager items={items as InventoryAssetDTO[]} suppliers={suppliers as SupplierDTO[]} kind="vehicle" />; }

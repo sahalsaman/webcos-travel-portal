@@ -3,6 +3,8 @@ import { connectDB } from "@/lib/db";
 import { ok, fail, handleError, requireApiRole } from "@/lib/api";
 import { tripUpdateSchema } from "@/lib/validations";
 import "@/models";
+import Booking from "@/models/Booking";
+import PartnerTrip from "@/models/PartnerTrip";
 import Trip from "@/models/Trip";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -27,14 +29,20 @@ export async function PATCH(request: Request, { params }: Ctx) {
   }
 }
 
-/** Admin: delete a trip. */
+/** Delete a package only while no traveler booking references it. */
 export async function DELETE(_request: Request, { params }: Ctx) {
   try {
     await requireApiRole(["admin"]);
     const { id } = await params;
     await connectDB();
-    const res = await (await tenantModel(Trip)).findByIdAndDelete(id);
+    const BookingModel = await tenantModel(Booking);
+    const hasBookings = await BookingModel.exists({ trip: id });
+    if (hasBookings) return fail("This package cannot be deleted because it has customer bookings.", 409);
+
+    const TripModel = await tenantModel(Trip);
+    const res = await TripModel.findByIdAndDelete(id);
     if (!res) return fail("Package not found", 404);
+    await (await tenantModel(PartnerTrip)).deleteMany({ trip: id });
     return ok({ deleted: true });
   } catch (err) {
     return handleError(err);

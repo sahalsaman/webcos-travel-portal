@@ -93,6 +93,8 @@ const tripBaseSchema = z.object({
         day: z.number().int().positive(),
         title: z.string(),
         description: z.string().default(""),
+        specials: z.array(z.string().trim().min(1)).default([]),
+        highlights: z.array(z.object({ type: z.enum(["hotel", "resort", "activity", "vibes", "other"]), label: z.string().trim().min(1), image: z.string().default("") })).default([]),
         schedule: z.array(z.object({ time: z.string().trim().min(1), title: z.string().trim().min(1), description: z.string().default("") })).default([]),
         transports: z.array(z.object({ title: z.string().trim().min(1), description: z.string().default("") })).default([]),
         hotels: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default(""), verified: z.boolean().default(true) })).default([]),
@@ -105,7 +107,10 @@ const tripBaseSchema = z.object({
   includedServices: z.array(z.enum(PACKAGE_SERVICES)).default([]),
   exclusions: z.array(z.string()).default([]),
   holidayPackage: z.boolean().default(true),
+  supplierPackage: z.boolean().default(false),
+  supplier: z.string().trim().optional().or(z.literal("")),
   basePrice: z.number().nonnegative(),
+  fixedPrice: z.boolean().default(false),
   durationDays: z.number().int().positive().default(1),
   totalSeats: z.number().int().nonnegative().default(0),
   availableSeats: z.number().int().nonnegative().default(0),
@@ -277,6 +282,15 @@ export const supplierSchema = z.object({
   taxId: z.string().trim().default(""),
   commissionRate: z.number().min(0).max(100).default(0),
   notes: z.string().trim().default(""),
+});
+
+export const inventoryAssetSchema = z.object({
+  supplier: z.string().trim().min(1),
+  kind: z.enum(["hotel", "vehicle"]),
+  name: z.string().trim().min(2),
+  image: z.string().trim().default(""),
+  description: z.string().trim().default(""),
+  facilities: z.array(z.string().trim().min(1)).default([]),
 });
 
 export const campaignSchema = z.object({

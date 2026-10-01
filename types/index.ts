@@ -38,11 +38,21 @@ export interface ItineraryItem {
   day: number;
   title: string;
   description: string;
+  specials?: string[];
+  highlights?: ItineraryHighlight[];
   schedule?: ItineraryScheduleItem[];
   transports?: ItineraryTransport[];
   hotels?: ItineraryHotel[];
   meals?: ItineraryMeal[];
   sightseeing?: SightseeingPlace[];
+}
+
+export type ItineraryHighlightType = "hotel" | "resort" | "activity" | "vibes" | "other";
+
+export interface ItineraryHighlight {
+  type: ItineraryHighlightType;
+  label: string;
+  image: string;
 }
 
 export interface ItineraryScheduleItem {
@@ -92,6 +102,9 @@ export interface TripDTO {
   includedServices?: PackageService[];
   exclusions: string[];
   holidayPackage?: boolean;
+  supplierPackage?: boolean;
+  supplier?: string;
+  fixedPrice?: boolean;
   basePrice: number;
   durationDays?: number;
   totalSeats: number;
@@ -245,6 +258,17 @@ export interface SupplierDTO {
   taxId: string;
   commissionRate: number;
   notes: string;
+  createdAt: string;
+}
+
+export interface InventoryAssetDTO {
+  _id: string;
+  supplier: SupplierDTO | string;
+  kind: "hotel" | "vehicle";
+  name: string;
+  image: string;
+  description: string;
+  facilities: string[];
   createdAt: string;
 }
 

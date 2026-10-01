@@ -14,6 +14,7 @@ import Destination from "@/models/Destination";
 import Payment from "@/models/Payment";
 import Employee from "@/models/Employee";
 import Supplier from "@/models/Supplier";
+import InventoryAsset from "@/models/InventoryAsset";
 import Campaign from "@/models/Campaign";
 import Payroll from "@/models/Payroll";
 import Quotation from "@/models/Quotation";
@@ -196,7 +197,7 @@ export async function getRecentBookings(limit = 8) {
 export async function listAdminTrips() {
   return safe(async () => serialize(await (await tenantModel(Trip)).find({})
     .sort({ createdAt: -1 })
-    .select("title slug destination country images featured category holidayPackage startDate endDate itinerary.day availableSeats totalSeats basePrice status")
+    .select("title slug destination country images featured category holidayPackage supplierPackage startDate endDate itinerary.day availableSeats totalSeats basePrice status")
     .lean()), []);
 }
 
@@ -390,6 +391,8 @@ export async function listAdminSuppliers() {
     return serialize(suppliers);
   }, []);
 }
+
+export async function listAdminInventoryAssets(kind: "hotel" | "vehicle") { return safe(async () => serialize(await (await tenantModel(InventoryAsset)).find({ kind }).sort({ name: 1 }).populate("supplier", "companyName phone").lean()), []); }
 
 export async function getAdminSupplierById(id: string) {
   return safe(async () => {

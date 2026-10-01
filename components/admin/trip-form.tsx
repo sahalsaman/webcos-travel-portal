@@ -13,7 +13,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CLIMATE_OPTIONS, COUNTRY_OPTIONS, PACKAGE_EXCLUSION_OPTIONS, PACKAGE_INCLUSION_OPTIONS, PACKAGE_SERVICES, PACKAGE_SERVICE_LABELS, PACKAGE_TYPES, TRIP_CATEGORIES, TRIP_STATUSES, tripThemeLabel, type PackageService, type PackageType, type TripCategory } from "@/lib/constants";
 import { resolveIncludedServices } from "@/components/trip/package-service-icons";
 import { emptyItineraryDay, ItineraryEditor, normalizeItineraryDay } from "@/components/admin/itinerary-editor";
-import type { DestinationDTO, ItineraryItem, TripDTO } from "@/types";
+import { SupplierDrawer } from "@/components/admin/supplier-drawer";
+import type { DestinationDTO, InventoryAssetDTO, ItineraryItem, SupplierDTO, TripDTO } from "@/types";
 
 function toDateInput(d?: string) {
   return d ? new Date(d).toISOString().slice(0, 10) : "";
@@ -53,7 +54,7 @@ function normalizeTripCategory(category?: string): TripCategory {
   return legacy[category ?? ""] ?? "Holiday Package";
 }
 
-export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinations?: DestinationDTO[] }) {
+export function TripForm({ trip, destinations = [], suppliers = [], hotels = [], vehicles = [] }: { trip?: TripDTO; destinations?: DestinationDTO[]; suppliers?: SupplierDTO[]; hotels?: InventoryAssetDTO[]; vehicles?: InventoryAssetDTO[] }) {
   const router = useRouter();
   const editing = Boolean(trip);
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
     country: initialCountry,
     description: trip?.description ?? "",
     basePrice: trip?.basePrice ?? 0,
+    fixedPrice: trip?.fixedPrice ?? false,
     totalSeats: trip?.totalSeats ?? 0,
     availableSeats: trip?.availableSeats ?? 0,
     startDate: toDateInput(trip?.startDate),
@@ -84,6 +86,8 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
     exclusions: (trip?.exclusions ?? []).join("\n"),
     tags: (trip?.tags ?? []).join(", "),
     holidayPackage: trip?.holidayPackage ?? true,
+    supplierPackage: trip?.supplierPackage ?? false,
+    supplier: trip?.supplier ?? "",
     visaRequired: trip?.visaRequired ?? false,
     visaNote: trip?.visaNote ?? "",
     visaDocuments: (trip?.visaDocuments ?? []).join("\n"),
@@ -100,7 +104,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
   );
   const savedDurationDays = initialDurationDays(trip);
   const [packageDuration, setPackageDuration] = useState(
-    `${savedDurationDays}D/${savedDurationDays - 1}N`,
+    `${savedDurationDays} Days / ${savedDurationDays - 1} Night${savedDurationDays === 2 ? "" : "s"}`,
   );
   // `holidayPackage` is a legacy field where true means a flexible/custom-date
   // package. Keep the persisted shape compatible while presenting the clearer
@@ -154,9 +158,9 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const durationMatch = packageDuration.trim().match(/^(\d+)\s*D\s*\/\s*(\d+)\s*N$/i);
+    const durationMatch = packageDuration.trim().match(/^(\d+)\s*Days?\s*\/\s*(\d+)\s*Nights?$/i);
     if (!durationMatch || Number(durationMatch[1]) < 1 || Number(durationMatch[2]) !== Number(durationMatch[1]) - 1) {
-      toast.error("Enter duration in the format 3D/2N.");
+      toast.error("Enter duration in the format 2 Days / 1 Night.");
       return;
     }
     setLoading(true);
@@ -170,6 +174,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       country: form.country,
       description: form.description,
       basePrice: Number(form.basePrice),
+      fixedPrice: form.fixedPrice,
       durationDays: Number(durationMatch[1]),
       totalSeats,
       availableSeats,
@@ -187,6 +192,8 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       includedServices: form.includedServices,
       exclusions: lines(form.exclusions),
       holidayPackage: form.holidayPackage,
+      supplierPackage: form.supplierPackage,
+      supplier: form.supplierPackage ? form.supplier : "",
       visaRequired: form.visaRequired,
       visaNote: form.visaNote,
       visaDocuments: lines(form.visaDocuments),
@@ -232,11 +239,12 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
              <div>
               <Label className="mb-1.5 block">Duration <RequiredMark /></Label>
               <Input
-                placeholder="3D/2N"
+                placeholder="2 Days / 1 Night"
                 value={packageDuration}
                 onChange={(e) => setPackageDuration(e.target.value)}
                 required
               />
+              <label className="mt-2 flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={form.fixedPrice} onChange={(event) => set("fixedPrice", event.target.checked)} className="size-4 accent-[var(--primary)]" />Fixed price</label>
             </div>
           <div>
             <Label className="mb-1.5 block">Country <RequiredMark /></Label>
@@ -338,7 +346,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       <Card>
         <CardContent className="grid gap-4 p-6 sm:grid-cols-3">
  
-          <div className="flex items-center sm:pt-5 sm:col-span-3">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 sm:pt-5 sm:col-span-3">
             <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
@@ -348,7 +356,12 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
               />
               Fixed Departures
             </label>
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input type="checkbox" checked={form.supplierPackage} onChange={(e) => set("supplierPackage", e.target.checked)} className="size-4 accent-[var(--primary)]" />
+              Supplier package
+            </label>
           </div>
+          {form.supplierPackage ? <div className="sm:col-span-3 flex flex-wrap items-end gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4"><div className="min-w-60 flex-1"><Label className="mb-1.5 block">Supplier <RequiredMark /></Label><Select required value={form.supplier} onChange={(event) => set("supplier", event.target.value)}><option value="">Select supplier</option>{suppliers.map((supplier) => <option key={supplier._id} value={supplier._id}>{supplier.companyName} · {supplier.phone}</option>)}</Select></div><SupplierDrawer supplierOptions={suppliers} /></div> : null}
           {showDateAndSeats ? (
             <>
               <div>
@@ -416,7 +429,7 @@ export function TripForm({ trip, destinations = [] }: { trip?: TripDTO; destinat
       </Card>
 
       <Card>
-        <CardContent className="p-6"><ItineraryEditor value={itinerary} onChange={setItinerary} /></CardContent>
+        <CardContent className="p-6"><ItineraryEditor value={itinerary} onChange={setItinerary} hotels={hotels} vehicles={vehicles} /></CardContent>
       </Card>
 
       <div className="flex justify-end gap-3">
