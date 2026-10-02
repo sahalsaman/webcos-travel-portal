@@ -18,6 +18,8 @@ export { default as OfferCard } from "./OfferCard";
 export { default as Employee } from "./Employee";
 export { default as Supplier } from "./Supplier";
 export { default as InventoryAsset } from "./InventoryAsset";
+export { default as Hotel } from "./Hotel";
+export { default as Vehicle } from "./Vehicle";
 export { default as Campaign } from "./Campaign";
 export { default as Payroll } from "./Payroll";
 export { default as Quotation } from "./Quotation";

@@ -14,7 +14,8 @@ import Destination from "@/models/Destination";
 import Payment from "@/models/Payment";
 import Employee from "@/models/Employee";
 import Supplier from "@/models/Supplier";
-import InventoryAsset from "@/models/InventoryAsset";
+import Hotel from "@/models/Hotel";
+import Vehicle from "@/models/Vehicle";
 import Campaign from "@/models/Campaign";
 import Payroll from "@/models/Payroll";
 import Quotation from "@/models/Quotation";
@@ -392,7 +393,13 @@ export async function listAdminSuppliers() {
   }, []);
 }
 
-export async function listAdminInventoryAssets(kind: "hotel" | "vehicle") { return safe(async () => serialize(await (await tenantModel(InventoryAsset)).find({ kind }).sort({ name: 1 }).populate("supplier", "companyName phone").lean()), []); }
+export async function listAdminInventoryAssets(kind: "hotel" | "vehicle") {
+  return safe(async () => {
+    const Model = kind === "hotel" ? Hotel : Vehicle;
+    const items = await (await tenantModel(Model)).find({}).sort({ name: 1 }).populate("supplier", "companyName phone").lean();
+    return serialize(items.map((item) => ({ ...item, kind })));
+  }, []);
+}
 
 export async function getAdminSupplierById(id: string) {
   return safe(async () => {

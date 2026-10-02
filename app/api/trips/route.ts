@@ -43,6 +43,7 @@ export async function POST(request: Request) {
     const slug = await uniqueTripSlug(data.title);
     const trip = await (await tenantModel(Trip)).create({
       ...data,
+      supplier: data.supplier || null,
       slug,
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),

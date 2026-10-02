@@ -48,11 +48,17 @@ function titleCase(value: string) {
   return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
+function assetDetails(asset: unknown, fallback: string) {
+  if (!asset || typeof asset === "string") return { title: fallback, description: "" };
+  const value = asset as { name?: string; description?: string };
+  return { title: value.name || fallback, description: value.description || "" };
+}
+
 function itineraryHeight(day: BookingConfirmation["trip"]["itinerary"][number]) {
   let height = 52;
   if (day.description) height += wrapText(day.description, 78).length * 10 + 4;
-  (day.transports ?? []).forEach((item) => { height += 11 + wrapText(item.description || "", 56).length * 9 + 5; });
-  (day.hotels ?? []).forEach((hotel) => { height += 11 + wrapText(hotel.description || "", 56).length * 9 + 5; });
+  (day.transports ?? []).forEach((item) => { height += 11 + wrapText(assetDetails(item.vehicle_id, "Selected transport").description, 56).length * 9 + 5; });
+  (day.hotels ?? []).forEach((hotel) => { height += 11 + wrapText(assetDetails(hotel.hotel_id, "Selected hotel").description, 56).length * 9 + 5; });
   if (day.meals?.length) height += 22;
   (day.sightseeing ?? []).forEach((place) => { height += 11 + wrapText(place.description || "", 55).length * 9 + 4; });
   return Math.max(104, height + 14);
@@ -94,8 +100,8 @@ function renderItineraryDay(
     y -= 5;
   };
 
-  addRows("TRANSPORT", (day.transports ?? []).map((item) => ({ title: item.title, description: item.description })));
-  addRows("STAY", (day.hotels ?? []).map((hotel) => ({ title: hotel.name, description: hotel.description })));
+  addRows("TRANSPORT", (day.transports ?? []).map((item) => assetDetails(item.vehicle_id, "Selected transport")));
+  addRows("STAY", (day.hotels ?? []).map((hotel) => assetDetails(hotel.hotel_id, "Selected hotel")));
   if (day.meals?.length) {
     commands.push(line("MEALS", 62, y, 7, false, MUTED));
     commands.push(line(day.meals.map(titleCase).join(", "), 146, y, 8, false, INK));

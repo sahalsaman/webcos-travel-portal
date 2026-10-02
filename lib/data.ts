@@ -3,6 +3,8 @@ import { connectDB } from "@/lib/db";
 import { serialize } from "@/lib/utils";
 import "@/models"; // ensure all schemas are registered
 import Trip from "@/models/Trip";
+import Hotel from "@/models/Hotel";
+import Vehicle from "@/models/Vehicle";
 import Destination from "@/models/Destination";
 import OfferCard from "@/models/OfferCard";
 import Partner from "@/models/Partner";
@@ -298,7 +300,11 @@ export async function getTripsByCategory(category: string, limit = 4) {
 
 export async function getTripBySlug(slug: string) {
   return safe(async () => {
-    const trip = await (await tenantModel(Trip)).findOne({ slug, status: "active" }).lean();
+    const [TripModel, HotelModel, VehicleModel] = await Promise.all([tenantModel(Trip), tenantModel(Hotel), tenantModel(Vehicle)]);
+    const trip = await TripModel.findOne({ slug, status: "active" })
+      .populate({ path: "itinerary.hotels.hotel_id", model: HotelModel, select: "name image description facilities", strictPopulate: false })
+      .populate({ path: "itinerary.transports.vehicle_id", model: VehicleModel, select: "name image description facilities", strictPopulate: false })
+      .lean();
     return trip ? (serialize(trip) as TripDTO) : null;
   }, null);
 }

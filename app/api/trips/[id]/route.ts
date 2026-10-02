@@ -17,7 +17,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     const data = tripUpdateSchema.parse(await request.json());
     await connectDB();
 
-    const update: Record<string, unknown> = { ...data };
+    const update: Record<string, unknown> = { ...data, ...(data.supplier !== undefined ? { supplier: data.supplier || null } : {}) };
     if (data.startDate) update.startDate = new Date(data.startDate);
     if (data.endDate) update.endDate = new Date(data.endDate);
 

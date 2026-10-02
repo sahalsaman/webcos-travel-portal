@@ -94,10 +94,10 @@ const tripBaseSchema = z.object({
         title: z.string(),
         description: z.string().default(""),
         specials: z.array(z.string().trim().min(1)).default([]),
-        highlights: z.array(z.object({ type: z.enum(["hotel", "resort", "activity", "vibes", "other"]), label: z.string().trim().min(1), image: z.string().default("") })).default([]),
+        highlights: z.array(z.object({ image: z.string().default("") })).default([]),
         schedule: z.array(z.object({ time: z.string().trim().min(1), title: z.string().trim().min(1), description: z.string().default("") })).default([]),
-        transports: z.array(z.object({ title: z.string().trim().min(1), description: z.string().default("") })).default([]),
-        hotels: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default(""), verified: z.boolean().default(true) })).default([]),
+        transports: z.array(z.object({ vehicle_id: z.string().trim().min(1) })).default([]),
+        hotels: z.array(z.object({ hotel_id: z.string().trim().min(1) })).default([]),
         meals: z.array(z.enum(["breakfast", "lunch", "dinner"])).default([]),
         sightseeing: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default("") })).default([]),
       }),
@@ -126,7 +126,7 @@ const tripBaseSchema = z.object({
   tags: z.array(z.string()).default([]),
 });
 
-function validateTravelRequirements(data:{visaRequired?:boolean;visaNote?:string;visaDocuments?:string[];permitRequired?:boolean;permitNote?:string;permitDocuments?:string[]},ctx:z.RefinementCtx){if(data.visaRequired){if(!data.visaNote)ctx.addIssue({code:"custom",path:["visaNote"],message:"Add the traveler visa note"});if(!data.visaDocuments?.length)ctx.addIssue({code:"custom",path:["visaDocuments"],message:"Add at least one required visa document"})}if(data.permitRequired){if(!data.permitNote)ctx.addIssue({code:"custom",path:["permitNote"],message:"Add the traveler permit note"});if(!data.permitDocuments?.length)ctx.addIssue({code:"custom",path:["permitDocuments"],message:"Add at least one required permit document"})}}
+function validateTravelRequirements(data:{visaRequired?:boolean;visaNote?:string;visaDocuments?:string[];permitRequired?:boolean;permitNote?:string;permitDocuments?:string[];supplierPackage?:boolean;supplier?:string;totalSeats?:number;availableSeats?:number;startDate?:string;endDate?:string},ctx:z.RefinementCtx){if(data.visaRequired){if(!data.visaNote)ctx.addIssue({code:"custom",path:["visaNote"],message:"Add the traveler visa note"});if(!data.visaDocuments?.length)ctx.addIssue({code:"custom",path:["visaDocuments"],message:"Add at least one required visa document"})}if(data.permitRequired){if(!data.permitNote)ctx.addIssue({code:"custom",path:["permitNote"],message:"Add the traveler permit note"});if(!data.permitDocuments?.length)ctx.addIssue({code:"custom",path:["permitDocuments"],message:"Add at least one required permit document"})}if(data.supplierPackage&&!data.supplier)ctx.addIssue({code:"custom",path:["supplier"],message:"Select a supplier for this supplier package"});if(data.totalSeats!==undefined&&data.availableSeats!==undefined&&data.availableSeats>data.totalSeats)ctx.addIssue({code:"custom",path:["availableSeats"],message:"Available seats cannot exceed total seats"});if(data.startDate&&data.endDate&&new Date(data.endDate)<new Date(data.startDate))ctx.addIssue({code:"custom",path:["endDate"],message:"End date must be on or after the start date"})}
 
 export const tripSchema=tripBaseSchema.superRefine(validateTravelRequirements);
 export const tripUpdateSchema=tripBaseSchema.partial().superRefine(validateTravelRequirements);

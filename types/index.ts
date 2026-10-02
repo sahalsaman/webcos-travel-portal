@@ -47,11 +47,7 @@ export interface ItineraryItem {
   sightseeing?: SightseeingPlace[];
 }
 
-export type ItineraryHighlightType = "hotel" | "resort" | "activity" | "vibes" | "other";
-
 export interface ItineraryHighlight {
-  type: ItineraryHighlightType;
-  label: string;
   image: string;
 }
 
@@ -62,15 +58,11 @@ export interface ItineraryScheduleItem {
 }
 
 export interface ItineraryTransport {
-  title: string;
-  description: string;
+  vehicle_id: VehicleDTO | string;
 }
 
 export interface ItineraryHotel {
-  name: string;
-  description: string;
-  image: string;
-  verified?: boolean;
+  hotel_id: HotelDTO | string;
 }
 
 export type ItineraryMeal = "breakfast" | "lunch" | "dinner";
@@ -103,7 +95,7 @@ export interface TripDTO {
   exclusions: string[];
   holidayPackage?: boolean;
   supplierPackage?: boolean;
-  supplier?: string;
+  supplier?: SupplierDTO | string | null;
   fixedPrice?: boolean;
   basePrice: number;
   durationDays?: number;
@@ -265,6 +257,26 @@ export interface InventoryAssetDTO {
   _id: string;
   supplier: SupplierDTO | string;
   kind: "hotel" | "vehicle";
+  name: string;
+  image: string;
+  description: string;
+  facilities: string[];
+  createdAt: string;
+}
+
+export interface HotelDTO {
+  _id: string;
+  supplier: SupplierDTO | string;
+  name: string;
+  image: string;
+  description: string;
+  facilities: string[];
+  createdAt: string;
+}
+
+export interface VehicleDTO {
+  _id: string;
+  supplier: SupplierDTO | string;
   name: string;
   image: string;
   description: string;

@@ -8,7 +8,7 @@ const ItinerarySchema = new Schema(
     description: { type: String, default: "" },
     specials: { type: [String], default: [] },
     highlights: {
-      type: [{ type: { type: String, enum: ["hotel", "resort", "activity", "vibes", "other"], required: true }, label: { type: String, required: true, trim: true }, image: { type: String, default: "" }, _id: false }],
+      type: [{ image: { type: String, default: "" }, _id: false }],
       default: [],
     },
     schedule: {
@@ -16,11 +16,11 @@ const ItinerarySchema = new Schema(
       default: [],
     },
     transports: {
-      type: [{ title: { type: String, required: true, trim: true }, description: { type: String, default: "" }, _id: false }],
+      type: [{ vehicle_id: { type: Schema.Types.ObjectId, ref: "Vehicle", required: true }, _id: false }],
       default: [],
     },
     hotels: {
-      type: [{ name: { type: String, required: true, trim: true }, description: { type: String, default: "" }, image: { type: String, default: "" }, verified: { type: Boolean, default: true }, _id: false }],
+      type: [{ hotel_id: { type: Schema.Types.ObjectId, ref: "Hotel", required: true }, _id: false }],
       default: [],
     },
     meals: { type: [String], enum: ["breakfast", "lunch", "dinner"], default: [] },

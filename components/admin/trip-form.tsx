@@ -54,6 +54,10 @@ function normalizeTripCategory(category?: string): TripCategory {
   return legacy[category ?? ""] ?? "Holiday Package";
 }
 
+function supplierId(value: TripDTO["supplier"]) {
+  return typeof value === "string" ? value : value?._id ?? "";
+}
+
 export function TripForm({ trip, destinations = [], suppliers = [], hotels = [], vehicles = [] }: { trip?: TripDTO; destinations?: DestinationDTO[]; suppliers?: SupplierDTO[]; hotels?: InventoryAssetDTO[]; vehicles?: InventoryAssetDTO[] }) {
   const router = useRouter();
   const editing = Boolean(trip);
@@ -87,7 +91,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
     tags: (trip?.tags ?? []).join(", "),
     holidayPackage: trip?.holidayPackage ?? true,
     supplierPackage: trip?.supplierPackage ?? false,
-    supplier: trip?.supplier ?? "",
+    supplier: supplierId(trip?.supplier),
     visaRequired: trip?.visaRequired ?? false,
     visaNote: trip?.visaNote ?? "",
     visaDocuments: (trip?.visaDocuments ?? []).join("\n"),
@@ -163,11 +167,23 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
       toast.error("Enter duration in the format 2 Days / 1 Night.");
       return;
     }
+    if (form.supplierPackage && !form.supplier) {
+      toast.error("Select a supplier for this supplier package.");
+      return;
+    }
     setLoading(true);
     const startDate = showDateAndSeats ? form.startDate : form.startDate || todayInput();
     const endDate = showDateAndSeats ? form.endDate : form.endDate || startDate;
     const totalSeats = showDateAndSeats ? Number(form.totalSeats) : 999;
     const availableSeats = showDateAndSeats ? Number(form.availableSeats) || totalSeats : 999;
+    if (showDateAndSeats && availableSeats > totalSeats) {
+      toast.error("Available seats cannot exceed total seats.");
+      return;
+    }
+    if (showDateAndSeats && new Date(endDate) < new Date(startDate)) {
+      toast.error("End date must be on or after the start date.");
+      return;
+    }
     const payload = {
       title: form.title,
       destination: form.destination,
