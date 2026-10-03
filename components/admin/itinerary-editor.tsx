@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Binoculars, BusFront, ChevronDown, Clock3, Hotel, Plus, Trash2, Utensils } from "lucide-react";
+import { Binoculars, BusFront, ChevronDown, Clock3, Hotel, Plus, Sparkles, Trash2, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { InventoryAssetDTO, ItineraryHighlight, ItineraryItem } from "@/types";
 
 export function emptyItineraryDay(day: number): ItineraryItem {
-  return { day, title: "", description: "", specials: [], highlights: [], schedule: [], transports: [], hotels: [], meals: [], sightseeing: [] };
+  return { day, title: "", description: "", specials: [], highlights: [], schedule: [], transports: [], hotels: [], meals: [], sightseeing: [], activity: [] };
 }
 
 export function normalizeItineraryDay(item: ItineraryItem, index: number): ItineraryItem {
@@ -23,6 +23,7 @@ export function normalizeItineraryDay(item: ItineraryItem, index: number): Itine
     hotels: item.hotels ?? [],
     meals: item.meals ?? [],
     sightseeing: item.sightseeing ?? [],
+    activity: item.activity ?? [],
   };
 }
 
@@ -91,6 +92,15 @@ export function ItineraryEditor({ value, onChange, hotels = [], vehicles = [] }:
                 <ItemBox key={placeIndex} onRemove={() => updateDay(dayIndex, { sightseeing: day.sightseeing?.filter((_, index) => index !== placeIndex) })}>
                   <div className="grid gap-3 sm:grid-cols-2"><Input required value={place.name} onChange={(event) => updateDay(dayIndex, { sightseeing: day.sightseeing?.map((entry, index) => index === placeIndex ? { ...entry, name: event.target.value } : entry) })} placeholder="Place name" /><Input type="url" value={place.image} onChange={(event) => updateDay(dayIndex, { sightseeing: day.sightseeing?.map((entry, index) => index === placeIndex ? { ...entry, image: event.target.value } : entry) })} placeholder="Place photo URL" /></div>
                   <Textarea required value={place.description} onChange={(event) => updateDay(dayIndex, { sightseeing: day.sightseeing?.map((entry, index) => index === placeIndex ? { ...entry, description: event.target.value } : entry) })} placeholder="Short description of this sightseeing place" className="min-h-20" />
+                </ItemBox>
+              ))}
+            </DayGroup>
+
+            <DayGroup icon={Sparkles} title="Activities" action="Add activity" onAdd={() => updateDay(dayIndex, { activity: [...(day.activity ?? []), { name: "", description: "", image: "" }] })}>
+              {(day.activity ?? []).map((place, placeIndex) => (
+                <ItemBox key={placeIndex} onRemove={() => updateDay(dayIndex, { activity: day.activity?.filter((_, index) => index !== placeIndex) })}>
+                  <div className="grid gap-3 sm:grid-cols-2"><Input required value={place.name} onChange={(event) => updateDay(dayIndex, { activity: day.activity?.map((entry, index) => index === placeIndex ? { ...entry, name: event.target.value } : entry) })} placeholder="Activity name" /><Input type="url" value={place.image} onChange={(event) => updateDay(dayIndex, { activity: day.activity?.map((entry, index) => index === placeIndex ? { ...entry, image: event.target.value } : entry) })} placeholder="Activity photo URL" /></div>
+                  <Textarea required value={place.description} onChange={(event) => updateDay(dayIndex, { activity: day.activity?.map((entry, index) => index === placeIndex ? { ...entry, description: event.target.value } : entry) })} placeholder="Short description of this activity" className="min-h-20" />
                 </ItemBox>
               ))}
             </DayGroup>

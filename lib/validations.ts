@@ -100,6 +100,7 @@ const tripBaseSchema = z.object({
         hotels: z.array(z.object({ hotel_id: z.string().trim().min(1) })).default([]),
         meals: z.array(z.enum(["breakfast", "lunch", "dinner"])).default([]),
         sightseeing: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default("") })).default([]),
+        activity: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default("") })).default([]),
       }),
     )
     .default([]),

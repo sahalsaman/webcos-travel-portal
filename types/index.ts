@@ -45,6 +45,7 @@ export interface ItineraryItem {
   hotels?: ItineraryHotel[];
   meals?: ItineraryMeal[];
   sightseeing?: SightseeingPlace[];
+  activity?: ActivityItem[];
 }
 
 export interface ItineraryHighlight {
@@ -68,6 +69,12 @@ export interface ItineraryHotel {
 export type ItineraryMeal = "breakfast" | "lunch" | "dinner";
 
 export interface SightseeingPlace {
+  name: string;
+  description: string;
+  image: string;
+}
+
+export interface ActivityItem {
   name: string;
   description: string;
   image: string;

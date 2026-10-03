@@ -28,6 +28,10 @@ const ItinerarySchema = new Schema(
       type: [{ name: { type: String, required: true, trim: true }, description: { type: String, default: "" }, image: { type: String, default: "" }, _id: false }],
       default: [],
     },
+    activity: {
+      type: [{ name: { type: String, required: true, trim: true }, description: { type: String, default: "" }, image: { type: String, default: "" }, _id: false }],
+      default: [],
+    },
   },
   { _id: false },
 );
