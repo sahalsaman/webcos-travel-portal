@@ -5,6 +5,7 @@ const HotelSchema = new Schema({
   name: { type: String, required: true, trim: true },
   image: { type: String, default: "" },
   description: { type: String, default: "", trim: true },
+  directHotelBooking: { type: Boolean, default: false },
   facilities: { type: [String], default: [] },
 }, { timestamps: true });
 

@@ -298,6 +298,18 @@ export async function getTripsByCategory(category: string, limit = 4) {
   }, [] as TripDTO[]);
 }
 
+/** Hotels explicitly enabled by a vendor for the public hotel catalogue. */
+export async function getDirectBookingHotels() {
+  return safe(async () => {
+    const items = await (await tenantModel(Hotel))
+      .find({ directHotelBooking: true })
+      .populate("supplier", "companyName city country")
+      .sort({ createdAt: -1 })
+      .lean();
+    return serialize(items);
+  }, []);
+}
+
 export async function getTripBySlug(slug: string) {
   return safe(async () => {
     const [TripModel, HotelModel, VehicleModel] = await Promise.all([tenantModel(Trip), tenantModel(Hotel), tenantModel(Vehicle)]);

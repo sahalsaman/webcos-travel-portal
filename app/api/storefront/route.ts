@@ -26,6 +26,7 @@ const operations = {
   getTripCategoryCounts: (args: unknown[]) => data.getTripCategoryCounts(filters.parse(args[0])),
   getFeaturedTrips: (args: unknown[]) => data.getFeaturedTrips(limit.parse(args[0])),
   getTripsByCategory: (args: unknown[]) => data.getTripsByCategory(text.parse(args[0]), limit.parse(args[1])),
+  getDirectBookingHotels: () => data.getDirectBookingHotels(),
   getTripBySlug: (args: unknown[]) => data.getTripBySlug(text.parse(args[0])),
   getRelatedTrips: (args: unknown[]) => data.getRelatedTrips(text.parse(args[0]), text.parse(args[1]), limit.parse(args[2])),
   getReviewsForTrip: (args: unknown[]) => data.getReviewsForTrip(text.parse(args[0])),
