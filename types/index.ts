@@ -267,6 +267,7 @@ export interface InventoryAssetDTO {
   name: string;
   image: string;
   description: string;
+  directHotelBooking?: boolean;
   facilities: string[];
   createdAt: string;
 }
@@ -277,6 +278,7 @@ export interface HotelDTO {
   name: string;
   image: string;
   description: string;
+  directHotelBooking: boolean;
   facilities: string[];
   createdAt: string;
 }

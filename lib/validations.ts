@@ -291,6 +291,7 @@ export const inventoryAssetSchema = z.object({
   name: z.string().trim().min(2),
   image: z.string().trim().default(""),
   description: z.string().trim().default(""),
+  directHotelBooking: z.boolean().default(false),
   facilities: z.array(z.string().trim().min(1)).default([]),
 });
 
