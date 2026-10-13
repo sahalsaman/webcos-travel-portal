@@ -21,6 +21,16 @@ export interface BusinessRecord {
   name: string; slug: string; databaseName: string; hosts: string[];
   siteUrl: string; logoUrl: string; primaryColor: string; status: string;
 }
+
+/** Local portal logos uploaded by the platform team. */
+const uploadedVendorLogos: Record<string, string> = {
+  voibee: "/vendor_logos/voibee_holidays.png",
+  testtravels: "/vendor_logos/test_holidays.png",
+};
+
+function brandLogoFor(business: BusinessRecord) {
+  return uploadedVendorLogos[business.slug] || business.logoUrl;
+}
 export async function businessModel() {
   await connectDB();
   const db = mongoose.connection.useDb(configuredPlatformDatabase(), { useCache: true });
@@ -42,5 +52,5 @@ export const getBusiness = cache(async (): Promise<BusinessRecord> => {
 });
 export async function getBrand() {
   const b = await getBusiness();
-  return { name: b.name, logoUrl: b.logoUrl, primaryColor: b.primaryColor, siteUrl: b.siteUrl };
+  return { name: b.name, logoUrl: brandLogoFor(b), primaryColor: b.primaryColor, siteUrl: b.siteUrl };
 }

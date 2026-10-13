@@ -10,6 +10,8 @@ import Trip from "@/models/Trip";
 import Destination from "@/models/Destination";
 import Partner from "@/models/Partner";
 import PartnerTrip from "@/models/PartnerTrip";
+import { getBusiness } from "@/lib/business";
+import { readPublicCache, storefrontCacheKey, writePublicCache } from "@/lib/redis";
 
 const text = z.string().max(250);
 const limit = z.number().int().min(1).max(100).optional();
@@ -47,10 +49,30 @@ const operations = {
   },
 };
 const partnerOperations = { getPartnerStats: dashboard.getPartnerStats, getPartnerEarningsChart: dashboard.getPartnerEarningsChart, getPartnerLinks: dashboard.getPartnerLinks, getPartnerBookings: dashboard.getPartnerBookings, getPartnerCommissions: dashboard.getPartnerCommissions, getResellableTrips: dashboard.getResellableTrips };
+const cachedPublicOperations = new Set([
+  "getActivityTypes", "getActivities", "getActivityBySlug", "getDestinations", "getHomeDestinations",
+  "getDestinationLanding", "getOfferCards", "getTrips", "getTripCategoryCounts", "getFeaturedTrips",
+  "getTripsByCategory", "getDirectBookingHotels", "getTripBySlug", "getRelatedTrips",
+  "getReviewsForTrip", "getPartnerBySlug", "getWhiteLabelTrip", "getPartnerStorefront",
+  "getHomeStats", "getSitemapRecords",
+]);
 export async function POST(request: Request) {
   try {
     const { operation, args } = z.object({ operation: z.string(), args: z.array(z.unknown()).max(4).default([]).transform(values => values.map(value => value === null ? undefined : value)) }).parse(await request.json());
-    if (Object.hasOwn(operations, operation)) return ok(await operations[operation as keyof typeof operations](args));
+    if (Object.hasOwn(operations, operation)) {
+      if (!cachedPublicOperations.has(operation)) return ok(await operations[operation as keyof typeof operations](args));
+
+      // Resolve the business before reading cache so suspended or unknown
+      // agencies never receive a previously cached storefront response.
+      const business = await getBusiness();
+      const cacheKey = storefrontCacheKey(business.slug, operation, args);
+      const cached = await readPublicCache<unknown>(cacheKey);
+      if (cached.hit) return ok(cached.value);
+
+      const response = await operations[operation as keyof typeof operations](args);
+      await writePublicCache(cacheKey, response);
+      return ok(response);
+    }
     if (operation === "getTravelerBookings" || operation === "getTravelerWishlist") {
       const user = await requireApiRole(["traveler"]);
       return ok(await dashboard[operation](user.id));
