@@ -1,5 +1,9 @@
+import { join } from "node:path";
 import type { TripDTO } from "@/types";
-import { buildSinglePagePdf, pdfLine as line } from "@/lib/simple-pdf";
+import { buildSinglePagePdf, loadIndexedPng, pdfImage, pdfLine as line } from "@/lib/simple-pdf";
+
+const voibeeLogo = loadIndexedPng(join(process.cwd(), "public/vendor_logos/voibee_holidays.png"), "VoibeeLogo");
+const voibeeWatermark = { image: voibeeLogo, width: 330, height: 130, opacity: 0.055 };
 
 function shorten(text: string, max = 86) {
   return text.length > max ? `${text.slice(0, max - 3)}...` : text;
@@ -9,6 +13,8 @@ export function createPackageDetailPdf(trip: TripDTO, brand: { name: string; sit
   const duration = Math.max(1, trip.durationDays || trip.itinerary.length || Math.round((new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / 86_400_000) + 1);
   const commands: string[] = [
     "0.02 0.38 0.88 rg 0 700 595 142 re f",
+    "1 1 1 rg 420 778 120 46 re f",
+    pdfImage(voibeeLogo, 425, 783, 110, 43),
     line(brand.name.toUpperCase(), 42, 797, 13, true, "1 1 1"),
     line("TOUR PACKAGE", 42, 758, 11, true, "0.82 0.9 1"),
     line(shorten(trip.title, 45), 42, 727, 23, true, "1 1 1"),
@@ -39,5 +45,5 @@ export function createPackageDetailPdf(trip: TripDTO, brand: { name: string; sit
     line("Page 1 of 1", 500, 92, 8, false, "0.45 0.49 0.56"),
   );
 
-  return buildSinglePagePdf(commands);
+  return buildSinglePagePdf(commands, voibeeWatermark);
 }

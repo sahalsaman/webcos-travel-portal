@@ -1,5 +1,6 @@
+import { join } from "node:path";
 import type { BookingConfirmation } from "@/lib/booking-confirmation";
-import { buildMultiPagePdf, pdfLine as line } from "@/lib/simple-pdf";
+import { buildMultiPagePdf, loadIndexedPng, pdfImage, pdfLine as line } from "@/lib/simple-pdf";
 
 const GREEN = "0.04 0.27 0.23";
 const TEAL = "0.03 0.50 0.40";
@@ -9,6 +10,8 @@ const MUTED = "0.40 0.44 0.47";
 const BORDER = "0.82 0.86 0.85";
 const CREAM = "0.97 0.96 0.92";
 const MINT = "0.84 0.92 0.89";
+const voibeeLogo = loadIndexedPng(join(process.cwd(), "public/vendor_logos/voibee_holidays.png"), "VoibeeLogo");
+const voibeeWatermark = { image: voibeeLogo, width: 330, height: 130, opacity: 0.055 };
 
 function money(value: number) {
   return `INR ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(value)}`;
@@ -129,6 +132,8 @@ function firstPage(booking: BookingConfirmation, brand: { name: string; siteUrl:
   const commands: string[] = [
     line(brand.siteUrl, 204, 810, 9, false, MUTED),
     fillRect(42, 685, 511, 115, GREEN),
+    "1 1 1 rg 425 785 112 43 re f",
+    pdfImage(voibeeLogo, 429, 789, 104, 41),
     line(brand.name.toUpperCase(), 62, 772, 9, false, GOLD),
     line(booking.bookingNumber, 430, 772, 9, false, "1 1 1"),
     line(booking.trip.title, 62, 726, 27, false, "1 1 1"),
@@ -166,6 +171,8 @@ function continuationPage(booking: BookingConfirmation, brand: { name: string; s
   return {
     commands: [
       fillRect(0, 774, 595, 68, GREEN),
+      "1 1 1 rg 438 785 112 43 re f",
+      pdfImage(voibeeLogo, 442, 789, 104, 41),
       line(brand.name.toUpperCase(), 42, 810, 9, false, GOLD),
       line(booking.bookingNumber, 444, 810, 8, false, "1 1 1"),
       line(`ITINERARY - ${booking.trip.title}`, 42, 788, 15, false, "1 1 1"),
@@ -197,5 +204,5 @@ export function createBookingConfirmationPdf(booking: BookingConfirmation, brand
     page.push(line(`${brand.name.toUpperCase()} - Computer-generated booking document`, 42, 24, 7, false, MUTED));
     page.push(line(`${index + 1} / ${pageCount}`, 520, 24, 7, false, MUTED));
   });
-  return buildMultiPagePdf(pages);
+  return buildMultiPagePdf(pages, voibeeWatermark);
 }

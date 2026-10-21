@@ -12,6 +12,9 @@ import Partner from "@/models/Partner";
 import Employee from "@/models/Employee";
 import mongoose from "mongoose";
 import { businessModel } from "@/lib/business";
+import { headers } from "next/headers";
+
+const portalOnlyRoles = new Set(["admin", "vendor", "vendor_employee", "employee"]);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -21,6 +24,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
+        const isVoibeeSiteLogin = (await headers()).get("x-portal-client") === "voibee-site";
+        const siteLoginBlocked = (role: string) => isVoibeeSiteLogin && portalOnlyRoles.has(role);
 
         // Resolve the request host first. The same email may exist as a
         // platform admin and as an agency owner; the portal host decides which
@@ -28,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         let business;
         try { business = await getBusiness(); } catch {
           const superAdmin = await authorizeSuperAdmin(parsed.data.email, parsed.data.password);
-          if (superAdmin) return superAdmin;
+          if (superAdmin) return siteLoginBlocked(superAdmin.role) ? null : superAdmin;
           await connectDB();
           const registry = await businessModel();
           const businesses = await registry.find({ status: "active" }).lean();
@@ -38,6 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const candidateUser = await users.findOne({ email: parsed.data.email }).select("+password").lean<{ _id: unknown; name: string; email: string; password?: string; role: string; image?: string }>();
             if (!candidateUser?.password || !["vendor", "vendor_employee", "vendor_partner", "vendor_traveler"].includes(candidateUser.role)) continue;
             if (!await bcrypt.compare(parsed.data.password, candidateUser.password)) continue;
+            if (siteLoginBlocked(candidateUser.role)) return null;
             return { id: String(candidateUser._id), businessId: String(candidate._id), name: candidateUser.name, email: candidateUser.email, image: candidateUser.image, role: candidateUser.role };
           }
           return null;
@@ -56,14 +62,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!user?.password) {
           const superAdmin = await authorizeSuperAdmin(parsed.data.email, parsed.data.password);
-          return superAdmin;
+          return superAdmin && !siteLoginBlocked(superAdmin.role) ? superAdmin : null;
         }
 
         const ok = await bcrypt.compare(parsed.data.password, user.password);
         if (!ok) {
           const superAdmin = await authorizeSuperAdmin(parsed.data.email, parsed.data.password);
-          return superAdmin;
+          return superAdmin && !siteLoginBlocked(superAdmin.role) ? superAdmin : null;
         }
+
+        if (siteLoginBlocked(user.role)) return null;
 
         // Attach partner slug so white-label links are one hop away in the UI.
         let partnerSlug: string | undefined;
