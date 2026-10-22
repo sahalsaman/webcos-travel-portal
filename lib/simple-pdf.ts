@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { deflateSync, inflateSync } from "node:zlib";
 
 export type PdfPng = {
@@ -82,6 +82,11 @@ export function loadIndexedPng(path: string, name: string): PdfPng {
     previous = decoded;
   }
   return { name, width, height, palette, data: Buffer.concat(dataChunks), alpha: transparency.length ? deflateSync(alpha) : undefined };
+}
+
+/** Load an optional branded PNG without making PDF routes fail at build time. */
+export function loadIndexedPngIfPresent(path: string, name: string) {
+  return existsSync(path) ? loadIndexedPng(path, name) : undefined;
 }
 
 export function pdfLine(text: string, x: number, y: number, size = 10, bold = false, color = "0.15 0.18 0.24") {
