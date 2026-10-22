@@ -14,6 +14,7 @@ import { CLIMATE_OPTIONS, COUNTRY_OPTIONS, PACKAGE_EXCLUSION_OPTIONS, PACKAGE_IN
 import { resolveIncludedServices } from "@/components/trip/package-service-icons";
 import { emptyItineraryDay, ItineraryEditor, normalizeItineraryDay } from "@/components/admin/itinerary-editor";
 import { SupplierDrawer } from "@/components/admin/supplier-drawer";
+import { CloudinaryImageUrlsField } from "@/components/admin/cloudinary-image-urls-field";
 import type { DestinationDTO, InventoryAssetDTO, ItineraryItem, SupplierDTO, TripDTO } from "@/types";
 
 function toDateInput(d?: string) {
@@ -425,18 +426,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
               ))}
             </div>
           </div>
-          <div className="sm:col-span-2">
-            <Label className="mb-1.5 block">Image URLs (one per line)</Label>
-            <Textarea
-              value={form.images}
-              onChange={(e) => set("images", e.target.value)}
-              className="min-h-24 font-mono text-xs"
-              placeholder="https://res.cloudinary.com/...&#10;https://images.unsplash.com/..."
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Paste Cloudinary/Unsplash URLs. (Cloudinary upload widget can be wired via the configured preset.)
-            </p>
-          </div>
+          <CloudinaryImageUrlsField className="sm:col-span-2" value={form.images} onChange={(value) => set("images", value)} />
           <div className="sm:col-span-2 grid gap-6 lg:grid-cols-2">
             <PackageChecklist title="Package inclusions" options={PACKAGE_INCLUSION_OPTIONS} selected={lines(form.inclusions)} onToggle={(item) => togglePackageItem("inclusions", item)} />
             <PackageChecklist title="Package exclusions" options={PACKAGE_EXCLUSION_OPTIONS} selected={lines(form.exclusions)} onToggle={(item) => togglePackageItem("exclusions", item)} />

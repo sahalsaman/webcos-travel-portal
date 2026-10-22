@@ -2,6 +2,8 @@ import { tenantModel } from "@/lib/tenant-db";
 import { connectDB } from "@/lib/db";
 import { ok, fail, handleError, requireApiRole } from "@/lib/api";
 import { tripUpdateSchema } from "@/lib/validations";
+import { CloudinaryUploadError, uploadExternalPackageImages } from "@/lib/cloudinary";
+import { collectCloudinaryUrls, removeUnusedCloudinaryImages } from "@/lib/cloudinary-media";
 import "@/models";
 import Booking from "@/models/Booking";
 import PartnerTrip from "@/models/PartnerTrip";
@@ -14,17 +16,22 @@ export async function PATCH(request: Request, { params }: Ctx) {
   try {
     await requireApiRole(["admin"]);
     const { id } = await params;
-    const data = tripUpdateSchema.parse(await request.json());
+    const body = await request.json();
+    const data = tripUpdateSchema.parse({ ...body, ...(body.images !== undefined ? { images: await uploadExternalPackageImages(body.images) } : {}) });
     await connectDB();
 
     const update: Record<string, unknown> = { ...data, ...(data.supplier !== undefined ? { supplier: data.supplier || null } : {}) };
     if (data.startDate) update.startDate = new Date(data.startDate);
     if (data.endDate) update.endDate = new Date(data.endDate);
 
-    const trip = await (await tenantModel(Trip)).findByIdAndUpdate(id, update, { new: true }).lean();
+    const TripModel = await tenantModel(Trip);
+    const previous = await TripModel.findById(id).lean();
+    const trip = await TripModel.findByIdAndUpdate(id, update, { new: true }).lean();
     if (!trip) return fail("Package not found", 404);
+    if (previous) await removeUnusedCloudinaryImages(collectCloudinaryUrls(previous));
     return ok(trip);
   } catch (err) {
+    if (err instanceof CloudinaryUploadError) return fail(err.message, 422);
     return handleError(err);
   }
 }
@@ -43,6 +50,7 @@ export async function DELETE(_request: Request, { params }: Ctx) {
     const res = await TripModel.findByIdAndDelete(id);
     if (!res) return fail("Package not found", 404);
     await (await tenantModel(PartnerTrip)).deleteMany({ trip: id });
+    await removeUnusedCloudinaryImages(collectCloudinaryUrls(res));
     return ok({ deleted: true });
   } catch (err) {
     return handleError(err);

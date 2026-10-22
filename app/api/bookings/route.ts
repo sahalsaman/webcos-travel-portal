@@ -66,8 +66,11 @@ export async function POST(request: Request) {
     const visaFee = trip.visaRequired && body.travelCompliance?.visa?.hasDocument === false ? Number(trip.visaFee || 0) : 0;
     const permitFee = trip.permitRequired && body.travelCompliance?.permit?.hasDocument === false ? Number(trip.permitFee || 0) : 0;
     const complianceFee = (visaFee + permitFee) * body.seats;
+    const activityAmount = Number(body.activityAmount || 0);
     breakdown.travelerPays += complianceFee;
     breakdown.adminReceives += complianceFee;
+    breakdown.travelerPays += activityAmount;
+    breakdown.adminReceives += activityAmount;
 
     const bookingNumber = shortId("VOI-");
     const confirmationToken = randomBytes(24).toString("hex");
@@ -138,6 +141,7 @@ export async function POST(request: Request) {
         visaFee,
         permitFee,
         complianceFee,
+        activityAmount,
         seats: body.seats,
         travelStartDate,
         travelEndDate,

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FileText, Megaphone, Settings, UserRound } from "lucide-react";
+import { FileText, Megaphone, PlugZap, Settings, UserRound } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { getSettings } from "@/models/Settings";
 import { serialize } from "@/lib/utils";
@@ -10,20 +10,23 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { OfferCardRowActions } from "@/components/admin/offer-card-row-actions";
 import { OfferCardDrawer } from "@/components/admin/offer-card-drawer";
-import { ChangePasswordForm } from "@/components/admin/change-password-form";
+import { ProfileSettings } from "@/components/admin/profile-settings";
 import { DEFAULT_SETTINGS } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/session";
 import { listAdminOfferCards } from "@/lib/dashboard";
 import type { OfferCardDTO } from "@/types";
 import { QuotationSettingsForm } from "@/components/admin/quotation-settings-form";
+import { IntegrationSettingsForm } from "@/components/admin/integration-settings-form";
+import { getBusiness, getBusinessCredentials } from "@/lib/business";
 
 const OFFER_FALLBACK = "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=200&q=60";
 
 const SETTINGS_SECTIONS = [
+  { key: "profile", label: "Profile", icon: UserRound },
   { key: "platform", label: "Platform Configuration", icon: Settings },
   { key: "quotation", label: "Quotation Setup", icon: FileText },
   { key: "offers", label: "Banner Slides", icon: Megaphone },
-  { key: "profile", label: "Profile", icon: UserRound },
+  { key: "integrations", label: "Integrations", icon: PlugZap },
 ] as const;
 
 type SettingsSection = (typeof SETTINGS_SECTIONS)[number]["key"];
@@ -37,7 +40,7 @@ function sectionFromParams(params: SearchParams): SettingsSection {
   const section = str(params.section);
   return SETTINGS_SECTIONS.some((item) => item.key === section)
     ? section as SettingsSection
-    : "platform";
+    : "profile";
 }
 
 export default async function AdminSettingsPage({
@@ -58,12 +61,13 @@ export default async function AdminSettingsPage({
   }
 
   const offers = activeSection === "offers" ? await listAdminOfferCards() : [];
+  const business = activeSection === "profile" || activeSection === "integrations" ? await getBusiness() : null;
+  const integrations = activeSection === "integrations" && business ? await getBusinessCredentials(business) : [];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage platform, quotation defaults, homepage banners and profile access</p>
       </div>
 
       <SettingsNav activeSection={activeSection} />
@@ -91,7 +95,9 @@ export default async function AdminSettingsPage({
         }} />
       ) : null}
 
-      {activeSection === "profile" ? <ChangePasswordForm email={user?.email} /> : null}
+      {activeSection === "integrations" ? <IntegrationSettingsForm credentials={integrations.map((credential) => ({ ...credential, name: credential.name ?? "", apikey: credential.apikey ?? "", secretKey: credential.secretKey ?? "", url: credential.url ?? "" }))} /> : null}
+
+      {activeSection === "profile" && business ? <ProfileSettings user={serialize(user ?? {})} business={serialize(business)} /> : null}
     </div>
   );
 }

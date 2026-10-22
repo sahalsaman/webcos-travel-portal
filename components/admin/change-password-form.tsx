@@ -4,11 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function ChangePasswordForm({ email }: { email?: string | null }) {
+export function ChangePasswordForm({ onSaved }: { onSaved?: () => void }) {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     currentPassword: "",
@@ -46,6 +45,7 @@ export function ChangePasswordForm({ email }: { email?: string | null }) {
       if (!res.ok || !data.success) throw new Error(data.message || "Password update failed");
       toast.success("Password changed");
       setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      onSaved?.();
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -54,18 +54,7 @@ export function ChangePasswordForm({ email }: { email?: string | null }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="grid gap-4 sm:max-w-xl">
-          {email ? (
-            <div>
-              <Label className="mb-1.5 block">Account email</Label>
-              <Input value={email} disabled />
-            </div>
-          ) : null}
+        <form onSubmit={onSubmit} className="grid gap-4">
           <div>
             <Label className="mb-1.5 block">Current password <span className="text-destructive">*</span></Label>
             <Input type="password" value={form.currentPassword} onChange={(event) => set("currentPassword", event.target.value)} required />
@@ -85,7 +74,5 @@ export function ChangePasswordForm({ email }: { email?: string | null }) {
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
   );
 }

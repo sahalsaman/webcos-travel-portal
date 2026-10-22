@@ -332,3 +332,7 @@ export const DEFAULT_SETTINGS = {
   quotationImportantInformation: "",
   quotationOtherInformation: "",
 };
+
+
+
+export const CREDENTIOL_PLATFORM = ["CLOUDINARY", "WHATSAPP_BUSINESS", "PAYMENT_GATEWAY"] as const;

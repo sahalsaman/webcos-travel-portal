@@ -39,6 +39,7 @@ const BookingSchema = new Schema(
     visaFee: { type: Number, default: 0, min: 0 },
     permitFee: { type: Number, default: 0, min: 0 },
     complianceFee: { type: Number, default: 0, min: 0 },
+    activityAmount: { type: Number, default: 0, min: 0 },
     seats: { type: Number, required: true, min: 1 },
     // Optional at schema level so legacy bookings remain editable. All new
     // booking entry points populate these snapshot dates.

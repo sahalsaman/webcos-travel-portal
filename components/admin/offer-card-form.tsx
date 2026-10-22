@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CloudinaryImageGallery } from "@/components/admin/cloudinary-image-urls-field";
 import { COUNTRY_OPTIONS, OFFER_CARD_STATUSES } from "@/lib/constants";
 import type { OfferCardDTO } from "@/types";
 
@@ -42,6 +43,10 @@ export function OfferCardForm({ offer, onSaved, onCancel }: { offer?: OfferCardD
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.image.trim()) {
+      toast.error("Choose a banner image before saving");
+      return;
+    }
     setLoading(true);
 
     const payload = {
@@ -136,11 +141,14 @@ export function OfferCardForm({ offer, onSaved, onCancel }: { offer?: OfferCardD
               Featured banner
             </label>
           </div>
-          <div className="sm:col-span-2">
-            <Label className="mb-1.5 block">Banner image URL <span className="text-destructive">*</span></Label>
-            <Input value={form.image} onChange={(e) => set("image", e.target.value)} placeholder="https://example.com/banner.jpg" required />
-            <p className="mt-1.5 text-xs text-muted-foreground">This image fills the complete slide background.</p>
-          </div>
+          <CloudinaryImageGallery
+            className="sm:col-span-2"
+            label="Banner image *"
+            description="Choose a previously uploaded image or upload a new background image for this slide."
+            images={form.image ? [form.image] : []}
+            onChange={(images) => set("image", images[0] ?? "")}
+            multiple={false}
+          />
           <div className="sm:col-span-2">
             <Label className="mb-1.5 block">Tags (comma separated)</Label>
             <Input value={form.tags} onChange={(e) => set("tags", e.target.value)} placeholder="summer, Dubai, family" />

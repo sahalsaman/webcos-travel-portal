@@ -18,8 +18,7 @@ interface TripCardProps {
   view?: "grid" | "list";
 }
 
-const FALLBACK_IMG =
-  "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=70";
+const FALLBACK_IMG = "/default_image.png";
 
 export function TripCard({ trip, href, priceOverride, priceLabel, view = "grid" }: TripCardProps) {
   const link = href ?? `/packages/${trip.slug}`;

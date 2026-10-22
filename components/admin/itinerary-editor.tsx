@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Binoculars, BusFront, ChevronDown, Clock3, Hotel, Plus, Sparkles, Trash2, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CloudinaryImageGallery } from "@/components/admin/cloudinary-image-urls-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -121,7 +122,7 @@ export function ItineraryEditor({ value, onChange, hotels = [], vehicles = [] }:
 }
 
 function DayHighlightImages({ value, onChange }: { value: ItineraryHighlight[]; onChange: (highlights: ItineraryHighlight[]) => void }) {
-  return <section className="rounded-xl border border-border/70 bg-secondary/20 p-4"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="font-semibold">Highlight images</p><p className="text-xs text-muted-foreground">Add any images that show this day’s experience.</p></div><Button type="button" variant="outline" size="sm" onClick={() => onChange([...value, { image: "" }])}><Plus />Add image</Button></div><div className="space-y-3">{value.map((highlight, index) => <div key={index} className="flex gap-3"><Input type="url" required value={highlight.image} onChange={(event) => onChange(value.map((item, itemIndex) => itemIndex === index ? { image: event.target.value } : item))} placeholder="Image URL" /><Button type="button" variant="ghost" size="icon" onClick={() => onChange(value.filter((_, itemIndex) => itemIndex !== index))}><Trash2 className="size-4 text-destructive" /></Button></div>)}</div></section>;
+  return <section className="rounded-xl border border-border/70 bg-secondary/20 p-4"><CloudinaryImageGallery label="Highlight images" description="Upload the images that show this day’s experience." images={value.map((highlight) => highlight.image).filter(Boolean)} onChange={(images) => onChange(images.map((image) => ({ image })))} /></section>;
 }
 
 function referenceId(value: unknown) {

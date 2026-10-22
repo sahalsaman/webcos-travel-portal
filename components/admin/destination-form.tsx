@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { COUNTRY_OPTIONS, DESTINATION_STATUSES } from "@/lib/constants";
+import { CloudinaryImageUrlsField } from "@/components/admin/cloudinary-image-urls-field";
 import type { DestinationDTO } from "@/types";
 
 function countryValue(country: string, countryCode: string) {
@@ -121,10 +122,7 @@ export function DestinationForm({ destination, onSaved, onCancel }: { destinatio
             <Label className="mb-1.5 block">Description</Label>
             <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} className="min-h-24" />
           </div>
-          <div className="sm:col-span-2">
-            <Label className="mb-1.5 block">Image URLs (one per line)</Label>
-            <Textarea value={form.images} onChange={(e) => set("images", e.target.value)} className="min-h-24 font-mono text-xs" />
-          </div>
+          <CloudinaryImageUrlsField className="sm:col-span-2" value={form.images} onChange={(value) => set("images", value)} />
           <div className="sm:col-span-2">
             <Label className="mb-1.5 block">Tags (comma separated)</Label>
             <Input value={form.tags} onChange={(e) => set("tags", e.target.value)} placeholder="beach, family, luxury" />

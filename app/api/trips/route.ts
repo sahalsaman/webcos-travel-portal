@@ -1,7 +1,8 @@
 import { tenantModel } from "@/lib/tenant-db";
 import { connectDB } from "@/lib/db";
-import { ok, handleError, requireApiRole } from "@/lib/api";
+import { ok, fail, handleError, requireApiRole } from "@/lib/api";
 import { tripSchema } from "@/lib/validations";
+import { CloudinaryUploadError, uploadExternalPackageImages } from "@/lib/cloudinary";
 import { slugify } from "@/lib/utils";
 import "@/models";
 import Trip from "@/models/Trip";
@@ -37,7 +38,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await requireApiRole(["admin"]);
-    const data = tripSchema.parse(await request.json());
+    const body = await request.json();
+    const data = tripSchema.parse({ ...body, images: await uploadExternalPackageImages(body.images ?? []) });
     await connectDB();
 
     const slug = await uniqueTripSlug(data.title);
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
     });
     return ok({ id: String(trip._id), slug }, 201);
   } catch (err) {
+    if (err instanceof CloudinaryUploadError) return fail(err.message, 422);
     return handleError(err);
   }
 }

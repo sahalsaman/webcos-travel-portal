@@ -11,6 +11,7 @@ const ActivitySchema = new Schema({
   description: { type: String, default: "" },
   images: { type: [String], default: [] },
   basePrice: { type: Number, required: true, min: 0 },
+  childPrice: { type: Number, default: 0, min: 0 },
   originalPrice: { type: Number, default: 0, min: 0 },
   duration: { type: String, default: "" },
   highlights: { type: [String], default: [] },

@@ -165,6 +165,7 @@ export const activitySchema = z.object({
   description: z.string().default(""),
   images: z.array(z.string()).default([]),
   basePrice: z.number().nonnegative(),
+  childPrice: z.number().nonnegative().default(0),
   originalPrice: z.number().nonnegative().default(0),
   duration: z.string().default(""),
   highlights: z.array(z.string()).default([]),
@@ -429,6 +430,7 @@ export const bookingSchema = z.object({
   partnerSlug: z.string().optional(),
   bookingMode: z.enum(["online", "offline"]).default("online"),
   seats: z.number().int().positive().max(50),
+  activityAmount: z.number().nonnegative().default(0),
   travelStartDate: z.string().trim().optional().or(z.literal("")),
   travelEndDate: z.string().trim().optional().or(z.literal("")),
   travelerDetails: z.object({

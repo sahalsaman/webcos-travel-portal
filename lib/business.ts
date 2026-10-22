@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import mongoose, { Schema } from "mongoose";
 import { configuredPlatformDatabase, connectDB } from "@/lib/db";
 import { getToken } from "next-auth/jwt";
+import { CREDENTIOL_PLATFORM } from "@/lib/constants";
 
 const businessSchema = new Schema({
   name: { type: String, required: true },
@@ -12,6 +13,13 @@ const businessSchema = new Schema({
   siteUrl: { type: String, required: true },
   logoUrl: { type: String, default: "" },
   primaryColor: { type: String, default: "#0060e6" },
+  credentials: [{
+    platform: { type: String, enum: CREDENTIOL_PLATFORM, required: true },
+    name: { type: String, trim: true, default: "" },
+    apikey: { type: String, trim: true, default: "" },
+    secretKey: { type: String, trim: true, default: "" },
+    url: { type: String, trim: true, default: "" },
+  }],
   provisioned: { type: Boolean, default: false },
   status: { type: String, enum: ["active", "suspended"], default: "active" },
 }, { timestamps: true });
@@ -20,7 +28,10 @@ export interface BusinessRecord {
   _id: mongoose.Types.ObjectId;
   name: string; slug: string; databaseName: string; hosts: string[];
   siteUrl: string; logoUrl: string; primaryColor: string; status: string;
+  credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "PAYMENT_GATEWAY"; name?: string; apikey?: string; secretKey?: string; url?: string }>;
 }
+
+export type BusinessCredential = NonNullable<BusinessRecord["credentials"]>[number];
 
 /** Local portal logos uploaded by the platform team. */
 const uploadedVendorLogos: Record<string, string> = {
@@ -29,7 +40,9 @@ const uploadedVendorLogos: Record<string, string> = {
 };
 
 function brandLogoFor(business: BusinessRecord) {
-  return uploadedVendorLogos[business.slug] || business.logoUrl;
+  // A vendor-uploaded logo is an intentional branding choice. The bundled
+  // logo remains only as a fallback for businesses that have not set one.
+  return business.logoUrl || uploadedVendorLogos[business.slug];
 }
 export async function businessModel() {
   await connectDB();
@@ -50,6 +63,15 @@ export const getBusiness = cache(async (): Promise<BusinessRecord> => {
   if (!business) throw new Error("Unknown or suspended business. Use your agency's portal address.");
   return business as unknown as BusinessRecord;
 });
+
+/** Credentials are read from the registry directly so hot-reloaded schemas never hide them. */
+export async function getBusinessCredentials(business?: BusinessRecord): Promise<BusinessCredential[]> {
+  const current = business ?? await getBusiness();
+  await connectDB();
+  const db = mongoose.connection.useDb(configuredPlatformDatabase(), { useCache: true });
+  const record = await db.collection("businesses").findOne({ _id: current._id }, { projection: { credentials: 1 } });
+  return (record?.credentials ?? current.credentials ?? []) as BusinessCredential[];
+}
 export async function getBrand() {
   const b = await getBusiness();
   return { name: b.name, logoUrl: brandLogoFor(b), primaryColor: b.primaryColor, siteUrl: b.siteUrl };
