@@ -266,6 +266,7 @@ export interface InventoryAssetDTO {
   supplier: SupplierDTO | string;
   kind: "hotel" | "vehicle";
   name: string;
+  vehicleType?: string;
   image: string;
   description: string;
   directHotelBooking?: boolean;
@@ -288,6 +289,7 @@ export interface VehicleDTO {
   _id: string;
   supplier: SupplierDTO | string;
   name: string;
+  vehicleType: string;
   image: string;
   description: string;
   facilities: string[];

@@ -24,8 +24,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
-        const isVoibeeSiteLogin = (await headers()).get("x-portal-client") === "voibee-site";
-        const siteLoginBlocked = (role: string) => isVoibeeSiteLogin && portalOnlyRoles.has(role);
+        const isTenantWebsiteLogin = (await headers()).get("x-portal-client") === "tenant-website";
+        const siteLoginBlocked = (role: string) => isTenantWebsiteLogin && portalOnlyRoles.has(role);
 
         // Resolve the request host first. The same email may exist as a
         // platform admin and as an agency owner; the portal host decides which

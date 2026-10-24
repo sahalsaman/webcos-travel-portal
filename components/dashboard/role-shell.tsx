@@ -45,7 +45,7 @@ const NAVS: Record<string, { label: string; items: NavItem[] }> = {
         { href: "/admin/inventory/destinations", label: "Destinations", icon: Compass },
         { href: "/admin/inventory/activities", label: "Activities", icon: Star },
         { href: "/admin/inventory/hotels", label: "Hotels", icon: CalendarCheck },
-        { href: "/admin/inventory/vehicles", label: "Vehicles", icon: CalendarCheck },
+        { href: "/admin/inventory/vehicles", label: "Transportation", icon: CalendarCheck },
       ] },
       { href: "/admin/hrm", label: "HRM", icon: BriefcaseBusiness, accessKey: "hrm", children: [
         { href: "/admin/hrm", label: "Dashboard", icon: LayoutDashboard, exact: true },

@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ============================================================
-   Design tokens — Voibee
+   Design tokens — Travel Portal
    Blue primary + cyan accent. Premium travel aesthetic.
    ============================================================ */
 :root {
@@ -197,4 +197,20 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Keep the AI package editor centered and use the same broad field layout as
+   the manual package form on laptop and desktop screens. */
+div[role="dialog"][aria-label="Edit AI generated package"] {
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  div[role="dialog"][aria-label="Edit AI generated package"] .overflow-y-auto > .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  div[role="dialog"][aria-label="Edit AI generated package"] .sm\:col-span-2 {
+    grid-column: span 3 / span 3;
+  }
 }

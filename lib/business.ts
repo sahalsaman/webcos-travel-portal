@@ -11,6 +11,7 @@ const businessSchema = new Schema({
   databaseName: { type: String, required: true, unique: true },
   hosts: { type: [String], required: true, unique: true },
   siteUrl: { type: String, required: true },
+  address: { type: String, default: "" },
   logoUrl: { type: String, default: "" },
   primaryColor: { type: String, default: "#0060e6" },
   credentials: [{
@@ -27,22 +28,14 @@ const businessSchema = new Schema({
 export interface BusinessRecord {
   _id: mongoose.Types.ObjectId;
   name: string; slug: string; databaseName: string; hosts: string[];
-  siteUrl: string; logoUrl: string; primaryColor: string; status: string;
-  credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "PAYMENT_GATEWAY"; name?: string; apikey?: string; secretKey?: string; url?: string }>;
+  siteUrl: string; address?: string; logoUrl: string; primaryColor: string; status: string;
+  credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "PAYMENT_GATEWAY" | "FLIGHT_API"; name?: string; apikey?: string; secretKey?: string; url?: string }>;
 }
 
 export type BusinessCredential = NonNullable<BusinessRecord["credentials"]>[number];
 
-/** Local portal logos uploaded by the platform team. */
-const uploadedVendorLogos: Record<string, string> = {
-  voibee: "/vendor_logos/voibee_holidays.png",
-  testtravels: "/vendor_logos/test_holidays.png",
-};
-
 function brandLogoFor(business: BusinessRecord) {
-  // A vendor-uploaded logo is an intentional branding choice. The bundled
-  // logo remains only as a fallback for businesses that have not set one.
-  return business.logoUrl || uploadedVendorLogos[business.slug];
+  return business.logoUrl;
 }
 export async function businessModel() {
   await connectDB();

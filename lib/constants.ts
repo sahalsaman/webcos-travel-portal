@@ -228,14 +228,14 @@ export const PACKAGE_INCLUSION_OPTIONS = [
   "🍛 Lunch",
   "🍽️ Dinner",
   "🌿 Sightseeing as per itinerary",
-  "🎯 Voibee Ice-Breaking Activities",
+  "🎯 Ice-Breaking Activities",
   "🤝 Stranger-to-Friends Social Games",
   "🏆 Team Challenges & Fun Activities",
   "🔥 Campfire Evening subject to resort/weather conditions",
   "🎤 Antakshari / Open Mic / Group Activities",
   "📸 Group Photography & Trip Moments",
   "🎥 Reel & Photo Challenges",
-  "🏅 Voibee Team Awards",
+  "🏅 Team Awards",
   "☕ Chai & Conversations Session",
   "🧑‍💼 Professional Trip Coordinator",
   "🩹 Basic First-Aid Support",
@@ -258,7 +258,7 @@ export const PACKAGE_EXCLUSION_OPTIONS = [
   "Personal photography/videography expenses",
   "Travel insurance",
   "Medical expenses and personal medication",
-  "Any expenses arising due to weather, roadblocks, natural calamities or other circumstances beyond Voibee’s control",
+  "Any expenses arising due to weather, roadblocks, natural calamities or other circumstances beyond the operator’s control",
   "Any additional transportation required due to personal reasons",
   "Anything not specifically mentioned under “Package Inclusions”",
 ] as const;
@@ -335,4 +335,4 @@ export const DEFAULT_SETTINGS = {
 
 
 
-export const CREDENTIOL_PLATFORM = ["CLOUDINARY", "WHATSAPP_BUSINESS", "PAYMENT_GATEWAY"] as const;
+export const CREDENTIOL_PLATFORM = ["CLOUDINARY", "WHATSAPP_BUSINESS", "PAYMENT_GATEWAY", "FLIGHT_API"] as const;

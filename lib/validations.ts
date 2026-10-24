@@ -290,6 +290,7 @@ export const inventoryAssetSchema = z.object({
   supplier: z.string().trim().min(1),
   kind: z.enum(["hotel", "vehicle"]),
   name: z.string().trim().min(2),
+  vehicleType: z.string().trim().default(""),
   image: z.string().trim().default(""),
   description: z.string().trim().default(""),
   directHotelBooking: z.boolean().default(false),

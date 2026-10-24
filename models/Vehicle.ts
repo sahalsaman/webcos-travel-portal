@@ -3,7 +3,7 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 const VehicleSchema = new Schema({
   supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true, index: true },
   name: { type: String, required: true, trim: true },
-  image: { type: String, default: "" },
+  vehicleType: { type: String, default: "", trim: true },
   description: { type: String, default: "", trim: true },
   facilities: { type: [String], default: [] },
 }, { timestamps: true });

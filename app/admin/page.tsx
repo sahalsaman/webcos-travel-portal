@@ -59,12 +59,7 @@ export default async function AdminDashboard() {
         <StatCard label="ORM Attention" value={reputation.unresolved} icon={MessageSquareWarning} accent="accent" hint={`${reputation.negative} negative open`} />
       </div>
 
-      <Card><CardHeader><CardTitle>Operations workspace</CardTitle></CardHeader><CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{[
-        { href: "/admin/lms", label: "Leads & quotations", description: "Follow enquiries and prepare offers", icon: ContactRound },
-        { href: "/admin/inventory", label: "Inventory", description: "Manage itineraries and suppliers", icon: Boxes },
-        { href: "/admin/finance", label: "Finance", description: "Review earnings, expenses and invoices", icon: Wallet },
-        { href: "/admin/reputation", label: "Reputation", description: "Respond to reviews and escalations", icon: Star },
-      ].map((item) => <Link key={item.href} href={item.href} className="rounded-xl border border-border p-4 transition-colors hover:bg-secondary/50"><item.icon className="mb-3 size-5 text-primary"/><p className="font-semibold">{item.label}</p><p className="mt-1 text-xs text-muted-foreground">{item.description}</p></Link>)}</CardContent></Card>
+   
 
       <div className="grid gap-6 lg:grid-cols-2">
         <AreaTrendChart title="Booking Trends" data={charts.trend} xKey="month" yKey="bookings" />

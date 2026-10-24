@@ -10,7 +10,7 @@ import {
   type CurrencyRates,
 } from "@/lib/currency";
 
-const STORAGE_KEY = "voibee-currency";
+const STORAGE_KEY = "travel-portal-currency";
 
 type CurrencyContextValue = {
   currency: CurrencyCode;

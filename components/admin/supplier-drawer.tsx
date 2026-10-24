@@ -13,7 +13,7 @@ export function SupplierDrawer({ supplier, defaultType, supplierOptions, require
   const [selectedId, setSelectedId] = useState(supplier?._id ?? "");
   const editing = Boolean(supplier);
   const selectedSupplier = supplier ?? supplierOptions?.find((item) => item._id === selectedId);
-  const inventoryLabel = defaultType === "Hotel" ? "Hotel" : defaultType === "Transport" ? "Vehicle" : "Supplier";
+  const inventoryLabel = defaultType === "Hotel" ? "Hotel" : defaultType === "Transport" ? "Transportation" : "Supplier";
 
   return (
     <>

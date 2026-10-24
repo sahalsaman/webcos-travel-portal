@@ -6,9 +6,7 @@ import { getBusiness } from "@/lib/business";
 export async function paymentConfig() {
   const business = await getBusiness();
   const all = JSON.parse(process.env.BUSINESS_PAYMENT_CREDENTIALS || "{}") as Record<string, { keyId?: string; keySecret?: string }>;
-  const credentials = all[business.slug] || (business.slug === "voibee"
-    ? { keyId: process.env.RAZORPAY_KEY_ID, keySecret: process.env.RAZORPAY_KEY_SECRET }
-    : {});
+  const credentials = all[business.slug] || {};
   return { ...credentials, configured: Boolean(credentials.keyId && credentials.keySecret) };
 }
 export async function getRazorpay() {
