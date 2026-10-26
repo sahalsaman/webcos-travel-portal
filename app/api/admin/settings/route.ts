@@ -30,6 +30,8 @@ export async function PATCH(request: Request) {
       "quotationPolicy",
       "quotationImportantInformation",
       "quotationOtherInformation",
+      "quotationTheme",
+      "quotationColor",
     ] as const;
     const update: Record<string, unknown> = {};
     for (const k of allowed) {

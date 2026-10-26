@@ -9,6 +9,8 @@ const businessSchema = z.object({
   name: z.string().trim().min(2, "Business name must be at least 2 characters").max(120),
   siteUrl: z.url("Enter a valid website URL").max(500),
   address: z.string().trim().max(500).default(""),
+  email: z.union([z.literal(""), z.email("Enter a valid email address")]).default(""),
+  phone: z.string().trim().max(40).default(""),
   logoUrl: z.union([z.literal(""), z.url("Choose a valid logo image")]).default(""),
 });
 
@@ -23,7 +25,7 @@ export async function PATCH(request: Request) {
     const result = await db.collection("businesses").findOneAndUpdate(
       { _id: business._id },
       { $set: { ...data, updatedAt: new Date() } },
-      { returnDocument: "after", projection: { name: 1, slug: 1, siteUrl: 1, address: 1, logoUrl: 1, status: 1 } },
+      { returnDocument: "after", projection: { name: 1, slug: 1, siteUrl: 1, address: 1, email: 1, phone: 1, logoUrl: 1, status: 1 } },
     );
     if (!result) return fail("Business not found", 404);
     if (previous) await removeUnusedCloudinaryImages(collectCloudinaryUrls(previous));

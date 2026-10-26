@@ -1,5 +1,6 @@
 import { fail, handleError, ok, requireApiRole } from "@/lib/api";
 import { CLIMATE_OPTIONS, PACKAGE_SERVICES, type PackageService } from "@/lib/constants";
+import { getBusinessCredentials } from "@/lib/business";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const supportedTypes = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
@@ -63,8 +64,9 @@ function normalize(data: Record<string, unknown>) {
 export async function POST(request: Request) {
   try {
     await requireApiRole(["admin"]);
-    const key = process.env.GEMINI_API_KEY?.trim();
-    if (!key) return fail("GEMINI_API_KEY is not configured on the server", 503);
+    const gemini = (await getBusinessCredentials()).find((credential) => credential.platform === "GEMINI_AI");
+    const key = gemini?.apikey?.trim();
+    if (!key) return fail("Add your Gemini AI API key in Settings → Integrations before generating a package", 503);
     const form = await request.formData();
     const file = form.get("file");
     const promptInput = form.get("prompt");

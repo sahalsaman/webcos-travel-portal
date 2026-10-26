@@ -4,7 +4,7 @@ import {
   SUPPORTED_CURRENCIES,
   type CurrencyCode,
   type CurrencyRates,
-} from "@/lib/currency";
+} from "@/lib/country_currency";
 
 export const revalidate = 21_600;
 

@@ -92,6 +92,8 @@ export default async function AdminSettingsPage({
           quotationPolicy: settings.quotationPolicy,
           quotationImportantInformation: settings.quotationImportantInformation,
           quotationOtherInformation: settings.quotationOtherInformation,
+          quotationTheme: settings.quotationTheme,
+          quotationColor: settings.quotationColor,
         }} />
       ) : null}
 

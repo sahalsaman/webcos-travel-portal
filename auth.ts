@@ -13,6 +13,7 @@ import Employee from "@/models/Employee";
 import mongoose from "mongoose";
 import { businessModel } from "@/lib/business";
 import { headers } from "next/headers";
+import { normaliseMobile, verifyPhoneOtp } from "@/lib/phone-otp";
 
 const portalOnlyRoles = new Set(["admin", "vendor", "vendor_employee", "employee"]);
 
@@ -20,8 +21,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      credentials: { email: {}, password: {} },
+      credentials: { email: {}, password: {}, mobile: {}, otp: {} },
       async authorize(credentials) {
+        const requestedMobile = typeof credentials?.mobile === "string" ? credentials.mobile : "";
+        const requestedOtp = typeof credentials?.otp === "string" ? credentials.otp : "";
+        if (requestedMobile && requestedOtp) {
+          try {
+            const mobile = normaliseMobile(requestedMobile);
+            if (!await verifyPhoneOtp(mobile, requestedOtp)) return null;
+            const business = await getBusiness();
+            await connectDB();
+            const legacyIndianMobile = mobile.startsWith("+91") ? mobile.slice(3) : "";
+            const user = await (await tenantModel(User)).findOne({ mobile: { $in: [mobile, legacyIndianMobile].filter(Boolean) } }).lean<{ _id: unknown; name: string; email: string; role: string; image?: string }>();
+            if (!user || !["traveler", "vendor_traveler"].includes(user.role)) return null;
+            return { id: String(user._id), businessId: String(business._id), name: user.name, email: user.email, image: user.image, role: user.role };
+          } catch {
+            return null;
+          }
+        }
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
         const isTenantWebsiteLogin = (await headers()).get("x-portal-client") === "tenant-website";

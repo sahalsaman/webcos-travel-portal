@@ -15,6 +15,8 @@ const SettingsSchema = new Schema(
     quotationPolicy: { type: String, default: DEFAULT_SETTINGS.quotationPolicy, trim: true },
     quotationImportantInformation: { type: String, default: DEFAULT_SETTINGS.quotationImportantInformation, trim: true },
     quotationOtherInformation: { type: String, default: DEFAULT_SETTINGS.quotationOtherInformation, trim: true },
+    quotationTheme: { type: String, default: DEFAULT_SETTINGS.quotationTheme, trim: true },
+    quotationColor: { type: String, default: DEFAULT_SETTINGS.quotationColor, trim: true },
   },
   { timestamps: true },
 );

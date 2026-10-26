@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PhoneNumberField } from "@/components/ui/phone-number-field";
 import { ADMIN_PORTAL_PAGES, EMPLOYEE_STATUSES, suggestedEmployeePortalPages, type AdminPortalPageKey } from "@/lib/constants";
 import type { EmployeeDTO } from "@/types";
 
@@ -109,10 +110,7 @@ export function EmployeeForm({ employee, onSaved, onCancel }: { employee?: Emplo
             <Label className="mb-1.5 block">Email <RequiredMark /></Label>
             <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} required />
           </div>
-          <div>
-            <Label className="mb-1.5 block">Mobile</Label>
-            <Input value={form.mobile} onChange={(e) => set("mobile", e.target.value)} />
-          </div>
+          <PhoneNumberField label="Mobile" value={form.mobile} onValueChange={(mobile) => set("mobile", mobile)} />
           <div>
             <Label className="mb-1.5 block">Designation <RequiredMark /></Label>
             <Input value={form.designation} onChange={(e) => set("designation", e.target.value)} onBlur={onDesignationBlur} required />

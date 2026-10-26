@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { PhoneNumberField } from "@/components/ui/phone-number-field";
 import { Textarea } from "@/components/ui/textarea";
 import { COUNTRY_OPTIONS, SUPPLIER_STATUSES, SUPPLIER_TYPES } from "@/lib/constants";
 import type { SupplierDTO } from "@/types";
@@ -97,10 +98,7 @@ export function SupplierForm({
             <Label className="mb-1.5 block">Email</Label>
             <Input type="email" value={form.email} onChange={(event) => set("email", event.target.value)} />
           </div>
-          <div>
-            <Label className="mb-1.5 block">Phone <span className="text-destructive">*</span></Label>
-            <Input value={form.phone} onChange={(event) => set("phone", event.target.value)} required />
-          </div>
+          <PhoneNumberField label="Phone" value={form.phone} onValueChange={(phone) => set("phone", phone)} required />
           <div>
             <Label className="mb-1.5 block">Country <span className="text-destructive">*</span></Label>
             <Select value={countryValue(form.country, form.countryCode)} onChange={(event) => onCountryChange(event.target.value)}>

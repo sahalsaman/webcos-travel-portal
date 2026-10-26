@@ -8,7 +8,7 @@ import {
   isCurrencyCode,
   type CurrencyCode,
   type CurrencyRates,
-} from "@/lib/currency";
+} from "@/lib/country_currency";
 
 const STORAGE_KEY = "travel-portal-currency";
 
