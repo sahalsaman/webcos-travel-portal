@@ -1,2 +1,2 @@
 import { redirect } from "next/navigation";
-export default function UsersPage() { redirect("/users/customers"); }
+export default function UsersPage() { redirect("/tenant/users/customers"); }

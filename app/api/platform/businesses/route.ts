@@ -21,15 +21,11 @@ export async function GET() {
   try {
     await requireSuperAdmin();
     const model = await businessModel();
-    const businesses = await model.find().sort({ createdAt: -1 }).lean();
-    const data = await Promise.all(businesses.map(async (business) => {
-      const db = mongoose.connection.useDb(business.databaseName, { useCache: true });
-      const users = db.models.User || db.model("User", User.schema);
-      const owner = await users.findOne({ role: "tenant", businessId: business._id }).select("name email").lean();
-      const { databaseName: _databaseName, ...safeBusiness } = business;
-      return { ...safeBusiness, owner: owner ? { name: owner.name, email: owner.email } : undefined };
-    }));
-    return ok(data);
+    const businesses = await model.find().select("-databaseName").sort({ createdAt: -1 }).lean();
+    return ok(businesses.map((business) => ({
+      ...business,
+      owner: business.ownerName || business.email ? { name: business.ownerName || "Tenant owner", email: business.email } : undefined,
+    })));
   }
   catch (e) { return handleError(e); }
 }
@@ -43,7 +39,7 @@ export async function POST(request: Request) {
     const selectedPlan = SUBSCRIPTION_PLANS.find((plan) => plan.plan === input.plan)!;
     const setupFee = input.setupFee ?? selectedPlan.setupFee;
     const setupPaidAmount = Math.min(input.setupPaidAmount ?? 0, setupFee);
-    const business = await model.create({ name: input.name, slug: input.slug, databaseName: `agency_${new mongoose.Types.ObjectId()}`, hosts: [input.host], siteUrl: input.siteUrl, logoUrl: input.logoUrl, primaryColor: input.primaryColor, status: "suspended", subscription: { plan: selectedPlan.plan, status: "trial", amount: input.monthlyAmount ?? selectedPlan.price, setupFee, setupPaidAmount, setupPaidAt: setupPaidAmount ? new Date() : null, currency: "INR", renewsAt: null } });
+    const business = await model.create({ name: input.name, slug: input.slug, databaseName: `agency_${new mongoose.Types.ObjectId()}`, hosts: [input.host], siteUrl: input.siteUrl, ownerName: input.adminName, email: input.adminEmail, logoUrl: input.logoUrl, primaryColor: input.primaryColor, status: "suspended", subscription: { plan: selectedPlan.plan, status: "trial", amount: input.monthlyAmount ?? selectedPlan.price, setupFee, setupPaidAmount, setupPaidAt: setupPaidAmount ? new Date() : null, currency: "INR", renewsAt: null } });
     const db = mongoose.connection.useDb(business.databaseName, { useCache: true });
     const users = db.model("User", User.schema);
     await users.init();
@@ -116,6 +112,8 @@ export async function PATCH(request: Request) {
     if (input.slug) update.slug = input.slug;
     if (input.host) update.hosts = [input.host];
     if (input.siteUrl) update.siteUrl = input.siteUrl;
+    if (input.adminName) update.ownerName = input.adminName;
+    if (input.adminEmail) update.email = input.adminEmail;
     if (input.primaryColor) update.primaryColor = input.primaryColor;
     if (input.status) update.status = input.status;
     if (input.subscription) {

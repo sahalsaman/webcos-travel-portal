@@ -6,8 +6,14 @@ export async function tenantModel<T extends Model<unknown>>(template: T): Promis
   const business = await getBusiness();
   await import("@/models");
   const connection = mongoose.connection.useDb(business.databaseName, { useCache: true });
-  for (const [name, model] of Object.entries(mongoose.models)) {
-    if (!connection.models[name]) connection.model(name, model.schema);
-  }
-  return connection.model(template.modelName) as T;
+  const modelName = template.modelName;
+  const existing = connection.models[modelName];
+  if (existing) return existing as T;
+
+  // Register only the model requested for this query. Previously every query
+  // copied every schema into the tenant connection, multiplying dashboard
+  // latency as the application gained more models.
+  const sharedModel = mongoose.models[modelName];
+  if (!sharedModel) throw new Error(`Model ${modelName} is not registered`);
+  return connection.model(modelName, sharedModel.schema) as T;
 }

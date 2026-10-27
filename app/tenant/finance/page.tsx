@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function FinancePage() {
-  redirect("/finance/dashboard");
+  redirect("/tenant/finance/dashboard");
 }

@@ -237,7 +237,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message || "Save failed");
       toast.success(editing ? "Package updated" : "Package created");
-      router.push("/inventory/packages");
+      router.push("/tenant/inventory/packages");
       router.refresh();
     } catch (err) {
       toast.error((err as Error).message);

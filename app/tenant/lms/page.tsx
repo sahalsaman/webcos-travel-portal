@@ -1,2 +1,2 @@
 import { redirect } from "next/navigation";
-export default function LmsPage() { redirect("/lms/bookings"); }
+export default function LmsPage() { redirect("/tenant/lms/bookings"); }

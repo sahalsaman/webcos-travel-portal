@@ -12,6 +12,7 @@ const businessSchema = new Schema({
   hosts: { type: [String], required: true, unique: true },
   siteUrl: { type: String, required: true },
   address: { type: String, default: "" },
+  ownerName: { type: String, default: "", trim: true },
   email: { type: String, default: "", trim: true, lowercase: true },
   phone: { type: String, default: "", trim: true },
   logoUrl: { type: String, default: "" },
@@ -40,7 +41,7 @@ const businessSchema = new Schema({
 export interface BusinessRecord {
   _id: mongoose.Types.ObjectId;
   name: string; slug: string; databaseName: string; hosts: string[];
-  siteUrl: string; address?: string; email?: string; phone?: string; logoUrl: string; primaryColor: string; status: string;
+  siteUrl: string; address?: string; ownerName?: string; email?: string; phone?: string; logoUrl: string; primaryColor: string; status: string;
   subscription?: { plan: string; status: "trial" | "active" | "past_due" | "cancelled"; amount: number; setupFee?: number; setupPaidAmount?: number; setupPaidAt?: Date | null; currency: string; renewsAt?: Date | null };
   credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "PAYMENT_GATEWAY" | "FLIGHT_API" | "GEMINI_AI"; name?: string; apikey?: string; secretKey?: string; url?: string }>;
 }

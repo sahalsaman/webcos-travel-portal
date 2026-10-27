@@ -20,7 +20,7 @@ import type { AttendanceDTO, EmployeeDTO, HrTaskDTO, LeaveRequestDTO, PayrollDTO
 
 export default async function EmployeeDetailPage({ params }: { params:Promise<{id:string}> }) {
   const access=await getHrmAccess();
-  if(!access.canManage) redirect("/hrm/employees");
+  if(!access.canManage) redirect("/tenant/hrm/employees");
   const {id}=await params;
   if(!isValidObjectId(id)) notFound();
   await connectDB();

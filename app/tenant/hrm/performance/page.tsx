@@ -10,7 +10,7 @@ import { getHrmAccess } from "@/lib/hr-access";
 import type { EmployeeDTO, PerformanceReviewDTO } from "@/types";
 
 export default async function Page({searchParams}:{searchParams:Promise<{search?:string}>}) {
-  const access=await getHrmAccess(); if(!access.canManage)redirect("/hrm");
+  const access=await getHrmAccess(); if(!access.canManage)redirect("/tenant/hrm");
   const[allRecords,employees,{search=""}]=await Promise.all([listTenantPerformanceReviews() as Promise<PerformanceReviewDTO[]>,listTenantEmployees() as Promise<EmployeeDTO[]>,searchParams]);
   const query=search.toLowerCase();
   const records=allRecords.filter((record)=>{const employee=typeof record.employee==="string"?"":`${record.employee.name} ${record.employee.email}`;return!query||`${employee} ${record.period} ${record.reviewer} ${record.feedback} ${record.goals} ${record.achievements}`.toLowerCase().includes(query)});
