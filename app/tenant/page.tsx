@@ -8,9 +8,6 @@ import {
   UserCircle,
   Star,
   MessageSquareWarning,
-  ContactRound,
-  Boxes,
-  Wallet,
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { AreaTrendChart, BarRankChart } from "@/components/dashboard/charts";

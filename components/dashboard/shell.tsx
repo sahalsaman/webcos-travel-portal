@@ -8,7 +8,6 @@ import { ChevronDown, Menu, X, LogOut, ExternalLink, type LucideIcon } from "luc
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useBusinessBrand } from "@/components/business-brand";
@@ -25,12 +24,10 @@ export interface NavItem {
 
 export function DashboardShell({
   nav,
-  roleLabel,
   user,
   children,
 }: {
   nav: NavItem[];
-  roleLabel: string;
   user: { name?: string | null; email?: string | null; image?: string | null };
   children: React.ReactNode;
 }) {
@@ -46,9 +43,6 @@ export function DashboardShell({
       <Link href="/tenant" className="flex h-20 items-center px-5 font-bold text-lg">
           {brand.logoUrl ? <Image src={brand.logoUrl} alt={brand.name} width={192} height={56} unoptimized className="h-14 w-48 max-w-full object-contain object-left" /> : <span>{brand.name}</span>}
       </Link>
-      {/* <div className="px-5 pb-3">
-        <Badge variant="secondary">{roleLabel}</Badge>
-      </div> */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
         {nav.map((item) => (
           item.children?.length ? <NavigationGroup key={item.href} item={item} pathname={pathname} onNavigate={() => setOpen(false)} /> : <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors", isActive(item) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}><item.icon className="size-5" />{item.label}</Link>

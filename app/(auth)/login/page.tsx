@@ -6,7 +6,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,7 @@ function LoginForm() {
   const params = useSearchParams();
   const callbackUrl = params.get("callbackUrl");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -61,7 +62,12 @@ function LoginForm() {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
-          <Input id="password" type="password" placeholder="••••••••" required {...register("password")} />
+          <div className="relative">
+            <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" required className="pr-11" {...register("password")} />
+            <button type="button" onClick={() => setShowPassword((current) => !current)} className="absolute inset-y-0 right-0 px-3 text-muted-foreground hover:text-foreground" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword}>
+              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
           {errors.password ? (
             <p className="text-xs text-destructive">{errors.password.message}</p>
           ) : null}

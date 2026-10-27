@@ -29,6 +29,9 @@ const businessSchema = new Schema({
     plan: { type: String, default: "Starter" },
     status: { type: String, enum: ["trial", "active", "past_due", "cancelled"], default: "trial" },
     amount: { type: Number, default: 0, min: 0 },
+    setupFee: { type: Number, default: 0, min: 0 },
+    setupPaidAmount: { type: Number, default: 0, min: 0 },
+    setupPaidAt: { type: Date, default: null },
     currency: { type: String, default: "INR" },
     renewsAt: { type: Date, default: null },
   },
@@ -38,7 +41,7 @@ export interface BusinessRecord {
   _id: mongoose.Types.ObjectId;
   name: string; slug: string; databaseName: string; hosts: string[];
   siteUrl: string; address?: string; email?: string; phone?: string; logoUrl: string; primaryColor: string; status: string;
-  subscription?: { plan: string; status: "trial" | "active" | "past_due" | "cancelled"; amount: number; currency: string; renewsAt?: Date | null };
+  subscription?: { plan: string; status: "trial" | "active" | "past_due" | "cancelled"; amount: number; setupFee?: number; setupPaidAmount?: number; setupPaidAt?: Date | null; currency: string; renewsAt?: Date | null };
   credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "PAYMENT_GATEWAY" | "FLIGHT_API" | "GEMINI_AI"; name?: string; apikey?: string; secretKey?: string; url?: string }>;
 }
 

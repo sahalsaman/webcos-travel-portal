@@ -12,11 +12,11 @@ import { Building2, CircleHelp, CreditCard, LayoutDashboard, LogOut, Menu, X } f
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/tenants", label: "Tenants", icon: Building2 },
-  { href: "/admin/payments", label: "Payments", icon: CreditCard },
+  { href: "/admin/invoices", label: "Invoices", icon: CreditCard },
   { href: "/admin/support", label: "Support tickets", icon: CircleHelp },
 ];
 
-export function PlatformAdminShell({ children, user }: { children: React.ReactNode; user: { name?: string | null; email?: string | null; image?: string | null } }) {
+export function AdminShell({ children, user }: { children: React.ReactNode; user: { name?: string | null; email?: string | null; image?: string | null } }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const sidebar = <div className="flex h-full flex-col"><Link href="/admin" className="flex h-20 items-center px-5"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-sky-300">Travel Portal</p><p className="mt-1 text-lg font-semibold text-white">Platform Admin</p></div></Link><nav className="flex-1 space-y-1 px-3">{links.map(({ href, label, icon: Icon, exact }) => { const active = exact ? pathname === href : pathname.startsWith(href); return <Link key={href} href={href} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active ? "bg-primary text-white shadow-lg" : "text-slate-300 hover:bg-white/10 hover:text-white"}`}><Icon className="size-5" />{label}</Link>; })}</nav><div className="border-t border-white/10 p-3"><button onClick={() => signOut({ callbackUrl: "/login" })} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 hover:bg-white/10 hover:text-white"><LogOut className="size-4" />Sign out</button></div></div>;

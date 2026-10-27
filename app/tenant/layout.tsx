@@ -9,13 +9,12 @@ export default async function TenantLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, accessPages, designation } = await requireTenantPortalAccess();
+  const { user, accessPages } = await requireTenantPortalAccess();
   const role = user.role === "tenant_employee" ? "tenant_employee" : "tenant";
   return (
     <BusinessBrand brand={await getBrand()}><RoleShell
       role={role}
       accessPages={accessPages}
-      roleLabel={role === "tenant_employee" ? designation || "Tenant employee" : "Tenant"}
       user={{ name: user.name, email: user.email, image: user.image }}
     >
       {children}

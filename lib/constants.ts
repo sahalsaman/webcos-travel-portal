@@ -321,3 +321,42 @@ export const DEFAULT_SETTINGS = {
 
 
 export const CREDENTIOL_PLATFORM = ["CLOUDINARY", "WHATSAPP_BUSINESS", "PAYMENT_GATEWAY", "FLIGHT_API", "GEMINI_AI"] as const;
+
+
+export const SUBSCRIPTION_PLANS = [{
+  plan: "basic",
+  label: "Basic",
+  description: "For small businesses and startups",
+  price: 999,
+  setupFee: 10000,
+  features: [
+    "Up to 10 employees",
+    "Basic support",
+    "Limited access to features",
+  ],
+}, {
+  plan: "standard",
+  label: "Standard",
+  description: "For growing businesses and teams",
+  price: 2899,
+  setupFee: 25000,
+  features: [
+    "Up to 50 employees",
+    "Priority support",
+    "Access to all features",
+    "Advanced analytics and reporting",
+  ],
+}, {
+  plan: "premium",
+  label: "Premium",
+  description: "For large businesses and enterprises",
+  price: 4799,
+  setupFee: 50000,
+  features: [
+    "Unlimited employees",
+    "24/7 dedicated support",
+    "Access to all features and integrations",
+    "Customizable workflows and automation",
+    "Advanced security and compliance features",
+  ],
+}] as const; 

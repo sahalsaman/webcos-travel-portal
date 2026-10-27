@@ -93,13 +93,11 @@ export function RoleShell({
   user,
   children,
   accessPages,
-  roleLabel,
 }: {
   role: "tenant" | "tenant_employee" | "tenant_partner" | "tenant_traveler";
   user: { name?: string | null; email?: string | null; image?: string | null };
   children: React.ReactNode;
   accessPages?: TenantPortalPageKey[];
-  roleLabel?: string;
 }) {
   const cfg = role === "tenant_employee" ? NAVS.tenant : NAVS[role];
   const allowed = accessPages ? new Set(accessPages) : null;
@@ -108,7 +106,7 @@ export function RoleShell({
     : cfg.items;
 
   return (
-    <DashboardShell nav={items} roleLabel={roleLabel || cfg.label} user={user}>
+    <DashboardShell nav={items} user={user}>
       {children}
     </DashboardShell>
   );

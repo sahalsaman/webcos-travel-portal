@@ -1,4 +1,22 @@
-import { PlatformConsole } from "@/components/platform-console";
-export default async function PlatformAdminDashboard() {
-  return <PlatformConsole view="dashboard" />;
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Building2, CreditCard, TicketCheck, Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ErrorState, Loading, Status } from "@/components/admin-page-ui";
+
+type Tenant = { _id: string; name: string; status: "active" | "suspended"; subscription?: { plan: string; status: string } };
+type Metrics = { totalTenants: number; activeTenants: number; suspendedTenants: number; openTickets: number };
+async function get<T>(url: string): Promise<T> { const response = await fetch(url); const body = await response.json(); if (!response.ok || !body.success) throw new Error(body.message || "Unable to load dashboard"); return body.data; }
+
+export default function AdminDashboardPage() {
+  const [metrics, setMetrics] = useState<Metrics | null>(null), [tenants, setTenants] = useState<Tenant[]>([]), [error, setError] = useState("");
+  useEffect(() => { void Promise.all([get<Metrics>("/api/platform/dashboard"), get<Tenant[]>("/api/platform/businesses")]).then(([dashboard, businesses]) => { setMetrics(dashboard); setTenants(businesses); }).catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Unable to load dashboard")); }, []);
+  const bars = useMemo(() => metrics ? [{ label: "Active", value: metrics.activeTenants, tone: "bg-emerald-500" }, { label: "Trial", value: tenants.filter(tenant => tenant.subscription?.status === "trial").length, tone: "bg-amber-400" }, { label: "Past due", value: tenants.filter(tenant => tenant.subscription?.status === "past_due").length, tone: "bg-rose-500" }, { label: "Suspended", value: metrics.suspendedTenants, tone: "bg-slate-400" }] : [], [metrics, tenants]);
+  if (!metrics && !error) return <Loading />;
+  if (error) return <ErrorState message={error} />;
+  const cards = [["Total tenants", metrics!.totalTenants, Users, "All agency accounts"], ["Active tenants", metrics!.activeTenants, Building2, "Live portals"], ["Payment issues", tenants.filter(tenant => tenant.subscription?.status === "past_due").length, CreditCard, "Needs follow-up"], ["Open tickets", metrics!.openTickets, TicketCheck, "Needs attention"]] as const;
+  return <section><header className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm font-medium text-primary">Dashboard</p><h1 className="mt-1 text-3xl font-bold tracking-tight">Platform health at a glance</h1><p className="mt-2 text-sm text-muted-foreground">Tenant growth, payments and customer support.</p></div><Button asChild><Link href="/admin/tenants">Manage tenants</Link></Button></header><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([label, value, Icon, caption]) => <Card key={label}><CardContent className="flex items-start justify-between p-5"><div><p className="text-sm text-muted-foreground">{label}</p><p className="mt-2 text-3xl font-bold">{value}</p><p className="mt-2 text-xs text-muted-foreground">{caption}</p></div><span className="rounded-xl bg-primary/10 p-3 text-primary"><Icon className="size-5" /></span></CardContent></Card>)}</div><div className="mt-5 grid gap-5 xl:grid-cols-[1.15fr_.85fr]"><Card><CardHeader><CardTitle>Tenant status distribution</CardTitle><p className="text-sm text-muted-foreground">Current agency portfolio</p></CardHeader><CardContent><div className="flex h-44 items-end gap-5 border-b pb-1">{bars.map(bar => <div key={bar.label} className="flex h-full flex-1 flex-col justify-end"><div className="mb-2 text-center text-sm font-bold">{bar.value}</div><div className={`${bar.tone} min-h-2 rounded-t-lg`} style={{ height: `${Math.max(8, metrics!.totalTenants ? bar.value / metrics!.totalTenants * 100 : 8)}%` }} /><p className="mt-3 text-center text-xs text-muted-foreground">{bar.label}</p></div>)}</div></CardContent></Card><Card><CardHeader><CardTitle>Latest tenants</CardTitle></CardHeader><CardContent className="space-y-3">{tenants.slice(0, 4).map(tenant => <div key={tenant._id} className="flex items-center justify-between rounded-lg bg-muted/60 p-3"><div><p className="text-sm font-semibold">{tenant.name}</p><p className="text-xs text-muted-foreground">{tenant.subscription?.plan || "Starter"} plan</p></div><Status value={tenant.status} /></div>)}{!tenants.length && <p className="text-sm text-muted-foreground">No tenants yet.</p>}</CardContent></Card></div></section>;
 }
