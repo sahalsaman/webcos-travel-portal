@@ -11,9 +11,9 @@ node --env-file=.env.local scripts/bootstrap-platform.mjs
 npm run dev -- --port 3001
 ```
 
-Sign in at `http://localhost:3001/login` with the bootstrap owner credentials. `/super-admin` lets the owner add businesses and activate/suspend them. Each new business needs a unique slug, portal host, website URL, branding, and initial agency administrator. Configure DNS/custom domains to route each portal host to this deployment. For local Voibee use `voibee.localhost:3001`.
+Sign in at `http://localhost:3001/login` with the bootstrap owner credentials. `/admin` lets the owner add businesses and activate/suspend them. Each new business needs a unique slug, portal host, website URL, branding, and initial agency administrator. Configure DNS/custom domains to route each portal host to this deployment. For local Voibee use `voibee.localhost:3001`.
 
-Agency administrators sign in on their **agency portal host**, with their agency credentials. They cannot access the super-admin APIs. Platform owners use `/super-admin`; agency access is intentionally a separate login, without implicit impersonation.
+Agency administrators sign in on their **agency portal host**, with their agency credentials. They cannot access the admin APIs. Platform owners use `/admin`; agency access is intentionally a separate login, without implicit impersonation.
 
 ## Voibee cutover
 

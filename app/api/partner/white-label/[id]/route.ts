@@ -19,7 +19,7 @@ async function ownedListing(userId: string, id: string) {
 /** Partner: update commission or toggle active state. */
 export async function PATCH(request: Request, { params }: Ctx) {
   try {
-    const user = await requireApiRole(["partner"]);
+    const user = await requireApiRole(["tenant_partner"]);
     const { id } = await params;
     const body = await request.json();
     await connectDB();
@@ -46,7 +46,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
 /** Partner: remove a white-label listing. */
 export async function DELETE(_request: Request, { params }: Ctx) {
   try {
-    const user = await requireApiRole(["partner"]);
+    const user = await requireApiRole(["tenant_partner"]);
     const { id } = await params;
     await connectDB();
     const owned = await ownedListing(user.id, id);

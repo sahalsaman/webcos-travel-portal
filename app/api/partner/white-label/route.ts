@@ -13,7 +13,7 @@ import PartnerTrip from "@/models/PartnerTrip";
 /** Partner: create or update a white-label listing for a package. */
 export async function POST(request: Request) {
   try {
-    const user = await requireApiRole(["partner"]);
+    const user = await requireApiRole(["tenant_partner"]);
     const { tripId, commission } = whiteLabelSchema.parse(await request.json());
     await connectDB();
 

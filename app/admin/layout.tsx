@@ -1,24 +1,10 @@
-export const dynamic = "force-dynamic";
-import { BusinessBrand } from "@/components/business-brand";
-import { getBrand } from "@/lib/business";
-import { requireAdminPortalAccess } from "@/lib/session";
-import { RoleShell } from "@/components/dashboard/role-shell";
+import { auth } from "@/auth";
+import { PlatformAdminShell } from "@/components/platform-admin-shell";
+import { redirect } from "next/navigation";
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { user, accessPages, designation } = await requireAdminPortalAccess();
-  const role = user.role === "vendor_employee" ? "employee" : "admin";
-  return (
-    <BusinessBrand brand={await getBrand()}><RoleShell
-      role={role}
-      accessPages={accessPages}
-      roleLabel={role === "employee" ? designation || "Employee" : undefined}
-      user={{ name: user.name, email: user.email, image: user.image }}
-    >
-      {children}
-    </RoleShell></BusinessBrand>
-  );
+export default async function PlatformAdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  if (!session?.user) redirect("/login?callbackUrl=/admin");
+  if (session.user.role !== "admin" || session.user.businessId) redirect("/");
+  return <PlatformAdminShell user={{ name: session.user.name, email: session.user.email, image: session.user.image }}>{children}</PlatformAdminShell>;
 }

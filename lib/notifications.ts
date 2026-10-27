@@ -1,6 +1,6 @@
 import { tenantModel } from "@/lib/tenant-db";
 import { connectDB } from "@/lib/db";
-import type { AdminPortalPageKey, NotificationType } from "@/lib/constants";
+import type { TenantPortalPageKey, NotificationType } from "@/lib/constants";
 import "@/models";
 import Employee from "@/models/Employee";
 import Notification from "@/models/Notification";
@@ -19,7 +19,7 @@ async function createForUsers(userIds: unknown[], input: NotificationInput) {
   await (await tenantModel(Notification)).insertMany(uniqueIds.map((user) => ({ user, channel: "in-app", ...input })));
 }
 
-export async function notifyAdminsAndEmployees(input: NotificationInput, employeePage?: AdminPortalPageKey) {
+export async function notifyAdminsAndEmployees(input: NotificationInput, employeePage?: TenantPortalPageKey) {
   try {
     await connectDB();
     const [admins, employees] = await Promise.all([

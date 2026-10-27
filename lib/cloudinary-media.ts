@@ -53,7 +53,7 @@ async function isReferenced(url: string) {
 }
 
 /**
- * Permanently removes only vendor-folder assets that no longer appear in any
+ * Permanently removes only tenant-folder assets that no longer appear in any
  * supported content record. Failures are logged; a completed content update is
  * never rolled back because Cloudinary housekeeping temporarily failed.
  */

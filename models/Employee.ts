@@ -1,5 +1,5 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
-import { ADMIN_PORTAL_PAGE_KEYS, EMPLOYEE_STATUSES } from "@/lib/constants";
+import { TENANT_PORTAL_PAGE_KEYS, EMPLOYEE_STATUSES } from "@/lib/constants";
 
 const EmployeeSchema = new Schema(
   {
@@ -13,7 +13,7 @@ const EmployeeSchema = new Schema(
     salary: { type: Number, default: 0, min: 0 },
     joinedAt: { type: Date },
     portalAccess: { type: Boolean, default: false, index: true },
-    portalPages: { type: [String], enum: ADMIN_PORTAL_PAGE_KEYS, default: [] },
+    portalPages: { type: [String], enum: TENANT_PORTAL_PAGE_KEYS, default: [] },
     hrAccess: { type: String, enum: ["self", "manage"], default: "self", index: true },
     notes: { type: String, default: "" },
   },

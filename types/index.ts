@@ -12,7 +12,7 @@ import type {
   CommissionStatus,
   OFFER_CARD_STATUSES,
   EmployeeStatus,
-  AdminPortalPageKey,
+  TenantPortalPageKey,
   SupplierStatus,
   SupplierType,
   CampaignStatus,
@@ -237,7 +237,7 @@ export interface EmployeeDTO {
   salary: number;
   joinedAt?: string;
   portalAccess?: boolean;
-  portalPages?: AdminPortalPageKey[];
+  portalPages?: TenantPortalPageKey[];
   hrAccess?: "self" | "manage";
   notes?: string;
   createdAt: string;
@@ -356,7 +356,7 @@ export interface VisaApplicationDTO {
 export interface TicketTrackingDTO { _id:string; lead?:string|Pick<LeadDTO,"_id"|"leadNumber"|"customerName">|null; customer?:string|Pick<UserDTO,"_id"|"name"|"email"|"mobile">|null; trackingNumber:string; customerName:string; phone:string; ticketType:TicketType; provider:string; referenceNumber:string; origin:string; destination:string; departureAt:string; arrivalAt?:string|null; travelers:number; amount:number; status:TicketStatus; assignedTo:string; notes:string; createdAt:string; }
 export interface HotelReservationDTO { _id:string; lead?:string|Pick<LeadDTO,"_id"|"leadNumber"|"customerName">|null; customer?:string|Pick<UserDTO,"_id"|"name"|"email"|"mobile">|null; trackingNumber:string; customerName:string; phone:string; hotelName:string; destination:string; confirmationNumber:string; checkIn:string; checkOut:string; rooms:number; guests:number; roomType:string; mealPlan:string; amount:number; status:HotelReservationStatus; assignedTo:string; notes:string; createdAt:string; }
 
-export interface ExpenseDTO { _id: string; expenseNumber: string; title: string; category: string; vendor: string; amount: number; expenseDate: string; status: ExpenseStatus; paymentReference: string; notes: string; createdAt: string; }
+export interface ExpenseDTO { _id: string; expenseNumber: string; title: string; category: string; tenant: string; amount: number; expenseDate: string; status: ExpenseStatus; paymentReference: string; notes: string; createdAt: string; }
 export interface InvoiceDTO { _id: string; invoiceNumber: string; customerName: string; customerEmail?: string; customerPhone: string; description: string; amount: number; issueDate: string; dueDate: string; status: InvoiceStatus; bookingNumber: string; notes: string; createdAt: string; }
 export interface ReputationDTO { _id: string; platform: ReputationPlatform; reviewerName: string; rating: number; reviewText: string; reviewUrl: string; sentiment: ReputationSentiment; status: ReputationStatus; assignedTo: string; responseText: string; reviewedAt: string; respondedAt?: string | null; notes: string; createdAt: string; }
 type EmployeeRef = string | Pick<EmployeeDTO, "_id" | "name" | "email" | "designation" | "department">;

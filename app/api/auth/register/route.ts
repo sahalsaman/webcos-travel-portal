@@ -13,7 +13,7 @@ import crypto from "node:crypto";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    if (body?.role === "partner" || body?.role === "vendor_partner") {
+    if (body?.role === "tenant_partner") {
       return fail("Partner accounts are invite-only. Please contact admin.", 403);
     }
 
@@ -26,19 +26,19 @@ export async function POST(request: Request) {
     const email = data.email?.toLowerCase() || `${mobile.slice(1)}@phone.voibee.local`;
     const passwordHash = await bcrypt.hash(data.password || crypto.randomBytes(32).toString("hex"), 10);
     const existing = await (await tenantModel(User)).findOne({ $or: [{ email }, { mobile }] }).select("+password role");
-    if (existing?.password || (existing && existing.role !== "vendor_traveler" && existing.role !== "traveler")) {
+    if (existing?.password || (existing && existing.role !== "tenant_traveler")) {
       return fail("An account with this email already exists", 409);
     }
     const user = existing
       ? await (await tenantModel(User)).findByIdAndUpdate(existing._id, { $set: { name: data.name, mobile, password: passwordHash } }, { returnDocument: "after" })
-      : await (await tenantModel(User)).create({ name: data.name, email, mobile, password: passwordHash, role: "vendor_traveler", businessId: business._id });
+      : await (await tenantModel(User)).create({ name: data.name, email, mobile, password: passwordHash, role: "tenant_traveler", businessId: business._id });
     await notifyAdminsAndEmployees({
       type: "registration",
       title: "New traveler registered",
       message: `${data.name} created a traveler account.`,
-      meta: { userId: String(user?._id), href: "/admin/users/customers" },
+      meta: { userId: String(user?._id), href: "/users/customers" },
     }, "users");
-    return ok({ id: String(user._id), role: "vendor_traveler" }, 201);
+    return ok({ id: String(user._id), role: "tenant_traveler" }, 201);
   } catch (err) {
     return handleError(err);
   }

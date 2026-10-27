@@ -19,14 +19,14 @@ export async function POST(request: Request) {
     const booking = await (await tenantModel(ActivityBooking)).create({
       ...data,
       activity: activity._id,
-      traveler: user?.role === "vendor_traveler" ? user.id : null,
+      traveler: user?.role === "tenant_traveler" ? user.id : null,
       activityDate: new Date(`${data.activityDate}T00:00:00.000Z`),
       totalParticipants,
       unitPrice: activity.basePrice,
       totalAmount: activity.basePrice * totalParticipants,
       bookingNumber,
     });
-    await notifyAdminsAndEmployees({ type: "booking", title: "New activity booking", message: `${bookingNumber} · ${activity.title} · ${data.name}`, meta: { activityBookingId: String(booking._id), href: "/admin/lms/activity-bookings" } }, "lms");
+    await notifyAdminsAndEmployees({ type: "booking", title: "New activity booking", message: `${bookingNumber} · ${activity.title} · ${data.name}`, meta: { activityBookingId: String(booking._id), href: "/lms/activity-bookings" } }, "lms");
     return ok({ bookingNumber, id: String(booking._id) }, 201);
   } catch (error) { return handleError(error); }
 }

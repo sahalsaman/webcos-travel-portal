@@ -298,7 +298,7 @@ export async function getTripsByCategory(category: string, limit = 4) {
   }, [] as TripDTO[]);
 }
 
-/** Hotels explicitly enabled by a vendor for the public hotel catalogue. */
+/** Hotels explicitly enabled by a tenant for the public hotel catalogue. */
 export async function getDirectBookingHotels() {
   return safe(async () => {
     const items = await (await tenantModel(Hotel))
@@ -435,7 +435,7 @@ export async function getHomeStats() {
         (await tenantModel(Trip)).countDocuments({ status: "active" }),
         (await tenantModel(Partner)).countDocuments({ status: "approved" }),
         (await tenantModel(Booking)).countDocuments({ status: { $in: ["confirmed", "completed"] } }),
-        (await tenantModel(User)).countDocuments({ role: "vendor_traveler" }),
+        (await tenantModel(User)).countDocuments({ role: "tenant_traveler" }),
       ]);
       return { trips, partners, bookings, travelers };
     },

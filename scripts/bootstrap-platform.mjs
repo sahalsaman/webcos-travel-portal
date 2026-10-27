@@ -13,7 +13,7 @@ try {
   await db.collection('businesses').createIndex({ slug: 1 }, { unique: true });
   await db.collection('businesses').createIndex({ databaseName: 1 }, { unique: true });
   await db.collection('businesses').createIndex({ hosts: 1 }, { unique: true });
- await db.collection('businesses').updateOne({ slug: 'voibee' }, { $set: { name: 'Voibee Holidays', databaseName: VOIBEE_DATABASE, hosts: [VOIBEE_PORTAL_HOST.toLowerCase()], siteUrl: VOIBEE_SITE_URL, logoUrl: '/vendor_logos/voibee_holidays.png', primaryColor: '#0060e6', status: 'active', provisioned: true }, $setOnInsert: { slug: 'voibee', createdAt: new Date() } }, { upsert: true });
+ await db.collection('businesses').updateOne({ slug: 'voibee' }, { $set: { name: 'Voibee Holidays', databaseName: VOIBEE_DATABASE, hosts: [VOIBEE_PORTAL_HOST.toLowerCase()], siteUrl: VOIBEE_SITE_URL, logoUrl: '/tenant_logos/voibee_holidays.png', primaryColor: '#0060e6', status: 'active', provisioned: true }, $setOnInsert: { slug: 'voibee', createdAt: new Date() } }, { upsert: true });
  }
  console.log('Platform owner provisioned. Existing agency records were not modified.');
 } finally { await mongoose.disconnect(); }

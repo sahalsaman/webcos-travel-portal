@@ -28,7 +28,7 @@ async function ensureTenantDestination(data: { destination: string; country: str
 /** Admin: list all trips (any status) with optional ?status & ?q. */
 export async function GET(request: Request) {
   try {
-    await requireApiRole(["admin"]);
+    await requireApiRole(["tenant", "tenant_employee"]);
     await connectDB();
     const { searchParams } = new URL(request.url);
     const query: Record<string, unknown> = {};
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 /** Admin: create a trip. */
 export async function POST(request: Request) {
   try {
-    await requireApiRole(["admin"]);
+    await requireApiRole(["tenant", "tenant_employee"]);
     const body = await request.json();
     const data = tripSchema.parse({ ...body, images: await uploadExternalPackageImages(body.images ?? []) });
     await connectDB();

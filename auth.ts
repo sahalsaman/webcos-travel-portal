@@ -15,7 +15,7 @@ import { businessModel } from "@/lib/business";
 import { headers } from "next/headers";
 import { normaliseMobile, verifyPhoneOtp } from "@/lib/phone-otp";
 
-const portalOnlyRoles = new Set(["admin", "vendor", "vendor_employee", "employee"]);
+const portalOnlyRoles = new Set(["admin", "tenant", "tenant_employee"]);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -33,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             await connectDB();
             const legacyIndianMobile = mobile.startsWith("+91") ? mobile.slice(3) : "";
             const user = await (await tenantModel(User)).findOne({ mobile: { $in: [mobile, legacyIndianMobile].filter(Boolean) } }).lean<{ _id: unknown; name: string; email: string; role: string; image?: string }>();
-            if (!user || !["traveler", "vendor_traveler"].includes(user.role)) return null;
+            if (!user || user.role !== "tenant_traveler") return null;
             return { id: String(user._id), businessId: String(business._id), name: user.name, email: user.email, image: user.image, role: user.role };
           } catch {
             return null;
@@ -58,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const db = mongoose.connection.useDb(candidate.databaseName, { useCache: true });
             const users = db.models.User || db.model("User", User.schema);
             const candidateUser = await users.findOne({ email: parsed.data.email }).select("+password").lean<{ _id: unknown; name: string; email: string; password?: string; role: string; image?: string }>();
-            if (!candidateUser?.password || !["vendor", "vendor_employee", "vendor_partner", "vendor_traveler"].includes(candidateUser.role)) continue;
+            if (!candidateUser?.password || !["tenant", "tenant_employee", "tenant_partner", "tenant_traveler"].includes(candidateUser.role)) continue;
             if (!await bcrypt.compare(parsed.data.password, candidateUser.password)) continue;
             if (siteLoginBlocked(candidateUser.role)) return null;
             return { id: String(candidateUser._id), businessId: String(candidate._id), name: candidateUser.name, email: candidateUser.email, image: candidateUser.image, role: candidateUser.role };
@@ -92,14 +92,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // Attach partner slug so white-label links are one hop away in the UI.
         let partnerSlug: string | undefined;
-        if (user.role === "vendor_partner" || user.role === "partner") {
+        if (user.role === "tenant_partner") {
           const partner = await (await tenantModel(Partner)).findOne({ user: user._id })
             .select("slug")
             .lean<{ slug: string }>();
           partnerSlug = partner?.slug;
         }
 
-        if (user.role === "vendor_employee" || user.role === "employee") {
+        if (user.role === "tenant_employee") {
           const employee = await (await tenantModel(Employee)).findOne({
             user: user._id,
             status: "active",

@@ -74,11 +74,11 @@ export async function POST(request: Request) {
       return ok(response);
     }
     if (operation === "getTravelerBookings" || operation === "getTravelerWishlist") {
-      const user = await requireApiRole(["traveler"]);
+      const user = await requireApiRole(["tenant_traveler"]);
       return ok(await dashboard[operation](user.id));
     }
     if (operation === "getPartnerByUser" || operation === "getSettings" || Object.hasOwn(partnerOperations, operation)) {
-      const user = await requireApiRole(["partner"]);
+      const user = await requireApiRole(["tenant_partner"]);
       const partner = await dashboard.getPartnerByUser(user.id);
       if (!partner) return fail("Partner not found", 404);
       if (operation === "getPartnerByUser") return ok(partner);

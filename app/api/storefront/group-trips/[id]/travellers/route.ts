@@ -10,7 +10,7 @@ type Context = { params: Promise<{ id: string }> };
 /** Logged-in travellers can see a compact, privacy-conscious group preview. */
 export async function GET(_request: Request, { params }: Context) {
   try {
-    await requireApiRole(["traveler"]);
+    await requireApiRole(["tenant_traveler"]);
     const { id } = await params;
     if (!mongoose.isValidObjectId(id)) return fail("Package not found", 404);
     await connectDB();

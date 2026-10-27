@@ -66,7 +66,7 @@ export async function uploadExternalPackageImages(images: string[]) {
   return clean.map((url) => url.includes(ownHost) ? url : uploaded[uploadIndex++]);
 }
 
-/** Upload a file selected in the vendor portal into that vendor's Cloudinary folder. */
+/** Upload a file selected in the tenant portal into that tenant's Cloudinary folder. */
 export async function uploadPackageImageFile(file: File) {
   const allowed = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
   if (!allowed.has(file.type)) throw new CloudinaryUploadError("Upload a JPG, PNG, WebP, or AVIF image.");
@@ -88,7 +88,7 @@ export async function uploadPackageImageFile(file: File) {
   return data.secure_url;
 }
 
-/** Return the latest images in this vendor's configured Cloudinary folder. */
+/** Return the latest images in this tenant's configured Cloudinary folder. */
 export async function listCloudinaryImages(limit = 12, nextCursor?: string) {
   const config = await cloudinaryConfig();
   if (!config) throw new CloudinaryUploadError("Configure Cloudinary in Settings before choosing images.");

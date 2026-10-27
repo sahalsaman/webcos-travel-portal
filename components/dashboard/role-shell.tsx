@@ -19,55 +19,55 @@ import {
   BriefcaseBusiness,
 } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/shell";
-import type { AdminPortalPageKey } from "@/lib/constants";
+import type { TenantPortalPageKey } from "@/lib/constants";
 
 const NAVS: Record<string, { label: string; items: NavItem[] }> = {
-  admin: {
-    label: "Admin",
+  tenant: {
+    label: "Tenant portal",
     items: [
-      { href: "/admin", label: "Dashboard", icon: LayoutDashboard, accessKey: "dashboard" },
-      { href: "/admin/lms", label: "Bookings & LMS", icon: ContactRound, accessKey: "lms", children: [
-        { href: "/admin/lms/bookings", label: "Bookings", icon: CalendarCheck },
-        { href: "/admin/lms/activity-bookings", label: "Activity Bookings", icon: CalendarCheck },
-        { href: "/admin/lms/leads", label: "Leads", icon: ContactRound },
-        { href: "/admin/lms/quotations", label: "Quotations", icon: FileBarChart },
-        { href: "/admin/lms/tickets", label: "Tickets", icon: CalendarCheck },
-        { href: "/admin/lms/hotels", label: "Hotel Reservations", icon: CalendarCheck },
-        { href: "/admin/lms/visas", label: "Visa Tracking", icon: CalendarCheck },
+      { href: "/tenant", label: "Dashboard", icon: LayoutDashboard, accessKey: "dashboard" },
+      { href: "/tenant/lms", label: "Bookings & LMS", icon: ContactRound, accessKey: "lms", children: [
+        { href: "/tenant/lms/bookings", label: "Bookings", icon: CalendarCheck },
+        { href: "/tenant/lms/activity-bookings", label: "Activity Bookings", icon: CalendarCheck },
+        { href: "/tenant/lms/leads", label: "Leads", icon: ContactRound },
+        { href: "/tenant/lms/quotations", label: "Quotations", icon: FileBarChart },
+        { href: "/tenant/lms/tickets", label: "Tickets", icon: CalendarCheck },
+        { href: "/tenant/lms/hotels", label: "Hotel Reservations", icon: CalendarCheck },
+        { href: "/tenant/lms/visas", label: "Visa Tracking", icon: CalendarCheck },
       ] },
-      { href: "/admin/users", label: "Users", icon: Users, accessKey: "users", children: [
-        { href: "/admin/users/customers", label: "Customers", icon: Users },
-        { href: "/admin/users/partners", label: "Partners", icon: Users },
-        { href: "/admin/users/suppliers", label: "Suppliers", icon: Users },
+      { href: "/tenant/users", label: "Users", icon: Users, accessKey: "users", children: [
+        { href: "/tenant/users/customers", label: "Customers", icon: Users },
+        { href: "/tenant/users/partners", label: "Partners", icon: Users },
+        { href: "/tenant/users/suppliers", label: "Suppliers", icon: Users },
       ] },
-      { href: "/admin/inventory", label: "Inventory", icon: Boxes, accessKey: "inventory", children: [
-        { href: "/admin/inventory/packages", label: "Packages", icon: Boxes },
-        { href: "/admin/inventory/destinations", label: "Destinations", icon: Compass },
-        { href: "/admin/inventory/activities", label: "Activities", icon: Star },
-        { href: "/admin/inventory/hotels", label: "Hotels", icon: CalendarCheck },
-        { href: "/admin/inventory/vehicles", label: "Transportation", icon: CalendarCheck },
+      { href: "/tenant/inventory", label: "Inventory", icon: Boxes, accessKey: "inventory", children: [
+        { href: "/tenant/inventory/packages", label: "Packages", icon: Boxes },
+        { href: "/tenant/inventory/destinations", label: "Destinations", icon: Compass },
+        { href: "/tenant/inventory/activities", label: "Activities", icon: Star },
+        { href: "/tenant/inventory/hotels", label: "Hotels", icon: CalendarCheck },
+        { href: "/tenant/inventory/vehicles", label: "Transportation", icon: CalendarCheck },
       ] },
-      { href: "/admin/hrm", label: "HRM", icon: BriefcaseBusiness, accessKey: "hrm", children: [
-        { href: "/admin/hrm", label: "Dashboard", icon: LayoutDashboard, exact: true },
-        { href: "/admin/hrm/tasks", label: "Tasks", icon: CalendarCheck },
-        { href: "/admin/hrm/attendance", label: "Attendance", icon: CalendarCheck },
-        { href: "/admin/hrm/leaves", label: "Leave", icon: CalendarCheck },
-        { href: "/admin/hrm/payroll", label: "Payroll", icon: Wallet },
-        { href: "/admin/hrm/employees", label: "Employees", icon: Users },
+      { href: "/tenant/hrm", label: "HRM", icon: BriefcaseBusiness, accessKey: "hrm", children: [
+        { href: "/tenant/hrm", label: "Dashboard", icon: LayoutDashboard, exact: true },
+        { href: "/tenant/hrm/tasks", label: "Tasks", icon: CalendarCheck },
+        { href: "/tenant/hrm/attendance", label: "Attendance", icon: CalendarCheck },
+        { href: "/tenant/hrm/leaves", label: "Leave", icon: CalendarCheck },
+        { href: "/tenant/hrm/payroll", label: "Payroll", icon: Wallet },
+        { href: "/tenant/hrm/employees", label: "Employees", icon: Users },
       ] },
-      { href: "/admin/finance", label: "Finance", icon: Wallet, accessKey: "finance", children: [
-        { href: "/admin/finance/dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/finance/earnings", label: "Earnings", icon: Wallet },
-        { href: "/admin/finance/expenses", label: "Expenses", icon: Wallet },
-        { href: "/admin/finance/invoices", label: "Invoices", icon: FileBarChart },
+      { href: "/tenant/finance", label: "Finance", icon: Wallet, accessKey: "finance", children: [
+        { href: "/tenant/finance/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/tenant/finance/earnings", label: "Earnings", icon: Wallet },
+        { href: "/tenant/finance/expenses", label: "Expenses", icon: Wallet },
+        { href: "/tenant/finance/invoices", label: "Invoices", icon: FileBarChart },
       ] },
-      { href: "/admin/reputation", label: "ORM", icon: Star, accessKey: "reputation" },
-      { href: "/admin/reports", label: "Reports", icon: FileBarChart, accessKey: "reports" },
-      { href: "/admin/campaigns", label: "Marketing Campaigns", icon: Megaphone, accessKey: "campaigns" },
-      { href: "/admin/settings", label: "Settings", icon: Settings, accessKey: "settings" },
+      { href: "/tenant/reputation", label: "ORM", icon: Star, accessKey: "reputation" },
+      { href: "/tenant/reports", label: "Reports", icon: FileBarChart, accessKey: "reports" },
+      { href: "/tenant/campaigns", label: "Marketing Campaigns", icon: Megaphone, accessKey: "campaigns" },
+      { href: "/tenant/settings", label: "Settings", icon: Settings, accessKey: "settings" },
     ],
   },
-  partner: {
+  tenant_partner: {
     label: "Partner",
     items: [
       { href: "/partner", label: "Dashboard", icon: LayoutDashboard },
@@ -78,7 +78,7 @@ const NAVS: Record<string, { label: string; items: NavItem[] }> = {
       { href: "/partner/profile", label: "Profile", icon: UserCircle },
     ],
   },
-  traveler: {
+  tenant_traveler: {
     label: "Traveler",
     items: [
       { href: "/traveler", label: "Dashboard", icon: LayoutDashboard },
@@ -95,16 +95,16 @@ export function RoleShell({
   accessPages,
   roleLabel,
 }: {
-  role: "admin" | "employee" | "partner" | "traveler";
+  role: "tenant" | "tenant_employee" | "tenant_partner" | "tenant_traveler";
   user: { name?: string | null; email?: string | null; image?: string | null };
   children: React.ReactNode;
-  accessPages?: AdminPortalPageKey[];
+  accessPages?: TenantPortalPageKey[];
   roleLabel?: string;
 }) {
-  const cfg = role === "employee" ? NAVS.admin : NAVS[role];
+  const cfg = role === "tenant_employee" ? NAVS.tenant : NAVS[role];
   const allowed = accessPages ? new Set(accessPages) : null;
   const items = allowed
-    ? cfg.items.filter((item) => !item.accessKey || allowed.has(item.accessKey as AdminPortalPageKey))
+    ? cfg.items.filter((item) => !item.accessKey || allowed.has(item.accessKey as TenantPortalPageKey))
     : cfg.items;
 
   return (

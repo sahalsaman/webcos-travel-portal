@@ -13,7 +13,7 @@ type Ctx = { params: Promise<{ id: string }> };
 /** Admin: update a booking's operational status. */
 export async function PATCH(request: Request, { params }: Ctx) {
   try {
-    await requireApiRole(["admin"]);
+    await requireApiRole(["tenant", "tenant_employee"]);
     const { id } = await params;
     const { status } = await request.json();
     if (!BOOKING_STATUSES.includes(status)) return fail("Invalid status", 400);

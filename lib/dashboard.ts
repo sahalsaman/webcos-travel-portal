@@ -47,7 +47,7 @@ async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 async function hrEmployeeScope() {
   const user = await getCurrentUser();
   if (!user || user.role === "admin") return null;
-  if (user.role !== "vendor_employee") return { _id: null };
+  if (user.role !== "tenant_employee") return { _id: null };
   const employee = await (await tenantModel(Employee)).findOne({ user: user.id, status: "active", portalAccess: true })
     .select("_id hrAccess")
     .lean<{ _id: unknown; hrAccess?: "self" | "manage" }>();
@@ -74,9 +74,9 @@ function lastMonths(n: number) {
   return arr;
 }
 
-/* ----------------------------- ADMIN ----------------------------- */
+/* ---------------------------- TENANT ---------------------------- */
 
-export async function getAdminStats() {
+export async function getTenantStats() {
   return safe(
     async () => {
       const [destinations, activeDestinations, trips, activeTrips, bookings, partners, travelers, revenueAgg] =
@@ -87,7 +87,7 @@ export async function getAdminStats() {
           (await tenantModel(Trip)).countDocuments({ status: "active" }),
           (await tenantModel(Booking)).countDocuments({ paymentStatus: "paid" }),
           (await tenantModel(Partner)).countDocuments({}),
-          (await tenantModel(User)).countDocuments({ role: "vendor_traveler" }),
+          (await tenantModel(User)).countDocuments({ role: "tenant_traveler" }),
           (await tenantModel(Booking)).aggregate([
             { $match: { paymentStatus: "paid" } },
             {
@@ -125,7 +125,7 @@ export async function getAdminStats() {
   );
 }
 
-export async function getAdminCharts() {
+export async function getTenantCharts() {
   return safe(
     async () => {
       const months = lastMonths(6);
@@ -195,14 +195,14 @@ export async function getRecentBookings(limit = 8) {
   }, []);
 }
 
-export async function listAdminTrips() {
+export async function listTenantTrips() {
   return safe(async () => serialize(await (await tenantModel(Trip)).find({})
     .sort({ createdAt: -1 })
     .select("title slug destination country images featured category holidayPackage supplierPackage startDate endDate itinerary.day availableSeats totalSeats basePrice status")
     .lean()), []);
 }
 
-export async function listAdminBookableTrips() {
+export async function listTenantBookableTrips() {
   return safe(
     async () =>
       serialize(
@@ -215,50 +215,50 @@ export async function listAdminBookableTrips() {
   );
 }
 
-export async function getAdminTripById(id: string) {
+export async function getTenantTripById(id: string) {
   return safe(async () => {
     const trip = await (await tenantModel(Trip)).findById(id).lean();
     return trip ? serialize(trip) : null;
   }, null);
 }
 
-export async function listAdminOfferCards() {
+export async function listTenantOfferCards() {
   return safe(async () => serialize(await (await tenantModel(OfferCard)).find({}).sort({ sortOrder: 1, createdAt: -1 }).lean()), []);
 }
 
-export async function getAdminOfferCardById(id: string) {
+export async function getTenantOfferCardById(id: string) {
   return safe(async () => {
     const offer = await (await tenantModel(OfferCard)).findById(id).lean();
     return offer ? serialize(offer) : null;
   }, null);
 }
 
-export async function listAdminDestinations() {
+export async function listTenantDestinations() {
   return safe(async () => serialize(await (await tenantModel(Destination)).find({}).sort({ featured: -1, createdAt: -1 }).lean()), []);
 }
 
-export async function listAdminActivityTypes() {
+export async function listTenantActivityTypes() {
   return safe(async () => serialize(await (await tenantModel(ActivityType)).find({}).sort({ sortOrder: 1, name: 1 }).lean()), []);
 }
 
-export async function listAdminActivities() {
+export async function listTenantActivities() {
   return safe(async () => serialize(await (await tenantModel(Activity)).find({}).sort({ createdAt: -1 }).populate({ path: "type", model: "ActivityType", select: "name slug" }).lean()), []);
 }
 
-export async function listAdminActivityBookings() {
+export async function listTenantActivityBookings() {
   return safe(async () => serialize(await (await tenantModel(ActivityBooking)).find({}).sort({ createdAt: -1 }).populate({ path: "activity", model: "Activity", select: "title slug destination" }).lean()), []);
 }
 
-export async function getAdminDestinationById(id: string) {
+export async function getTenantDestinationById(id: string) {
   return safe(async () => {
     const destination = await (await tenantModel(Destination)).findById(id).lean();
     return destination ? serialize(destination) : null;
   }, null);
 }
 
-export async function listAdminTravelers() {
+export async function listTenantTravelers() {
   return safe(async () => {
-    const travelers = await (await tenantModel(User)).find({ role: "vendor_traveler" }).sort({ createdAt: -1 }).select("name email mobile image status createdAt").lean();
+    const travelers = await (await tenantModel(User)).find({ role: "tenant_traveler" }).sort({ createdAt: -1 }).select("name email mobile image status createdAt").lean();
     const ids = travelers.map((traveler) => traveler._id);
     const bookingAgg = await (await tenantModel(Booking)).aggregate([
       { $match: { traveler: { $in: ids } } },
@@ -295,7 +295,7 @@ export async function listAdminTravelers() {
   }, []);
 }
 
-export async function getAdminFinanceSummary() {
+export async function getTenantFinanceSummary() {
   return safe(async () => {
     const [bookingAgg, paymentAgg, commissionAgg, recentPayments] = await Promise.all([
       (await tenantModel(Booking)).aggregate([
@@ -344,7 +344,7 @@ export async function getAdminFinanceSummary() {
   }, { totals: { totalRevenue: 0, paidRevenue: 0, adminEarnings: 0, partnerEarnings: 0, bookings: 0 }, paymentsByStatus: [], commissionsByStatus: [], recentPayments: [] });
 }
 
-export async function listAdminEarnings() {
+export async function listTenantEarnings() {
   return safe(async () => serialize(await (await tenantModel(Booking)).find({ paymentStatus: "paid" })
     .sort({ createdAt: -1 })
     .populate({ path: "trip", model: "Trip", select: "title destination" })
@@ -353,18 +353,18 @@ export async function listAdminEarnings() {
     .lean()), []);
 }
 
-export async function listAdminEmployees() {
+export async function listTenantEmployees() {
   return safe(async () => serialize(await (await tenantModel(Employee)).find((await hrEmployeeScope()) ?? {}).sort({ createdAt: -1 }).lean()), []);
 }
 
-export async function getAdminEmployeeById(id: string) {
+export async function getTenantEmployeeById(id: string) {
   return safe(async () => {
     const employee = await (await tenantModel(Employee)).findById(id).lean();
     return employee ? serialize(employee) : null;
   }, null);
 }
 
-export async function listAdminBookings() {
+export async function listTenantBookings() {
   return safe(async () => {
     const bookings = await (await tenantModel(Booking)).find({})
       .sort({ createdAt: -1 })
@@ -376,7 +376,7 @@ export async function listAdminBookings() {
   }, []);
 }
 
-export async function listAdminPartners() {
+export async function listTenantPartners() {
   return safe(async () => {
     const partners = await (await tenantModel(Partner)).find({})
       .sort({ createdAt: -1 })
@@ -386,14 +386,14 @@ export async function listAdminPartners() {
   }, []);
 }
 
-export async function listAdminSuppliers() {
+export async function listTenantSuppliers() {
   return safe(async () => {
     const suppliers = await (await tenantModel(Supplier)).find({}).sort({ companyName: 1, createdAt: -1 }).lean();
     return serialize(suppliers);
   }, []);
 }
 
-export async function listAdminInventoryAssets(kind: "hotel" | "vehicle") {
+export async function listTenantInventoryAssets(kind: "hotel" | "vehicle") {
   return safe(async () => {
     const Model = kind === "hotel" ? Hotel : Vehicle;
     const items = await (await tenantModel(Model)).find({}).sort({ name: 1 }).populate("supplier", "companyName phone").lean();
@@ -401,14 +401,14 @@ export async function listAdminInventoryAssets(kind: "hotel" | "vehicle") {
   }, []);
 }
 
-export async function getAdminSupplierById(id: string) {
+export async function getTenantSupplierById(id: string) {
   return safe(async () => {
     const supplier = await (await tenantModel(Supplier)).findById(id).lean();
     return supplier ? serialize(supplier) : null;
   }, null);
 }
 
-export async function listAdminCampaigns() {
+export async function listTenantCampaigns() {
   return safe(async () => {
     const campaigns = await (await tenantModel(Campaign)).find({}).sort({ startDate: -1, createdAt: -1 }).lean();
     const counts = await (await tenantModel(Lead)).aggregate([{ $match: { campaign: { $ne: null } } }, { $group: { _id: "$campaign", count: { $sum: 1 } } }]);
@@ -417,7 +417,7 @@ export async function listAdminCampaigns() {
   }, []);
 }
 
-export async function listAdminPayroll() {
+export async function listTenantPayroll() {
   return safe(async () => {
     const payroll = await (await tenantModel(Payroll)).find(await hrRecordScope())
       .sort({ month: -1, createdAt: -1 })
@@ -427,7 +427,7 @@ export async function listAdminPayroll() {
   }, []);
 }
 
-export async function listAdminQuotations() {
+export async function listTenantQuotations() {
   return safe(async () => {
     const quotations = await (await tenantModel(Quotation)).find({}).sort({ createdAt: -1 })
       .populate({ path: "lead", model: "Lead", select: "leadNumber customerName" })
@@ -438,7 +438,7 @@ export async function listAdminQuotations() {
   }, []);
 }
 
-export async function listAdminLeads(campaignId?: string) {
+export async function listTenantLeads(campaignId?: string) {
   return safe(async () => serialize(await (await tenantModel(Lead)).find(campaignId ? { campaign: campaignId } : {})
     .sort({ createdAt: -1 })
     .populate({ path: "campaign", model: "Campaign", select: "name channel" })
@@ -446,22 +446,22 @@ export async function listAdminLeads(campaignId?: string) {
     .lean()), []);
 }
 
-export async function listAdminVisas() {
+export async function listTenantVisas() {
   return safe(async () => serialize(await (await tenantModel(VisaApplication)).find({}).sort({ createdAt: -1 }).populate("lead", "leadNumber customerName").populate("customer", "name email mobile").lean()), []);
 }
-export async function listAdminTickets() { return safe(async()=>serialize(await (await tenantModel(TicketTracking)).find({}).sort({departureAt:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email mobile").lean()),[]); }
-export async function listAdminHotelReservations() { return safe(async()=>serialize(await (await tenantModel(HotelReservation)).find({}).sort({checkIn:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email mobile").lean()),[]); }
+export async function listTenantTickets() { return safe(async()=>serialize(await (await tenantModel(TicketTracking)).find({}).sort({departureAt:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email mobile").lean()),[]); }
+export async function listTenantHotelReservations() { return safe(async()=>serialize(await (await tenantModel(HotelReservation)).find({}).sort({checkIn:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email mobile").lean()),[]); }
 
-export async function listAdminExpenses() { return safe(async () => serialize(await (await tenantModel(Expense)).find({}).sort({ expenseDate: -1, createdAt: -1 }).lean()), []); }
-export async function listAdminInvoices() { return safe(async () => serialize(await (await tenantModel(Invoice)).find({}).sort({ issueDate: -1, createdAt: -1 }).lean()), []); }
-export async function listAdminReputation() { return safe(async () => serialize(await (await tenantModel(Reputation)).find({}).sort({ reviewedAt: -1, createdAt: -1 }).lean()), []); }
-export async function getAdminReputationSummary() { return safe(async () => { const [total, unresolved, negative, ratings] = await Promise.all([(await tenantModel(Reputation)).countDocuments({}), (await tenantModel(Reputation)).countDocuments({ status: { $nin: ["responded", "resolved"] } }), (await tenantModel(Reputation)).countDocuments({ sentiment: "negative", status: { $ne: "resolved" } }), (await tenantModel(Reputation)).aggregate([{ $group: { _id: null, average: { $avg: "$rating" } } }])]); return { total, unresolved, negative, averageRating: Number((ratings[0]?.average ?? 0).toFixed(1)) }; }, { total: 0, unresolved: 0, negative: 0, averageRating: 0 }); }
+export async function listTenantExpenses() { return safe(async () => serialize(await (await tenantModel(Expense)).find({}).sort({ expenseDate: -1, createdAt: -1 }).lean()), []); }
+export async function listTenantInvoices() { return safe(async () => serialize(await (await tenantModel(Invoice)).find({}).sort({ issueDate: -1, createdAt: -1 }).lean()), []); }
+export async function listTenantReputation() { return safe(async () => serialize(await (await tenantModel(Reputation)).find({}).sort({ reviewedAt: -1, createdAt: -1 }).lean()), []); }
+export async function getTenantReputationSummary() { return safe(async () => { const [total, unresolved, negative, ratings] = await Promise.all([(await tenantModel(Reputation)).countDocuments({}), (await tenantModel(Reputation)).countDocuments({ status: { $nin: ["responded", "resolved"] } }), (await tenantModel(Reputation)).countDocuments({ sentiment: "negative", status: { $ne: "resolved" } }), (await tenantModel(Reputation)).aggregate([{ $group: { _id: null, average: { $avg: "$rating" } } }])]); return { total, unresolved, negative, averageRating: Number((ratings[0]?.average ?? 0).toFixed(1)) }; }, { total: 0, unresolved: 0, negative: 0, averageRating: 0 }); }
 const employeePopulate={path:"employee",model:"Employee",select:"name email designation department"};
-export async function listAdminAttendance(){return safe(async()=>serialize(await (await tenantModel(Attendance)).find(await hrRecordScope()).sort({date:-1}).populate(employeePopulate).lean()),[])}
+export async function listTenantAttendance(){return safe(async()=>serialize(await (await tenantModel(Attendance)).find(await hrRecordScope()).sort({date:-1}).populate(employeePopulate).lean()),[])}
 export async function listAttendanceRegularizations(){return safe(async()=>serialize(await (await tenantModel(AttendanceRegularization)).find(await hrRecordScope()).sort({createdAt:-1}).populate(employeePopulate).lean()),[])}
-export async function listAdminPerformanceReviews(){return safe(async()=>serialize(await (await tenantModel(PerformanceReview)).find(await hrRecordScope()).sort({createdAt:-1}).populate(employeePopulate).lean()),[])}
-export async function listAdminLeaveRequests(){return safe(async()=>serialize(await (await tenantModel(LeaveRequest)).find(await hrRecordScope()).sort({startDate:-1}).populate(employeePopulate).lean()),[])}
-export async function listAdminHrTasks(){return safe(async()=>serialize(await (await tenantModel(HrTask)).find(await hrRecordScope()).sort({dueDate:1}).populate(employeePopulate).lean()),[])}
+export async function listTenantPerformanceReviews(){return safe(async()=>serialize(await (await tenantModel(PerformanceReview)).find(await hrRecordScope()).sort({createdAt:-1}).populate(employeePopulate).lean()),[])}
+export async function listTenantLeaveRequests(){return safe(async()=>serialize(await (await tenantModel(LeaveRequest)).find(await hrRecordScope()).sort({startDate:-1}).populate(employeePopulate).lean()),[])}
+export async function listTenantHrTasks(){return safe(async()=>serialize(await (await tenantModel(HrTask)).find(await hrRecordScope()).sort({dueDate:1}).populate(employeePopulate).lean()),[])}
 
 /* ----------------------------- PARTNER ----------------------------- */
 

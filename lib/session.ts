@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { connectDB } from "@/lib/db";
-import { ADMIN_PORTAL_PAGES, adminPortalPageKeyForPath, type AdminPortalPageKey, type Role } from "@/lib/constants";
+import { TENANT_PORTAL_PAGES, tenantPortalPageKeyForPath, type TenantPortalPageKey, type Role } from "@/lib/constants";
 import Employee from "@/models/Employee";
 
 export interface SessionUser {
@@ -12,6 +12,7 @@ export interface SessionUser {
   email?: string | null;
   image?: string | null;
   role: Role;
+  businessId?: string;
   partnerSlug?: string;
 }
 
@@ -39,12 +40,12 @@ export async function requireRole(roles: readonly string[]): Promise<SessionUser
 }
 
 
-export async function requireAdminPortalAccess() {
-  const user = await requireRole(["vendor", "vendor_employee", "admin"]);
-  if (user.role === "vendor" || user.role === "admin") {
+export async function requireTenantPortalAccess() {
+  const user = await requireRole(["tenant", "tenant_employee"]);
+  if (user.role === "tenant") {
     return {
       user,
-      accessPages: ADMIN_PORTAL_PAGES.map((page) => page.key),
+      accessPages: TENANT_PORTAL_PAGES.map((page) => page.key),
     };
   }
 
@@ -55,16 +56,16 @@ export async function requireAdminPortalAccess() {
     portalAccess: true,
   })
     .select("portalPages designation")
-    .lean<{ portalPages?: AdminPortalPageKey[]; designation?: string }>();
+    .lean<{ portalPages?: TenantPortalPageKey[]; designation?: string }>();
 
   const accessPages = employee?.portalPages ?? [];
-  if (!employee || accessPages.length === 0) redirect("/");
+  if (!employee || accessPages.length === 0) redirect("/tenant");
 
-  const pathname = (await headers()).get("x-portal-pathname") ?? "/admin";
-  const currentPage = adminPortalPageKeyForPath(pathname);
+  const pathname = (await headers()).get("x-portal-pathname") ?? "/";
+  const currentPage = tenantPortalPageKeyForPath(pathname);
   if (!accessPages.includes(currentPage)) {
-    const firstPage = ADMIN_PORTAL_PAGES.find((page) => accessPages.includes(page.key));
-    redirect(firstPage?.href ?? "/");
+    const firstPage = TENANT_PORTAL_PAGES.find((page) => accessPages.includes(page.key));
+    redirect(firstPage?.href ?? "/tenant");
   }
 
   return { user, accessPages, designation: employee.designation };

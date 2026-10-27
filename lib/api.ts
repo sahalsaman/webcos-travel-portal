@@ -59,12 +59,6 @@ export async function requireApiRole(roles?: readonly string[]) {
   const user = await currentUser();
   if (!user) throw fail("Authentication required", 401);
   const actualRole = String(user.role);
-  if (roles && !roles.some((role) => {
-    if (role === "admin") return actualRole === "vendor" || actualRole === "admin";
-    if (role === "employee") return actualRole === "vendor_employee" || actualRole === "employee";
-    if (role === "partner") return actualRole === "vendor_partner" || actualRole === "partner";
-    if (role === "traveler") return actualRole === "vendor_traveler" || actualRole === "traveler";
-    return role === actualRole;
-  })) throw fail("Forbidden", 403);
+  if (roles && !roles.includes(actualRole)) throw fail("Forbidden", 403);
   return user;
 }

@@ -26,7 +26,7 @@ export interface CommissionConfig {
 
 export interface CommissionInput {
   basePrice: number;
-  commission: number; // partner-set commission per seat (0 for direct/admin sales)
+  commission: number; // partner-set commission per seat (0 for direct/ sales)
   seats?: number;
   config?: CommissionConfig;
 }

@@ -30,8 +30,8 @@ try {
     businesses[slug] = id;
     await platform.collection('businesses').insertOne({ _id: id, name: slug, slug, databaseName: `integration_${slug}`, hosts: [`${slug}.localhost:${port}`], siteUrl: siteBase, logoUrl: '', primaryColor: '#0060e6', status: 'active', provisioned: true });
     const db = mongoose.connection.useDb(`integration_${slug}`);
-    await db.collection('users').insertOne({ name: slug, email: 'admin@example.test', password: passwordHash, role: 'vendor' });
-    await db.collection('users').insertOne({ name: `${slug} traveler`, email: 'traveler@example.test', password: passwordHash, role: 'vendor_traveler' });
+    await db.collection('users').insertOne({ name: slug, email: 'admin@example.test', password: passwordHash, role: 'tenant' });
+    await db.collection('users').insertOne({ name: `${slug} traveler`, email: 'traveler@example.test', password: passwordHash, role: 'tenant_traveler' });
     await db.collection('trips').insertOne({ title: `${slug} trip`, slug: 'same-slug', status: 'active', images: [], basePrice: 100, category: 'Family', createdAt: new Date() });
     await db.collection('settings').insertOne({ key: 'global', defaultCommission: slug === 'alpha' ? 100 : 200 });
   }
@@ -73,19 +73,19 @@ try {
     }
   }
   const alpha = new Client(base, 'alpha'); const beta = new Client(base, 'beta'); const owner = new Client(base);
-  assert.equal((await alpha.login('admin@example.test')).user.role, 'vendor');
+  assert.equal((await alpha.login('admin@example.test')).user.role, 'tenant');
   assert.equal((await alpha.json('/api/auth/session')).body.user.businessId, String(businesses.alpha));
   assert.equal((await beta.login('admin@example.test')).user.businessId, String(businesses.beta));
   assert.equal((await owner.login('owner@example.test')).user.role, 'admin');
   assert.equal((await alpha.json('/api/platform/businesses')).status, 403);
-  assert.equal((await new Client(base, 'alpha').json('/api/admin/settings')).status, 401);
+  assert.equal((await new Client(base, 'alpha').json('/api/tenant/settings')).status, 401);
   const crossSession = await alpha.json('/api/auth/session', { headers: { 'x-business-slug': 'beta' } });
   assert.ok(!crossSession.body.user, 'An alpha session must not authenticate to beta');
-  assert.equal((await alpha.json('/api/admin/settings', { headers: { 'x-business-slug': 'beta' } })).status, 401);
-  const patch = await alpha.json('/api/admin/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ defaultCommission: 321 }) });
+  assert.equal((await alpha.json('/api/tenant/settings', { headers: { 'x-business-slug': 'beta' } })).status, 401);
+  const patch = await alpha.json('/api/tenant/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ defaultCommission: 321 }) });
   assert.equal(patch.status, 200);
-  assert.equal((await beta.json('/api/admin/settings')).body.data.defaultCommission, 200);
-  assert.equal((await alpha.json('/api/admin/settings')).body.data.defaultCommission, 321);
+  assert.equal((await beta.json('/api/tenant/settings')).body.data.defaultCommission, 200);
+  assert.equal((await alpha.json('/api/tenant/settings')).body.data.defaultCommission, 321);
   const rpc = (client, operation, args = []) => client.json('/api/storefront', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operation, args }) });
   assert.equal((await rpc(alpha, 'getTrips')).body.data.items[0].title, 'alpha trip');
   assert.equal((await rpc(beta, 'getTrips')).body.data.items[0].title, 'beta trip');
@@ -95,7 +95,7 @@ try {
   const created = await owner.json('/api/platform/businesses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Gamma Agency', slug: 'gamma', host: `gamma.localhost:${port}`, siteUrl: siteBase, adminName: 'Gamma Admin', adminEmail: 'gamma@example.test', adminPassword: password }) });
   assert.equal(created.status, 201, JSON.stringify(created.body));
   const gamma = new Client(base, 'gamma');
-  assert.equal((await gamma.login('gamma@example.test')).user.role, 'vendor');
+  assert.equal((await gamma.login('gamma@example.test')).user.role, 'tenant');
   assert.equal((await rpc(gamma, 'getTrips')).body.data.items.length, 0);
   // Test real same-origin website rewrites, Auth.js cookies, and server-rendered session access.
   const website = new Client(siteBase);
@@ -108,11 +108,11 @@ try {
   const suspend = await owner.json('/api/platform/businesses', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: String(businesses.alpha), status: 'suspended' }) });
   assert.equal(suspend.status, 200);
   assert.ok(!(await alpha.json('/api/auth/session')).body.user);
-  assert.equal((await alpha.json('/api/admin/settings')).status, 401);
+  assert.equal((await alpha.json('/api/tenant/settings')).status, 401);
   portalChild.kill('SIGTERM');
   await once(portalChild, 'exit');
   assert.equal((await website.request('/')).status, 200, 'Public website should degrade gracefully while the portal is unavailable');
-  console.log('PASS: agency isolation, settings writes, session binding, super-admin authorization, business onboarding, private RPC authorization, input limits, website proxy login/cookies, header spoofing, server rendering, suspension, and public-site outage fallback.');
+  console.log('PASS: agency isolation, settings writes, session binding, admin authorization, business onboarding, private RPC authorization, input limits, website proxy login/cookies, header spoofing, server rendering, suspension, and public-site outage fallback.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
   await Promise.all(children.map(child => child.exitCode === null ? once(child, 'exit') : Promise.resolve()));

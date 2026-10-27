@@ -14,7 +14,7 @@ export async function authorizeSuperAdmin(email: string, password: string) {
   if (!user || !await bcrypt.compare(password, user.password)) return null;
   // Platform administrators use the public `admin` role. They have no tenant
   // businessId, which is how the session layer distinguishes them from an
-  // agency owner (`vendor`).
+  // agency owner (`tenant`).
   return { id: String(user._id), name: user.name as string, email: user.email as string, role: "admin", businessId: undefined };
 }
 export async function requireSuperAdmin() {

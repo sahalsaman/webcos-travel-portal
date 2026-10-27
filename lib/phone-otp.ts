@@ -64,7 +64,7 @@ export async function requestPhoneOtp(input: string, purpose: "login" | "registe
     const legacyIndianMobile = mobile.startsWith("+91") ? mobile.slice(3) : "";
     const user = await (await tenantModel(User)).exists({
       mobile: { $in: [mobile, legacyIndianMobile].filter(Boolean) },
-      role: { $in: ["traveler", "vendor_traveler"] },
+      role: "tenant_traveler",
     });
     if (!user) throw new Error("No account exists with this mobile number. Please create an account first.");
   }

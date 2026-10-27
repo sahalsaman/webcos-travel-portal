@@ -7,7 +7,7 @@ import Partner from "@/models/Partner";
 /** Partner: update business profile / branding. */
 export async function PATCH(request: Request) {
   try {
-    const user = await requireApiRole(["partner"]);
+    const user = await requireApiRole(["tenant_partner"]);
     const body = await request.json();
     await connectDB();
 

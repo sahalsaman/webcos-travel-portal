@@ -30,7 +30,7 @@ try {
         databaseName: VOIBEE_DATABASE,
         hosts: [...new Set(localHosts)],
         siteUrl: VOIBEE_SITE_URL,
-        logoUrl: "/vendor_logos/voibee_holidays.png",
+        logoUrl: "/tenant_logos/voibee_holidays.png",
         primaryColor: "#0060e6",
         status: "active",
         provisioned: true,

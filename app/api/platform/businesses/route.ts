@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const db = mongoose.connection.useDb(business.databaseName, { useCache: true });
     const users = db.model("User", User.schema);
     await users.init();
-    await users.create({ name: input.adminName, email: input.adminEmail, password: await bcrypt.hash(input.adminPassword, 12), role: "vendor", businessId: business._id });
+    await users.create({ name: input.adminName, email: input.adminEmail, password: await bcrypt.hash(input.adminPassword, 12), role: "tenant", businessId: business._id });
     business.provisioned = true;
     business.status = "active";
     await business.save();
@@ -39,9 +39,26 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     await requireSuperAdmin();
-    const input = z.object({ id: z.string().regex(/^[a-f\d]{24}$/i), status: z.enum(["active", "suspended"]) }).parse(await request.json());
+    const input = z.object({
+      id: z.string().regex(/^[a-f\d]{24}$/i),
+      name: z.string().trim().min(2).max(100).optional(),
+      siteUrl: z.url().optional(),
+      status: z.enum(["active", "suspended"]).optional(),
+      subscription: z.object({
+        plan: z.string().trim().min(2).max(60),
+        status: z.enum(["trial", "active", "past_due", "cancelled"]),
+        amount: z.coerce.number().nonnegative(),
+        currency: z.string().trim().length(3).default("INR"),
+        renewsAt: z.string().datetime().nullable().optional(),
+      }).optional(),
+    }).refine((value) => value.name || value.siteUrl || value.status || value.subscription, "Add at least one update").parse(await request.json());
     const model = await businessModel();
-    const business = await model.findOneAndUpdate({ _id: input.id, provisioned: true }, { status: input.status }, { new: true });
-    return business ? ok({ id: String(business._id), status: business.status }) : fail("Business not found", 404);
+    const update: Record<string, unknown> = {};
+    if (input.name) update.name = input.name;
+    if (input.siteUrl) update.siteUrl = input.siteUrl;
+    if (input.status) update.status = input.status;
+    if (input.subscription) update.subscription = { ...input.subscription, renewsAt: input.subscription.renewsAt ? new Date(input.subscription.renewsAt) : null };
+    const business = await model.findOneAndUpdate({ _id: input.id, provisioned: true }, update, { new: true }).select("-databaseName").lean();
+    return business ? ok(business) : fail("Tenant not found", 404);
   } catch (e) { return handleError(e); }
 }

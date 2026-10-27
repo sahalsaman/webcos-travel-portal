@@ -14,7 +14,7 @@ type Ctx = { params: Promise<{ id: string }> };
 /** Admin: update a trip. */
 export async function PATCH(request: Request, { params }: Ctx) {
   try {
-    await requireApiRole(["admin"]);
+    await requireApiRole(["tenant", "tenant_employee"]);
     const { id } = await params;
     const body = await request.json();
     const data = tripUpdateSchema.parse({ ...body, ...(body.images !== undefined ? { images: await uploadExternalPackageImages(body.images) } : {}) });
@@ -39,7 +39,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
 /** Delete a package only while no traveler booking references it. */
 export async function DELETE(_request: Request, { params }: Ctx) {
   try {
-    await requireApiRole(["admin"]);
+    await requireApiRole(["tenant", "tenant_employee"]);
     const { id } = await params;
     await connectDB();
     const BookingModel = await tenantModel(Booking);

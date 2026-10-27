@@ -1,7 +1,7 @@
 /** Shared enums & option lists used by models, forms and UI. */
 export { COUNTRY_OPTIONS, type CountryOption } from "@/lib/country_currency";
 
-export const ROLES = ["admin","vendor", "vendor_employee", "vendor_partner", "vendor_traveler"] as const;
+export const ROLES = ["admin","tenant", "tenant_employee", "tenant_partner", "tenant_traveler"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const PARTNER_TYPES = [
@@ -67,24 +67,24 @@ export const LEAVE_REQUEST_STATUSES = ["pending", "approved", "rejected", "cance
 export const HR_TASK_PRIORITIES = ["low", "medium", "high", "urgent"] as const;
 export const HR_TASK_STATUSES = ["todo", "in_progress", "blocked", "completed", "cancelled"] as const;
 
-export const ADMIN_PORTAL_PAGES = [
-  { key: "dashboard", label: "Dashboard", href: "/admin" },
-  { key: "lms", label: "Bookings & LMS", href: "/admin/lms" },
-  { key: "hrm", label: "HRM", href: "/admin/hrm" },
-  { key: "users", label: "Users", href: "/admin/users" },
-  { key: "inventory", label: "Inventory", href: "/admin/inventory" },
-  { key: "finance", label: "Finance", href: "/admin/finance" },
-  { key: "reputation", label: "ORM", href: "/admin/reputation" },
-  { key: "reports", label: "Reports", href: "/admin/reports" },
-  { key: "campaigns", label: "Marketing Campaigns", href: "/admin/campaigns" },
-  { key: "settings", label: "Settings", href: "/admin/settings" },
+export const TENANT_PORTAL_PAGES = [
+  { key: "dashboard", label: "Dashboard", href: "/tenant" },
+  { key: "lms", label: "Bookings & LMS", href: "/tenant/lms" },
+  { key: "hrm", label: "HRM", href: "/tenant/hrm" },
+  { key: "users", label: "Users", href: "/tenant/users" },
+  { key: "inventory", label: "Inventory", href: "/tenant/inventory" },
+  { key: "finance", label: "Finance", href: "/tenant/finance" },
+  { key: "reputation", label: "ORM", href: "/tenant/reputation" },
+  { key: "reports", label: "Reports", href: "/tenant/reports" },
+  { key: "campaigns", label: "Marketing Campaigns", href: "/tenant/campaigns" },
+  { key: "settings", label: "Settings", href: "/tenant/settings" },
 ] as const;
-export type AdminPortalPageKey = (typeof ADMIN_PORTAL_PAGES)[number]["key"];
-export const ADMIN_PORTAL_PAGE_KEYS = ADMIN_PORTAL_PAGES.map((page) => page.key) as [AdminPortalPageKey, ...AdminPortalPageKey[]];
+export type TenantPortalPageKey = (typeof TENANT_PORTAL_PAGES)[number]["key"];
+export const TENANT_PORTAL_PAGE_KEYS = TENANT_PORTAL_PAGES.map((page) => page.key) as [TenantPortalPageKey, ...TenantPortalPageKey[]];
 
-export function adminPortalPageKeyForPath(pathname: string) {
-  const cleanPath = pathname.split("?")[0] || "/admin";
-  const match = [...ADMIN_PORTAL_PAGES]
+export function tenantPortalPageKeyForPath(pathname: string) {
+  const cleanPath = pathname.split("?")[0] || "/";
+  const match = [...TENANT_PORTAL_PAGES]
     .sort((a, b) => b.href.length - a.href.length)
     .find((page) => cleanPath === page.href || cleanPath.startsWith(`${page.href}/`));
   return match?.key ?? "dashboard";

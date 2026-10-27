@@ -17,7 +17,7 @@ import {
   ACTIVITY_STATUSES,
   ACTIVITY_TYPE_STATUSES,
   EMPLOYEE_STATUSES,
-  ADMIN_PORTAL_PAGE_KEYS,
+  TENANT_PORTAL_PAGE_KEYS,
   LEAD_SOURCES,
   LEAD_STATUSES,
   VISA_STATUSES,
@@ -98,8 +98,14 @@ const tripBaseSchema = z.object({
         specials: z.array(z.string().trim().min(1)).default([]),
         highlights: z.array(z.object({ image: z.string().default("") })).default([]),
         schedule: z.array(z.object({ time: z.string().trim().min(1), title: z.string().trim().min(1), description: z.string().default("") })).default([]),
-        transports: z.array(z.object({ vehicle_id: z.string().trim().min(1) })).default([]),
-        hotels: z.array(z.object({ hotel_id: z.string().trim().min(1) })).default([]),
+        transports: z.array(z.union([
+          z.object({ vehicle_id: z.string().trim().min(1) }),
+          z.object({ title: z.string().trim().min(1), description: z.string().default("") }),
+        ])).default([]),
+        hotels: z.array(z.union([
+          z.object({ hotel_id: z.string().trim().min(1) }),
+          z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default("") }),
+        ])).default([]),
         meals: z.array(z.enum(["breakfast", "lunch", "dinner"])).default([]),
         sightseeing: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default("") })).default([]),
         activity: z.array(z.object({ name: z.string().trim().min(1), description: z.string().default(""), image: z.string().default("") })).default([]),
@@ -204,7 +210,7 @@ const employeeFieldsSchema = z.object({
   joinedAt: z.string().optional().or(z.literal("")),
   portalAccess: z.boolean().default(false),
   portalPassword: z.string().optional().or(z.literal("")),
-  portalPages: z.array(z.enum(ADMIN_PORTAL_PAGE_KEYS)).default([]),
+  portalPages: z.array(z.enum(TENANT_PORTAL_PAGE_KEYS)).default([]),
   hrAccess: z.enum(["self", "manage"]).default("self"),
   notes: z.string().default(""),
 });
@@ -390,7 +396,7 @@ export const hotelReservationSchema = z.object({ leadId:z.string().trim().option
 export const expenseSchema = z.object({
   title: z.string().trim().min(2),
   category: z.string().trim().min(2),
-  vendor: z.string().trim().default(""),
+  tenant: z.string().trim().default(""),
   amount: z.number().positive(),
   expenseDate: z.string().trim().min(1),
   status: z.enum(EXPENSE_STATUSES).default("pending"),

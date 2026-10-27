@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     const travelEndDate = new Date(travelStartDate.getTime() + configuredDuration);
 
     let travelerId: string;
-    if (user?.role === "vendor_traveler") {
+    if (user?.role === "tenant_traveler") {
       const traveler = await (await tenantModel(User)).findByIdAndUpdate(
         user.id,
         {
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         {
           $setOnInsert: {
             email: travelerDetails.email,
-            role: "traveler",
+            role: "tenant_traveler",
           },
           $set: {
             name: travelerDetails.name,
@@ -170,7 +170,7 @@ export async function POST(request: Request) {
       type: "booking",
       title: "New booking received",
       message: `${bookingNumber} · ${trip.title} · ${travelerDetails.name} · ${body.seats} traveler(s)`,
-      meta: { bookingId: String(booking._id), bookingNumber, href: "/admin/lms/bookings" },
+      meta: { bookingId: String(booking._id), bookingNumber, href: "/lms/bookings" },
     }, "lms");
 
     // Offline bookings are stored immediately and remain unpaid until an admin
