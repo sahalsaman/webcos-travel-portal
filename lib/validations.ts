@@ -302,8 +302,16 @@ export const inventoryAssetSchema = z.object({
   image: z.string().trim().default(""),
   description: z.string().trim().default(""),
   directHotelBooking: z.boolean().default(false),
+  additionalTax: z.boolean().default(false),
+  taxLabel: z.string().trim().max(40).default("GST"),
+  taxPercentage: z.number().min(0).max(100).default(0),
   facilities: z.array(z.string().trim().min(1)).default([]),
-});
+  rooms: z.array(z.object({
+    name: z.string().trim().min(2), description: z.string().trim().default(""), category: z.string().trim().default(""),
+    capacity: z.number().int().positive().default(1), numberOfRooms: z.number().int().positive().default(1),
+    price: z.number().nonnegative(), currency: z.string().trim().length(3).default("USD"), amenities: z.array(z.string().trim().min(1)).default([]),
+  })).default([]),
+}).superRefine((data, ctx) => { if (data.additionalTax && !data.taxLabel) ctx.addIssue({ code: "custom", path: ["taxLabel"], message: "Enter a tax label" }); });
 
 export const campaignSchema = z.object({
   name: z.string().trim().min(2),
@@ -391,7 +399,7 @@ export const visaSchema = z.object({
 }).refine((data) => Boolean(data.leadId || data.customerId), { path: ["customerId"], message: "Select a customer or lead" });
 
 export const ticketTrackingSchema = z.object({ leadId:z.string().trim().optional().or(z.literal("")), customerId:z.string().trim().optional().or(z.literal("")), ticketType:z.enum(TICKET_TYPES), provider:z.string().trim().min(2), referenceNumber:z.string().trim().default(""), origin:z.string().trim().min(2), destination:z.string().trim().min(2), departureAt:z.string().trim().min(1), arrivalAt:z.string().trim().optional().or(z.literal("")), travelers:z.number().int().positive().default(1), amount:z.number().nonnegative().default(0), status:z.enum(TICKET_STATUSES).default("requested"), assignedTo:z.string().trim().default(""), notes:z.string().trim().default("") }).refine((data)=>Boolean(data.leadId||data.customerId),{path:["customerId"],message:"Select a customer or lead"});
-export const hotelReservationSchema = z.object({ leadId:z.string().trim().optional().or(z.literal("")), customerId:z.string().trim().optional().or(z.literal("")), hotelName:z.string().trim().min(2), destination:z.string().trim().min(2), confirmationNumber:z.string().trim().default(""), checkIn:z.string().trim().min(1), checkOut:z.string().trim().min(1), rooms:z.number().int().positive().default(1), guests:z.number().int().positive().default(1), roomType:z.string().trim().default(""), mealPlan:z.string().trim().default(""), amount:z.number().nonnegative().default(0), status:z.enum(HOTEL_RESERVATION_STATUSES).default("requested"), assignedTo:z.string().trim().default(""), notes:z.string().trim().default("") }).refine((data)=>Boolean(data.leadId||data.customerId),{path:["customerId"],message:"Select a customer or lead"}).refine((data)=>new Date(data.checkOut)>new Date(data.checkIn),{path:["checkOut"],message:"Check-out must be after check-in"});
+export const hotelReservationSchema = z.object({ leadId:z.string().trim().optional().or(z.literal("")), customerId:z.string().trim().optional().or(z.literal("")), hotelId:z.string().trim().min(1), roomId:z.string().trim().min(1), hotelName:z.string().trim().min(2), destination:z.string().trim().min(2), confirmationNumber:z.string().trim().default(""), checkIn:z.string().trim().min(1), checkOut:z.string().trim().min(1), rooms:z.number().int().positive().default(1), guests:z.number().int().positive().default(1), roomType:z.string().trim().min(1), mealPlan:z.string().trim().default(""), amount:z.number().nonnegative().default(0), status:z.enum(HOTEL_RESERVATION_STATUSES).default("requested"), assignedTo:z.string().trim().default(""), notes:z.string().trim().default("") }).refine((data)=>Boolean(data.leadId||data.customerId),{path:["customerId"],message:"Select a customer or lead"}).refine((data)=>new Date(data.checkOut)>new Date(data.checkIn),{path:["checkOut"],message:"Check-out must be after check-in"});
 
 export const expenseSchema = z.object({
   title: z.string().trim().min(2),

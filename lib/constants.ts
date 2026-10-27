@@ -27,6 +27,7 @@ export const OFFER_CARD_STATUSES = ["active", "inactive"] as const;
 export const EMPLOYEE_STATUSES = ["active", "inactive"] as const;
 export const SUPPLIER_STATUSES = ["active", "inactive"] as const;
 export const SUPPLIER_TYPES = [
+  "B2B Package Supplier",
   "Hotel",
   "Transport",
   "Activity",
