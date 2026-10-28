@@ -184,7 +184,7 @@ export interface ActivityBookingDTO {
   activity: string | Pick<ActivityDTO, "_id" | "title" | "slug" | "destination">;
   name: string;
   email: string;
-  mobile: string;
+  phone: string;
   activityDate: string;
   timeSlot: string;
   adults: number;
@@ -220,7 +220,7 @@ export interface UserDTO {
   _id: string;
   name: string;
   email: string;
-  mobile?: string;
+  phone?: string;
   role: Role;
   image?: string;
   createdAt?: string;
@@ -230,7 +230,7 @@ export interface EmployeeDTO {
   _id: string;
   name: string;
   email: string;
-  mobile?: string;
+  phone?: string;
   designation: string;
   department: string;
   status: EmployeeStatus;
@@ -340,7 +340,7 @@ export interface LeadDTO {
 export interface VisaApplicationDTO {
   _id: string;
   lead?: string | Pick<LeadDTO, "_id" | "leadNumber" | "customerName"> | null;
-  customer?: string | Pick<UserDTO, "_id" | "name" | "email" | "mobile"> | null;
+  customer?: string | Pick<UserDTO, "_id" | "name" | "email" | "phone"> | null;
   visaNumber: string;
   applicantName: string;
   phone: string;
@@ -358,8 +358,8 @@ export interface VisaApplicationDTO {
   createdAt: string;
 }
 
-export interface TicketTrackingDTO { _id:string; lead?:string|Pick<LeadDTO,"_id"|"leadNumber"|"customerName">|null; customer?:string|Pick<UserDTO,"_id"|"name"|"email"|"mobile">|null; trackingNumber:string; customerName:string; phone:string; ticketType:TicketType; provider:string; referenceNumber:string; origin:string; destination:string; departureAt:string; arrivalAt?:string|null; travelers:number; amount:number; status:TicketStatus; assignedTo:string; notes:string; createdAt:string; }
-export interface HotelReservationDTO { _id:string; lead?:string|Pick<LeadDTO,"_id"|"leadNumber"|"customerName">|null; customer?:string|Pick<UserDTO,"_id"|"name"|"email"|"mobile">|null; hotel?:string|null; roomId?:string|null; trackingNumber:string; customerName:string; phone:string; hotelName:string; destination:string; confirmationNumber:string; checkIn:string; checkOut:string; rooms:number; guests:number; roomType:string; mealPlan:string; amount:number; status:HotelReservationStatus; assignedTo:string; notes:string; createdAt:string; }
+export interface TicketTrackingDTO { _id:string; lead?:string|Pick<LeadDTO,"_id"|"leadNumber"|"customerName">|null; customer?:string|Pick<UserDTO,"_id"|"name"|"email"|"phone">|null; trackingNumber:string; customerName:string; phone:string; ticketType:TicketType; provider:string; referenceNumber:string; origin:string; destination:string; departureAt:string; arrivalAt?:string|null; travelers:number; amount:number; status:TicketStatus; assignedTo:string; notes:string; createdAt:string; }
+export interface HotelReservationDTO { _id:string; lead?:string|Pick<LeadDTO,"_id"|"leadNumber"|"customerName">|null; customer?:string|Pick<UserDTO,"_id"|"name"|"email"|"phone">|null; hotel?:string|null; roomId?:string|null; trackingNumber:string; customerName:string; phone:string; hotelName:string; destination:string; confirmationNumber:string; checkIn:string; checkOut:string; rooms:number; guests:number; roomType:string; mealPlan:string; amount:number; status:HotelReservationStatus; assignedTo:string; notes:string; createdAt:string; }
 
 export interface ExpenseDTO { _id: string; expenseNumber: string; title: string; category: string; tenant: string; amount: number; expenseDate: string; status: ExpenseStatus; paymentReference: string; notes: string; createdAt: string; }
 export interface InvoiceDTO { _id: string; invoiceNumber: string; customerName: string; customerEmail?: string; customerPhone: string; description: string; amount: number; issueDate: string; dueDate: string; status: InvoiceStatus; bookingNumber: string; notes: string; createdAt: string; }
@@ -391,7 +391,7 @@ export interface QuotationDTO {
   quotationNumber: string;
   shareToken: string;
   lead?: string | Pick<LeadDTO, "_id" | "leadNumber" | "customerName"> | null;
-  customer?: string | Pick<UserDTO, "_id" | "name" | "email" | "mobile"> | null;
+  customer?: string | Pick<UserDTO, "_id" | "name" | "email" | "phone"> | null;
   trip?: string | Pick<TripDTO, "_id" | "title" | "destination" | "basePrice"> | null;
   customItinerary?: ItineraryItem[];
   customerName: string;
@@ -455,7 +455,7 @@ export interface BookingDTO {
   travelerDetails: {
     name: string;
     email: string;
-    mobile: string;
+    phone: string;
     travellers: number;
     notes?: string;
   };

@@ -78,14 +78,14 @@ try {
   assert.equal((await beta.login('admin@example.test')).user.businessId, String(businesses.beta));
   assert.equal((await owner.login('owner@example.test')).user.role, 'admin');
   assert.equal((await alpha.json('/api/platform/businesses')).status, 403);
-  assert.equal((await new Client(base, 'alpha').json('/api/tenant/settings')).status, 401);
+  assert.equal((await new Client(base, 'alpha').json('/api/settings')).status, 401);
   const crossSession = await alpha.json('/api/auth/session', { headers: { 'x-business-slug': 'beta' } });
   assert.ok(!crossSession.body.user, 'An alpha session must not authenticate to beta');
-  assert.equal((await alpha.json('/api/tenant/settings', { headers: { 'x-business-slug': 'beta' } })).status, 401);
-  const patch = await alpha.json('/api/tenant/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ defaultCommission: 321 }) });
+  assert.equal((await alpha.json('/api/settings', { headers: { 'x-business-slug': 'beta' } })).status, 401);
+  const patch = await alpha.json('/api/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ defaultCommission: 321 }) });
   assert.equal(patch.status, 200);
-  assert.equal((await beta.json('/api/tenant/settings')).body.data.defaultCommission, 200);
-  assert.equal((await alpha.json('/api/tenant/settings')).body.data.defaultCommission, 321);
+  assert.equal((await beta.json('/api/settings')).body.data.defaultCommission, 200);
+  assert.equal((await alpha.json('/api/settings')).body.data.defaultCommission, 321);
   const rpc = (client, operation, args = []) => client.json('/api/storefront', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operation, args }) });
   assert.equal((await rpc(alpha, 'getTrips')).body.data.items[0].title, 'alpha trip');
   assert.equal((await rpc(beta, 'getTrips')).body.data.items[0].title, 'beta trip');
@@ -108,7 +108,7 @@ try {
   const suspend = await owner.json('/api/platform/businesses', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: String(businesses.alpha), status: 'suspended' }) });
   assert.equal(suspend.status, 200);
   assert.ok(!(await alpha.json('/api/auth/session')).body.user);
-  assert.equal((await alpha.json('/api/tenant/settings')).status, 401);
+  assert.equal((await alpha.json('/api/settings')).status, 401);
   portalChild.kill('SIGTERM');
   await once(portalChild, 'exit');
   assert.equal((await website.request('/')).status, 200, 'Public website should degrade gracefully while the portal is unavailable');

@@ -137,7 +137,7 @@ export async function POST(request: Request) {
       type: "payment",
       title: "Payment received",
       message: `${booking.bookingNumber} was paid successfully for ${trip?.title ?? "a package"}.`,
-      meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/tenant/finance/earnings" },
+      meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/finance/earnings" },
     }, "finance");
 
     return ok({ bookingNumber: booking.bookingNumber });

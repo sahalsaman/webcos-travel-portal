@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Binoculars, BusFront, ChevronDown, Clock3, Hotel, Plus, Sparkles, Trash2, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CloudinaryImageGallery } from "@/components/tenant/cloudinary-image-urls-field";
+import { CloudinaryImageGallery } from "@/components/cloudinary-image-urls-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";

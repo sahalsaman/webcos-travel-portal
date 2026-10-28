@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { QuotationDrawer } from "@/components/tenant/quotation-drawer";
+import { QuotationDrawer } from "@/components/quotation-drawer";
 import { formatDate, formatINR } from "@/lib/utils";
 import type { TripDTO, UserDTO } from "@/types";
 
@@ -36,7 +36,7 @@ export function TravelerDetailDrawer({ travelers, itineraries }: { travelers: Tr
           <thead>
             <tr className="border-b border-border text-left text-muted-foreground">
               <th className="p-4 font-medium">Traveler</th>
-              <th className="p-4 font-medium">Mobile</th>
+              <th className="p-4 font-medium">Phone</th>
               <th className="p-4 font-medium">Bookings</th>
               <th className="p-4 font-medium">Paid amount</th>
               <th className="p-4 font-medium">Last booking</th>
@@ -50,7 +50,7 @@ export function TravelerDetailDrawer({ travelers, itineraries }: { travelers: Tr
                   <p className="font-medium">{traveler.name}</p>
                   <p className="text-xs text-muted-foreground">{traveler.email}</p>
                 </td>
-                <td className="p-4 text-muted-foreground">{traveler.mobile || "-"}</td>
+                <td className="p-4 text-muted-foreground">{traveler.phone || "-"}</td>
                 <td className="p-4">{traveler.bookingCount}</td>
                 <td className="p-4 font-medium">{formatINR(traveler.paidAmount)}</td>
                 <td className="p-4 text-muted-foreground">{traveler.lastBookingAt ? formatDate(traveler.lastBookingAt) : "-"}</td>
@@ -72,7 +72,7 @@ export function TravelerDetailDrawer({ travelers, itineraries }: { travelers: Tr
               <Button variant="ghost" size="icon" onClick={() => setSelected(null)}><X className="size-5" /></Button>
             </div>
             <div className="grid gap-3 border-b border-border p-5 text-sm sm:grid-cols-3">
-              <div><p className="text-muted-foreground">Mobile</p><p className="font-medium">{selected.mobile || "-"}</p></div>
+              <div><p className="text-muted-foreground">Phone</p><p className="font-medium">{selected.phone || "-"}</p></div>
               <div><p className="text-muted-foreground">Bookings</p><p className="font-medium">{selected.bookingCount}</p></div>
               <div><p className="text-muted-foreground">Paid</p><p className="font-medium">{formatINR(selected.paidAmount)}</p></div>
             </div>

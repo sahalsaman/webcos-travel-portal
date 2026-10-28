@@ -13,7 +13,7 @@ import Employee from "@/models/Employee";
 import mongoose from "mongoose";
 import { businessModel } from "@/lib/business";
 import { headers } from "next/headers";
-import { normaliseMobile, verifyPhoneOtp } from "@/lib/phone-otp";
+import { normalisePhone, verifyPhoneOtp } from "@/lib/phone-otp";
 
 const portalOnlyRoles = new Set(["admin", "tenant", "tenant_employee"]);
 
@@ -21,18 +21,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      credentials: { email: {}, password: {}, mobile: {}, otp: {} },
+      credentials: { email: {}, password: {}, phone: {}, otp: {} },
       async authorize(credentials) {
-        const requestedMobile = typeof credentials?.mobile === "string" ? credentials.mobile : "";
+        const requestedPhone = typeof credentials?.phone === "string" ? credentials.phone : "";
         const requestedOtp = typeof credentials?.otp === "string" ? credentials.otp : "";
-        if (requestedMobile && requestedOtp) {
+        if (requestedPhone && requestedOtp) {
           try {
-            const mobile = normaliseMobile(requestedMobile);
-            if (!await verifyPhoneOtp(mobile, requestedOtp)) return null;
+            const phone = normalisePhone(requestedPhone);
+            if (!await verifyPhoneOtp(phone, requestedOtp)) return null;
             const business = await getBusiness();
             await connectDB();
-            const legacyIndianMobile = mobile.startsWith("+91") ? mobile.slice(3) : "";
-            const user = await (await tenantModel(User)).findOne({ mobile: { $in: [mobile, legacyIndianMobile].filter(Boolean) } }).lean<{ _id: unknown; name: string; email: string; role: string; image?: string }>();
+            const legacyIndianPhone = phone.startsWith("+91") ? phone.slice(3) : "";
+            const user = await (await tenantModel(User)).findOne({ phone: { $in: [phone, legacyIndianPhone].filter(Boolean) } }).lean<{ _id: unknown; name: string; email: string; role: string; image?: string }>();
             if (!user || user.role !== "tenant_traveler") return null;
             return { id: String(user._id), businessId: String(business._id), name: user.name, email: user.email, image: user.image, role: user.role };
           } catch {
@@ -41,8 +41,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
-        const isTenantWebsiteLogin = (await headers()).get("x-portal-client") === "tenant-website";
-        const siteLoginBlocked = (role: string) => isTenantWebsiteLogin && portalOnlyRoles.has(role);
+        const portalClient = (await headers()).get("x-portal-client");
+        const isPublicWebsiteLogin = portalClient === "tenant-website" || portalClient === "voibee-site";
+        const siteLoginBlocked = (role: string) => isPublicWebsiteLogin && portalOnlyRoles.has(role);
 
         // Resolve the request host first. The same email may exist as a
         // platform admin and as an agency owner; the portal host decides which

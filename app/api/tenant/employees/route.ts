@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       const user = await (await tenantModel(User)).findOneAndUpdate(
         { email },
         {
-          $set: { email, name: data.name, mobile: data.mobile, password, role: "tenant_employee" },
+          $set: { email, name: data.name, phone: data.phone, password, role: "tenant_employee" },
         },
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
       );

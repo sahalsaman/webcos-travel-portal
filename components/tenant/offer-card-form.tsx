@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CloudinaryImageGallery } from "@/components/tenant/cloudinary-image-urls-field";
+import { CloudinaryImageGallery } from "@/components/cloudinary-image-urls-field";
 import { COUNTRY_OPTIONS, OFFER_CARD_STATUSES } from "@/lib/constants";
 import type { OfferCardDTO } from "@/types";
 
@@ -74,7 +74,7 @@ export function OfferCardForm({ offer, onSaved, onCancel }: { offer?: OfferCardD
       if (!res.ok || !data.success) throw new Error(data.message || "Save failed");
       toast.success(editing ? "Banner slide updated" : "Banner slide created");
       if (onSaved) onSaved();
-      else router.push("/tenant/settings?section=offers");
+      else router.push("/settings?section=offers");
       router.refresh();
     } catch (err) {
       toast.error((err as Error).message);
@@ -156,7 +156,7 @@ export function OfferCardForm({ offer, onSaved, onCancel }: { offer?: OfferCardD
       </div>
 
       <div className="sticky bottom-0 z-10 -mx-5 -mb-5 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel ?? (() => router.push("/tenant/settings?section=offers"))}>
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel ?? (() => router.push("/settings?section=offers"))}>
           Cancel
         </Button>
         <Button type="submit" variant="gradient" className="w-full sm:w-auto" disabled={loading}>

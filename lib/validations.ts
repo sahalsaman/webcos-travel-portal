@@ -30,10 +30,12 @@ import {
   ATTENDANCE_STATUSES, PERFORMANCE_STATUSES, LEAVE_TYPES, LEAVE_REQUEST_STATUSES, HR_TASK_PRIORITIES, HR_TASK_STATUSES,
 } from "@/lib/constants";
 
-const mobile = z
+const phone = z
   .string()
   .trim()
-  .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number");
+  // Booking and website forms send E.164 values (for example +919746341376),
+  // while established Portal records may still contain a local 10-digit value.
+  .regex(/^\+?[1-9]\d{6,14}$/, "Enter a valid phone number with country code");
 
 export const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -43,7 +45,7 @@ export const loginSchema = z.object({
 export const travelerRegisterSchema = z.object({
   name: z.string().trim().min(2, "Name is too short"),
   email: z.string().email("Enter a valid email").optional(),
-  mobile: z.string().trim().regex(/^\+?[1-9]\d{6,14}$/, "Enter a valid mobile number with country code"),
+  phone: z.string().trim().regex(/^\+?[1-9]\d{6,14}$/, "Enter a valid phone number with country code"),
   password: z.string().min(6, "Password must be at least 6 characters").optional(),
 });
 
@@ -61,7 +63,7 @@ export const partnerRegisterSchema = travelerRegisterSchema.extend({
 export const adminPartnerInviteSchema = z.object({
   name: z.string().trim().min(2, "Name is too short"),
   email: z.string().email("Enter a valid email"),
-  mobile,
+  phone,
   password: z.string().min(6, "Password must be at least 6 characters"),
   businessName: z.string().trim().min(2, "Business name is required"),
   partnerType: z.enum(PARTNER_TYPES).default("Travel Agency"),
@@ -72,7 +74,7 @@ export const adminPartnerInviteSchema = z.object({
 export const adminTravelerSchema = z.object({
   name: z.string().trim().min(2, "Name is too short"),
   email: z.string().email("Enter a valid email"),
-  mobile,
+  phone,
 });
 
 const tripBaseSchema = z.object({
@@ -191,7 +193,7 @@ export const activityBookingSchema = z.object({
   activityId: z.string().trim().min(1),
   name: z.string().trim().min(2),
   email: z.string().email(),
-  mobile: z.string().trim().min(6),
+  phone: z.string().trim().min(6),
   activityDate: z.string().trim().min(1),
   timeSlot: z.string().default(""),
   adults: z.number().int().nonnegative().default(1),
@@ -202,7 +204,7 @@ export const activityBookingSchema = z.object({
 const employeeFieldsSchema = z.object({
   name: z.string().trim().min(2),
   email: z.string().email(),
-  mobile: z.string().trim().optional().or(z.literal("")),
+  phone: z.string().trim().optional().or(z.literal("")),
   designation: z.string().trim().min(2),
   department: z.string().trim().default("Operations"),
   status: z.enum(EMPLOYEE_STATUSES).default("active"),
@@ -261,7 +263,7 @@ export const adminManualBookingSchema = z.object({
   travelerDetails: z.object({
     name: z.string().trim().min(2),
     email: z.string().email(),
-    mobile,
+    phone,
     travellers: z.number().int().positive().default(1),
     notes: z.string().optional(),
   }),
@@ -272,7 +274,7 @@ export const adminBookingTravelerSchema = z.object({
   travelerDetails: z.object({
     name: z.string().trim().min(2),
     email: z.string().email(),
-    mobile,
+    phone,
     travellers: z.number().int().positive().default(1),
     notes: z.string().optional(),
   }),
@@ -454,7 +456,7 @@ export const bookingSchema = z.object({
   travelerDetails: z.object({
     name: z.string().trim().min(2),
     email: z.string().email(),
-    mobile,
+    phone,
     travellers: z.number().int().positive(),
     departureCity: z.string().trim().default(""),
     adults: z.number().int().nonnegative().default(1),

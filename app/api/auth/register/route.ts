@@ -6,7 +6,7 @@ import { travelerRegisterSchema } from "@/lib/validations";
 import User from "@/models/User";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
 import { getBusiness } from "@/lib/business";
-import { normaliseMobile, verifyPhoneOtp } from "@/lib/phone-otp";
+import { normalisePhone, verifyPhoneOtp } from "@/lib/phone-otp";
 import { z } from "zod";
 import crypto from "node:crypto";
 
@@ -19,24 +19,24 @@ export async function POST(request: Request) {
 
     const data = travelerRegisterSchema.parse(body);
     const otp = z.string().regex(/^\d{6}$/, "Enter the 6-digit WhatsApp code").parse(body.otp);
-    const mobile = normaliseMobile(data.mobile);
-    if (!await verifyPhoneOtp(mobile, otp)) return fail("The WhatsApp code is invalid or has expired. Request a new code and try again.", 400);
+    const phone = normalisePhone(data.phone);
+    if (!await verifyPhoneOtp(phone, otp)) return fail("The WhatsApp code is invalid or has expired. Request a new code and try again.", 400);
     const business = await getBusiness();
     await connectDB();
-    const email = data.email?.toLowerCase() || `${mobile.slice(1)}@phone.voibee.local`;
+    const email = data.email?.toLowerCase() || `${phone.slice(1)}@phone.voibee.local`;
     const passwordHash = await bcrypt.hash(data.password || crypto.randomBytes(32).toString("hex"), 10);
-    const existing = await (await tenantModel(User)).findOne({ $or: [{ email }, { mobile }] }).select("+password role");
+    const existing = await (await tenantModel(User)).findOne({ $or: [{ email }, { phone }] }).select("+password role");
     if (existing?.password || (existing && existing.role !== "tenant_traveler")) {
       return fail("An account with this email already exists", 409);
     }
     const user = existing
-      ? await (await tenantModel(User)).findByIdAndUpdate(existing._id, { $set: { name: data.name, email, mobile, password: passwordHash } }, { returnDocument: "after" })
-      : await (await tenantModel(User)).create({ name: data.name, email, mobile, password: passwordHash, role: "tenant_traveler", businessId: business._id });
+      ? await (await tenantModel(User)).findByIdAndUpdate(existing._id, { $set: { name: data.name, email, phone, password: passwordHash } }, { returnDocument: "after" })
+      : await (await tenantModel(User)).create({ name: data.name, email, phone, password: passwordHash, role: "tenant_traveler", businessId: business._id });
     await notifyAdminsAndEmployees({
       type: "registration",
       title: "New traveler registered",
       message: `${data.name} created a traveler account.`,
-      meta: { userId: String(user?._id), href: "/tenant/users/customers" },
+      meta: { userId: String(user?._id), href: "/users/customers" },
     }, "users");
     return ok({ id: String(user._id), role: "tenant_traveler" }, 201);
   } catch (err) {

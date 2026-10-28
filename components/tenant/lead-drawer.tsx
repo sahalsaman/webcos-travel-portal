@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LeadForm } from "@/components/tenant/lead-form";
+import { LeadForm } from "@/components/lead-form";
 import type { CampaignDTO, LeadDTO } from "@/types";
 
 export function LeadDrawer({ lead, campaigns, defaultCampaignId }: { lead?: LeadDTO; campaigns: CampaignDTO[]; defaultCampaignId?: string }) {

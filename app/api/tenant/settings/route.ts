@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { ok, handleError, requireApiRole } from "@/lib/api";
 import "@/models";
 import Settings, { getSettings } from "@/models/Settings";
+import { getBusiness } from "@/lib/business";
 
 export async function GET() {
   try {
@@ -38,7 +39,8 @@ export async function PATCH(request: Request) {
       if (body[k] !== undefined) update[k] = body[k];
     }
 
-    const settings = await (await tenantModel(Settings)).findOneAndUpdate({ key: "global" }, update, {
+    const business = await getBusiness();
+    const settings = await (await tenantModel(Settings)).findOneAndUpdate({ businessId: business._id }, { $set: update, $setOnInsert: { businessId: business._id } }, {
       new: true,
       upsert: true,
     }).lean();

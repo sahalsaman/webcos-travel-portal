@@ -3,6 +3,7 @@ import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
 
 const LeadSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     leadNumber: { type: String, required: true, unique: true, index: true },
     customerName: { type: String, required: true, trim: true, index: true },
     email: { type: String, default: "", lowercase: true, trim: true },

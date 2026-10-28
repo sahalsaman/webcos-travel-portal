@@ -12,6 +12,7 @@ const SocialLinkSchema = new Schema(
 
 const PartnerSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",

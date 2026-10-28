@@ -14,7 +14,7 @@ import { PARTNER_TYPES } from "@/lib/constants";
 const INITIAL_FORM = {
   name: "",
   email: "",
-  mobile: "",
+  phone: "",
   password: "",
   businessName: "",
   partnerType: "Travel Agency",
@@ -144,8 +144,8 @@ Partner link: ${brand.siteUrl}/p/${result.slug}`;
                     <Field label="Email">
                       <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} required />
                     </Field>
-                    <Field label="Mobile">
-                      <Input value={form.mobile} maxLength={10} onChange={(e) => set("mobile", e.target.value)} required />
+                    <Field label="Phone">
+                      <Input value={form.phone} maxLength={10} onChange={(e) => set("phone", e.target.value)} required />
                     </Field>
                     <Field label="Partner type">
                       <Select value={form.partnerType} onChange={(e) => set("partnerType", e.target.value)}>

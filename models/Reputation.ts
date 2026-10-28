@@ -2,6 +2,7 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 import { REPUTATION_PLATFORMS, REPUTATION_SENTIMENTS, REPUTATION_STATUSES } from "@/lib/constants";
 
 const ReputationSchema = new Schema({
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   platform: { type: String, enum: REPUTATION_PLATFORMS, required: true, index: true },
   reviewerName: { type: String, required: true, trim: true, index: true },
   rating: { type: Number, required: true, min: 1, max: 5, index: true },

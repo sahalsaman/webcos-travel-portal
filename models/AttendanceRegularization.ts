@@ -2,6 +2,7 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 
 const AttendanceRegularizationSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     employee: { type: Schema.Types.ObjectId, ref: "Employee", required: true, index: true },
     date: { type: Date, required: true, index: true },
     requestedCheckIn: { type: String, required: true },

@@ -12,7 +12,7 @@ import {
   bookingTripStateStyles,
   getBookingTripState,
   type BookingTripState,
-} from "@/components/tenant/booking-trip-state-filter";
+} from "@/components/booking-trip-state-filter";
 
 type CalendarTrip = {
   _id: string;
@@ -224,7 +224,7 @@ export function TenantTripCalendar({ trips }: { trips: CalendarTrip[] }) {
                         return (
                           <Link
                             key={`${trip._id}-${dateKey(week[0])}`}
-                            href={trip.source === "booking" ? `/tenant/lms/bookings?view=list&q=${encodeURIComponent(trip.bookingNumber || "")}` : `/tenant/inventory/packages/${trip.packageId}/edit`}
+                            href={trip.source === "booking" ? `/lms/bookings?view=list&q=${encodeURIComponent(trip.bookingNumber || "")}` : `/inventory/packages/${trip.packageId}/edit`}
                             className={cn(
                               "pointer-events-auto z-10 mx-1 min-w-0 border px-3 py-2 text-xs shadow-sm transition hover:z-20 hover:brightness-95",
                               segment.startsHere ? "rounded-l-xl" : "-ml-px border-l-0 rounded-l-none",

@@ -3,6 +3,7 @@ import { CAMPAIGN_CHANNELS, CAMPAIGN_STATUSES } from "@/lib/constants";
 
 const CampaignSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     name: { type: String, required: true, trim: true, index: true },
     channel: { type: String, enum: CAMPAIGN_CHANNELS, required: true, index: true },
     status: { type: String, enum: CAMPAIGN_STATUSES, default: "draft", index: true },

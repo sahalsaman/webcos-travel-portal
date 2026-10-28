@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CurrencyPrice } from "@/components/currency/currency-price";
 import { COUNTRY_OPTIONS } from "@/lib/constants";
-import { CloudinaryImageUrlsField } from "@/components/tenant/cloudinary-image-urls-field";
+import { CloudinaryImageUrlsField } from "@/components/cloudinary-image-urls-field";
 import type { ActivityDTO, ActivityTypeDTO } from "@/types";
 
 const lines = (value: string) => value.split("\n").map((item) => item.trim()).filter(Boolean);

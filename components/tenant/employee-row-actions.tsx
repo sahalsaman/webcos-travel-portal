@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EmployeeDrawer } from "@/components/tenant/employee-drawer";
+import { EmployeeDrawer } from "@/components/employee-drawer";
 import type { EmployeeDTO } from "@/types";
 
 export function EmployeeRowActions({ employee }: { employee: EmployeeDTO }) {

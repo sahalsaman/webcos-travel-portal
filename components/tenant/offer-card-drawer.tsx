@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
-import { OfferCardForm } from "@/components/tenant/offer-card-form";
+import { OfferCardForm } from "@/components/offer-card-form";
 import { Button } from "@/components/ui/button";
 import type { OfferCardDTO } from "@/types";
 

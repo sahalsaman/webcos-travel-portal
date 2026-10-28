@@ -6,6 +6,7 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
  */
 const PartnerTripSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     partner: {
       type: Schema.Types.ObjectId,
       ref: "Partner",

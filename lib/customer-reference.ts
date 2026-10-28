@@ -9,9 +9,9 @@ export async function resolveCustomerReference(leadId?: string, customerId?: str
     return { lead: leadId, customer: null, customerName: lead.customerName, phone: lead.phone, email: lead.email || "" };
   }
   if (customerId) {
-    const customer = await (await tenantModel(User)).findOne({ _id: customerId, role: "tenant_traveler" }).select("name mobile email").lean();
+    const customer = await (await tenantModel(User)).findOne({ _id: customerId, role: "tenant_traveler" }).select("name phone email").lean();
     if (!customer) throw new Error("Selected customer was not found");
-    return { lead: null, customer: customerId, customerName: customer.name, phone: customer.mobile || "", email: customer.email || "" };
+    return { lead: null, customer: customerId, customerName: customer.name, phone: customer.phone || "", email: customer.email || "" };
   }
   throw new Error("Select a customer or lead");
 }

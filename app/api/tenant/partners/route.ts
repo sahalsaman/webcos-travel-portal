@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const user = await (await tenantModel(User)).create({
       name: data.name,
       email: data.email,
-      mobile: data.mobile,
+      phone: data.phone,
       password: passwordHash,
       role: "tenant_partner",
     });
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       slug,
       partnerType: data.partnerType,
       contactEmail: data.email,
-      contactPhone: data.mobile,
+      contactPhone: data.phone,
       status: data.status,
       defaultCommission: data.defaultCommission,
     });

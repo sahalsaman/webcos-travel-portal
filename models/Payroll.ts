@@ -3,6 +3,7 @@ import { PAYROLL_STATUSES } from "@/lib/constants";
 
 const PayrollSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     employee: { type: Schema.Types.ObjectId, ref: "Employee", required: true, index: true },
     month: { type: String, required: true, match: /^\d{4}-(0[1-9]|1[0-2])$/, index: true },
     basicSalary: { type: Number, required: true, min: 0 },

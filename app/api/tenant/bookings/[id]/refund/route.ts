@@ -73,7 +73,7 @@ export async function POST(_request: Request, { params }: Ctx) {
       type: "payment",
       title: "Booking refunded",
       message: `${booking.bookingNumber} was refunded and cancelled.`,
-      meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/tenant/lms/bookings" },
+      meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/lms/bookings" },
     }, "finance");
 
     return ok({ refundId, alreadyRefunded: false });

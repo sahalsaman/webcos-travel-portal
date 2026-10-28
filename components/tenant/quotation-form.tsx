@@ -33,7 +33,7 @@ export function QuotationForm({ quotation, leads = [], customers = [], itinerari
     customerId: customerReferenceId(quotation?.customer) || defaultCustomer?._id || "",
     customerName: quotation?.customerName ?? defaultCustomer?.name ?? "",
     customerEmail: quotation?.customerEmail ?? defaultCustomer?.email ?? "",
-    customerPhone: quotation?.customerPhone ?? defaultCustomer?.mobile ?? "",
+    customerPhone: quotation?.customerPhone ?? defaultCustomer?.phone ?? "",
     itineraryId: tripReferenceId(quotation?.trip),
     itineraryTitle: quotation?.title ?? "",
     customItinerary: quotation?.customItinerary ?? [],
@@ -53,7 +53,7 @@ export function QuotationForm({ quotation, leads = [], customers = [], itinerari
   useEffect(() => {
     if (editing) return;
     let active = true;
-    fetch("/api/tenant/settings")
+    fetch("/api/settings")
       .then((response) => response.json())
       .then((result) => {
         if (!active || !result.success) return;
@@ -84,7 +84,7 @@ export function QuotationForm({ quotation, leads = [], customers = [], itinerari
 
   function selectCustomer(customerId: string) {
     const customer = customers.find((item) => item._id === customerId);
-    setForm((current) => ({ ...current, customerId, leadId: customerId ? "" : current.leadId, customerName: customer?.name ?? current.customerName, customerEmail: customer?.email ?? current.customerEmail, customerPhone: customer?.mobile ?? current.customerPhone }));
+    setForm((current) => ({ ...current, customerId, leadId: customerId ? "" : current.leadId, customerName: customer?.name ?? current.customerName, customerEmail: customer?.email ?? current.customerEmail, customerPhone: customer?.phone ?? current.customerPhone }));
   }
 
   function removeDay(index: number) { set("customItinerary", form.customItinerary.filter((_, itemIndex) => itemIndex !== index).map((item, itemIndex) => ({ ...item, day: itemIndex + 1 }))); }
@@ -118,7 +118,7 @@ export function QuotationForm({ quotation, leads = [], customers = [], itinerari
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="grid items-start gap-x-4 gap-y-5 sm:grid-cols-2">
-        <div className="sm:col-span-2"><Label className="mb-1.5 block">Existing customer <span className="text-destructive">*</span></Label><Select required={!form.leadId} value={form.customerId} onChange={(event) => selectCustomer(event.target.value)}><option value="">Select customer</option>{customers.map((customer) => <option key={customer._id} value={customer._id}>{customer.name} — {customer.mobile || customer.email}</option>)}</Select></div>
+        <div className="sm:col-span-2"><Label className="mb-1.5 block">Existing customer <span className="text-destructive">*</span></Label><Select required={!form.leadId} value={form.customerId} onChange={(event) => selectCustomer(event.target.value)}><option value="">Select customer</option>{customers.map((customer) => <option key={customer._id} value={customer._id}>{customer.name} — {customer.phone || customer.email}</option>)}</Select></div>
         <div className="sm:col-span-2"><Label className="mb-1.5 block">Or linked lead <span className="text-destructive">*</span></Label><Select required={!form.customerId} value={form.leadId} onChange={(event) => selectLead(event.target.value)}><option value="">Select lead</option>{leads.map((lead) => <option key={lead._id} value={lead._id}>{lead.leadNumber} — {lead.customerName}{lead.destination ? ` · ${lead.destination}` : ""}</option>)}</Select></div>
         <div className="sm:col-span-2"><Label className="mb-1.5 block">Itinerary <span className="text-destructive">*</span></Label><Select required value={form.itineraryId} onChange={(event) => selectItinerary(event.target.value)}><option value="">Select itinerary</option>{itineraries.map((item) => <option key={item._id} value={item._id}>{item.title} — {item.destination}</option>)}</Select></div>
         <div className="sm:col-span-2"><Label className="mb-1.5 block">Quotation amount <span className="text-destructive">*</span></Label><Input type="number" min={0} step="0.01" required value={form.amount} onChange={(event) => set("amount", Number(event.target.value))} /></div>

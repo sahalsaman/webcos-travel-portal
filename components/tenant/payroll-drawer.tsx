@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PayrollForm } from "@/components/tenant/payroll-form";
+import { PayrollForm } from "@/components/payroll-form";
 import type { EmployeeDTO, PayrollDTO } from "@/types";
 
 export function PayrollDrawer({ payroll, employees }: { payroll?: PayrollDTO; employees: EmployeeDTO[] }) {

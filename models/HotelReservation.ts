@@ -2,6 +2,7 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 import { HOTEL_RESERVATION_STATUSES } from "@/lib/constants";
 
 const HotelReservationSchema = new Schema({
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   lead: { type: Schema.Types.ObjectId, ref: "Lead", default: null, index: true },
   customer: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
   hotel: { type: Schema.Types.ObjectId, ref: "Hotel", default: null, index: true },

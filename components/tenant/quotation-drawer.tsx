@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { QuotationForm } from "@/components/tenant/quotation-form";
+import { QuotationForm } from "@/components/quotation-form";
 import type { LeadDTO, QuotationDTO, TripDTO, UserDTO } from "@/types";
 
 export function QuotationDrawer({ quotation, leads = [], customers = [], itineraries = [], leadId, customer }: { quotation?: QuotationDTO; leads?: LeadDTO[]; customers?: UserDTO[]; itineraries?: TripDTO[]; leadId?: string; customer?: UserDTO }) {

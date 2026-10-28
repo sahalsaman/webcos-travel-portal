@@ -1,5 +1,5 @@
 import { WalletCards } from "lucide-react";
-import { PayrollDrawer } from "@/components/tenant/payroll-drawer";
+import { PayrollDrawer } from "@/components/payroll-drawer";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";

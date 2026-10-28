@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { COUNTRY_OPTIONS, DESTINATION_STATUSES } from "@/lib/constants";
-import { CloudinaryImageUrlsField } from "@/components/tenant/cloudinary-image-urls-field";
+import { CloudinaryImageUrlsField } from "@/components/cloudinary-image-urls-field";
 import type { DestinationDTO } from "@/types";
 import { CurrencyCode } from "@/components/currency/currency-code";
 import { MoneyInput } from "@/components/currency/money-input";
@@ -75,7 +75,7 @@ export function DestinationForm({ destination, onSaved, onCancel }: { destinatio
       if (!res.ok || !data.success) throw new Error(data.message || "Save failed");
       toast.success(editing ? "Destination updated" : "Destination created");
       if (onSaved) onSaved();
-      else router.push("/tenant/inventory/destinations");
+      else router.push("/inventory/destinations");
       router.refresh();
     } catch (err) {
       toast.error((err as Error).message);
@@ -131,7 +131,7 @@ export function DestinationForm({ destination, onSaved, onCancel }: { destinatio
           </div>
       </div>
       <div className="sticky bottom-0 z-10 -mx-5 -mb-5 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel ?? (() => router.push("/tenant/inventory/destinations"))}>Cancel</Button>
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel ?? (() => router.push("/inventory/destinations"))}>Cancel</Button>
         <Button type="submit" variant="gradient" className="w-full sm:w-auto" disabled={loading}>
           {loading ? <Loader2 className="size-4 animate-spin" /> : null}
           {editing ? "Save destination" : "Create destination"}

@@ -18,6 +18,7 @@ import User from "@/models/User";
 import { getSettings } from "@/models/Settings";
 import { isCustomDateTripCategory } from "@/lib/constants";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { getBusiness } from "@/lib/business";
 
 export async function POST(request: Request) {
   try {
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
     const gateway = await paymentConfig();
     if (body.bookingMode !== "offline" && !gateway.configured) return fail("Online payments are not configured. Please choose offline booking.", 503);
     await connectDB();
+    const business = await getBusiness();
 
     const trip = await (await tenantModel(Trip)).findById(body.tripId);
     if (!trip || trip.status !== "active") {
@@ -91,7 +93,7 @@ export async function POST(request: Request) {
         {
           $set: {
             name: travelerDetails.name,
-            mobile: travelerDetails.mobile,
+            phone: travelerDetails.phone,
           },
         },
         { returnDocument: "after" },
@@ -104,10 +106,11 @@ export async function POST(request: Request) {
           $setOnInsert: {
             email: travelerDetails.email,
             role: "tenant_traveler",
+            businessId: business._id,
           },
           $set: {
             name: travelerDetails.name,
-            mobile: travelerDetails.mobile,
+            phone: travelerDetails.phone,
           },
         },
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
@@ -131,6 +134,7 @@ export async function POST(request: Request) {
     let booking;
     try {
       booking = await (await tenantModel(Booking)).create({
+        businessId: business._id,
         bookingNumber,
         trip: trip._id,
         traveler: travelerId,
@@ -170,13 +174,13 @@ export async function POST(request: Request) {
       type: "booking",
       title: "New booking received",
       message: `${bookingNumber} · ${trip.title} · ${travelerDetails.name} · ${body.seats} traveler(s)`,
-      meta: { bookingId: String(booking._id), bookingNumber, href: "/tenant/lms/bookings" },
+      meta: { bookingId: String(booking._id), bookingNumber, href: "/lms/bookings" },
     }, "lms");
 
     // Offline bookings are stored immediately and remain unpaid until an admin
     // records an advance or full payment.
     if (body.bookingMode === "offline") {
-      const payment = await (await tenantModel(Payment)).create({ booking: booking._id, amount: breakdown.travelerPays, status: "created", notes: { offline: true, confirmationToken } });
+      const payment = await (await tenantModel(Payment)).create({ businessId: business._id, booking: booking._id, amount: breakdown.travelerPays, status: "created", notes: { offline: true, confirmationToken } });
       booking.payment = payment._id;
       await booking.save();
       return ok({ bookingId: String(booking._id), bookingNumber, amount: breakdown.travelerPays, confirmationToken, offline: true });
@@ -188,6 +192,7 @@ export async function POST(request: Request) {
         const order = await createOrder(breakdown.travelerPays, bookingNumber);
         if (order?.id) {
           const payment = await (await tenantModel(Payment)).create({
+            businessId: business._id,
             booking: booking._id,
             razorpayOrderId: order.id,
             amount: breakdown.travelerPays,

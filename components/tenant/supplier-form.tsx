@@ -60,7 +60,7 @@ export function SupplierForm({
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(editing ? `/api/tenant/suppliers/${supplier!._id}` : "/api/tenant/suppliers", {
+      const response = await fetch(editing ? `/api/suppliers/${supplier!._id}` : "/api/suppliers", {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, commissionRate: Number(form.commissionRate) }),
@@ -72,7 +72,7 @@ export function SupplierForm({
       toast.success(editing ? "Supplier updated" : "Supplier created");
       router.refresh();
       if (onSaved) onSaved();
-      else router.push("/tenant/users/suppliers");
+      else router.push("/users/suppliers");
     } catch (error) {
       toast.error((error as Error).message);
       setLoading(false);
@@ -137,7 +137,7 @@ export function SupplierForm({
           </div>
       </div>
       <div className="sticky bottom-0 z-10 -mx-5 -mb-5 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel ?? (() => router.push("/tenant/users/suppliers"))}>Cancel</Button>
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel ?? (() => router.push("/users/suppliers"))}>Cancel</Button>
         <Button type="submit" variant="gradient" className="w-full sm:w-auto" disabled={loading}>
           {loading ? <Loader2 className="size-4 animate-spin" /> : null}
           {editing ? "Save supplier" : "Create supplier"}

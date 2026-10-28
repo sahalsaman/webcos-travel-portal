@@ -1,2 +1,2 @@
-import { HrmTablePageSkeleton } from "@/components/tenant/hrm-page-skeletons";
+import { HrmTablePageSkeleton } from "@/components/hrm-page-skeletons";
 export default function Loading(){return <HrmTablePageSkeleton statusFilter={false} columns={7}/>}

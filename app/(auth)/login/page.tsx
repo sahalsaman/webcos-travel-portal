@@ -14,7 +14,7 @@ import { loginSchema, type LoginInput } from "@/lib/validations";
 
 function dashboardPath(role?: string) {
   if (role === "admin") return "/admin";
-  if (role === "tenant" || role === "tenant_employee") return "/tenant";
+  if (role === "tenant" || role === "tenant_employee") return "/";
   return "/";
 }
 
@@ -33,16 +33,22 @@ function LoginForm() {
 
   async function onSubmit(values: LoginInput) {
     setLoading(true);
-    const res = await signIn("credentials", { ...values, redirect: false });
-    if (res?.error) {
-      toast.error("Invalid email or password");
+    try {
+      const res = await signIn("credentials", { ...values, redirect: false });
+      if (res?.error) {
+        toast.error("Invalid email or password");
+        return;
+      }
+      const session = await getSession();
+      if (!session?.user) throw new Error("Your sign-in could not be verified. Please try again.");
+      toast.success("Welcome back!");
+      router.push(callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : dashboardPath(session.user.role));
+      router.refresh();
+    } catch {
+      toast.error("Sign-in service is temporarily unavailable. Please refresh and try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-    toast.success("Welcome back!");
-    const session = await getSession();
-    router.push(callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : dashboardPath(session?.user?.role));
-    router.refresh();
   }
 
   return (

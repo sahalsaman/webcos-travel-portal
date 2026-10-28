@@ -3,6 +3,7 @@ import { NOTIFICATION_TYPES } from "@/lib/constants";
 
 const NotificationSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     type: { type: String, enum: NOTIFICATION_TYPES, default: "system" },
     title: { type: String, required: true },

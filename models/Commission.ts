@@ -4,6 +4,7 @@ import { COMMISSION_STATUSES } from "@/lib/constants";
 /** Ledger entry created when a partner-driven booking is paid. */
 const CommissionSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     booking: { type: Schema.Types.ObjectId, ref: "Booking", required: true, unique: true },
     partner: { type: Schema.Types.ObjectId, ref: "Partner", required: true, index: true },
     trip: { type: Schema.Types.ObjectId, ref: "Trip", required: true },

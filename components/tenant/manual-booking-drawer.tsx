@@ -21,7 +21,7 @@ interface BookableTrip {
   totalSeats: number;
 }
 
-type ManualBookingField = "tripId" | "seats" | "name" | "email" | "mobile" | "status" | "paymentStatus";
+type ManualBookingField = "tripId" | "seats" | "name" | "email" | "phone" | "status" | "paymentStatus";
 type FieldErrors = Partial<Record<ManualBookingField, string>>;
 
 function RequiredLabel({ children }: { children: React.ReactNode }) {
@@ -47,7 +47,7 @@ export function ManualBookingDrawer({ trips }: { trips: BookableTrip[] }) {
     seats: 1,
     name: "",
     email: "",
-    mobile: "",
+    phone: "",
     notes: "",
     status: "confirmed",
     paymentStatus: "paid",
@@ -82,7 +82,7 @@ export function ManualBookingDrawer({ trips }: { trips: BookableTrip[] }) {
     }
     if (form.name.trim().length < 2) next.name = "Enter traveler name";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = "Enter a valid email address";
-    if (!/^[6-9]\d{9}$/.test(form.mobile.trim())) next.mobile = "Enter a valid 10-digit mobile number";
+    if (!/^[6-9]\d{9}$/.test(form.phone.trim())) next.phone = "Enter a valid 10-digit phone number";
     if (!form.status) next.status = "Select booking status";
     if (!form.paymentStatus) next.paymentStatus = "Select payment status";
 
@@ -114,7 +114,7 @@ export function ManualBookingDrawer({ trips }: { trips: BookableTrip[] }) {
           travelerDetails: {
             name: form.name,
             email: form.email,
-            mobile: form.mobile,
+            phone: form.phone,
             travellers: Number(form.seats),
             notes: form.notes || undefined,
           },
@@ -135,7 +135,7 @@ export function ManualBookingDrawer({ trips }: { trips: BookableTrip[] }) {
         seats: 1,
         name: "",
         email: "",
-        mobile: "",
+        phone: "",
         notes: "",
         status: "confirmed",
         paymentStatus: "paid",
@@ -239,18 +239,18 @@ export function ManualBookingDrawer({ trips }: { trips: BookableTrip[] }) {
                     <FieldError message={errors.email} />
                   </div>
                   <div className="space-y-1.5">
-                    <RequiredLabel>Mobile</RequiredLabel>
+                    <RequiredLabel>Phone</RequiredLabel>
                     <Input
-                      value={form.mobile}
-                      onChange={(e) => set("mobile", e.target.value.replace(/\D/g, ""))}
-                      placeholder="10 digit mobile"
+                      value={form.phone}
+                      onChange={(e) => set("phone", e.target.value.replace(/\D/g, ""))}
+                      placeholder="10 digit phone"
                       required
                       maxLength={10}
                       minLength={10}
-                      aria-invalid={Boolean(errors.mobile)}
-                      className={errors.mobile ? "border-destructive" : undefined}
+                      aria-invalid={Boolean(errors.phone)}
+                      className={errors.phone ? "border-destructive" : undefined}
                     />
-                    <FieldError message={errors.mobile} />
+                    <FieldError message={errors.phone} />
                   </div>
                 </div>
 

@@ -15,7 +15,7 @@ export async function GET() {
   try {
     await requireApiRole(["tenant", "tenant_employee"]);
     await connectDB();
-    const quotations = await (await tenantModel(Quotation)).find({}).sort({ createdAt: -1 }).populate("lead", "leadNumber customerName").populate("customer", "name email mobile").populate("trip", "title destination basePrice").lean();
+    const quotations = await (await tenantModel(Quotation)).find({}).sort({ createdAt: -1 }).populate("lead", "leadNumber customerName").populate("customer", "name email phone").populate("trip", "title destination basePrice").lean();
     return ok(quotations);
   } catch (err) {
     return handleError(err);

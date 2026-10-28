@@ -3,6 +3,7 @@ import { SUPPLIER_STATUSES, SUPPLIER_TYPES } from "@/lib/constants";
 
 const SupplierSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     companyName: { type: String, required: true, trim: true, index: true },
     contactName: { type: String, default: "", trim: true },
     email: { type: String, default: "", lowercase: true, trim: true },

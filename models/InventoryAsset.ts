@@ -1,6 +1,7 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
 
 const InventoryAssetSchema = new Schema({
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true, index: true },
   kind: { type: String, enum: ["hotel", "vehicle"], required: true, index: true },
   name: { type: String, required: true, trim: true },

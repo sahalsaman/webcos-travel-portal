@@ -4,6 +4,7 @@ import { DESTINATION_STATUSES } from "@/lib/constants";
 
 const DestinationSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     title: { type: String, required: true, trim: true },
     description: { type: String, default: "" },
     images: { type: [String], default: [] },

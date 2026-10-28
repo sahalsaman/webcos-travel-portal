@@ -38,4 +38,7 @@ export { default as HrTask } from "./HrTask";
 export { default as ActivityType } from "./ActivityType";
 export { default as Activity } from "./Activity";
 export { default as ActivityBooking } from "./ActivityBooking";
-export { default as BBusiness } from "./Business";
+export { default as Business } from "./Business";
+export { default as PlatformAdmin } from "./PlatformAdmin";
+export { default as PlatformSupportTicket } from "./PlatformSupportTicket";
+export { default as PlatformSubscriptionInvoice } from "./PlatformSubscriptionInvoice";

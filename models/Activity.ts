@@ -3,7 +3,7 @@ import { ACTIVITY_STATUSES } from "@/lib/constants";
 
 const ActivitySchema = new Schema({
   title: { type: String, required: true, trim: true },
-  slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   type: { type: Schema.Types.ObjectId, ref: "ActivityType", required: true, index: true },
   destination: { type: String, required: true, trim: true, index: true },
   country: { type: String, default: "India" },

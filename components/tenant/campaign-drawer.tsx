@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Pencil, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CampaignForm } from "@/components/tenant/campaign-form";
+import { CampaignForm } from "@/components/campaign-form";
 import type { CampaignDTO } from "@/types";
 
 export function CampaignDrawer({ campaign }: { campaign?: CampaignDTO }) {

@@ -5,7 +5,7 @@ const TravelerDetailsSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
-    mobile: { type: String, required: true },
+    phone: { type: String, required: true },
     travellers: { type: Number, default: 1, min: 1 },
     departureCity: { type: String, default: "" },
     adults: { type: Number, default: 1, min: 0 },
@@ -22,6 +22,7 @@ const ComplianceAnswerSchema = new Schema({ hasDocument:{type:Boolean,required:t
 
 const BookingSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     bookingNumber: {
       type: String,
       required: true,

@@ -75,13 +75,13 @@ test("booking validation accepts fixed and custom date payloads but rejects inva
     travelerDetails: {
       name: "Test Traveler",
       email: "traveler@example.com",
-      mobile: "9876543210",
+      phone: "9876543210",
       travellers: 2,
     },
   };
   assert.equal(bookingSchema.safeParse(base).success, true);
   assert.equal(bookingSchema.safeParse({ ...base, travelStartDate: "2026-10-01", travelEndDate: "2026-10-05" }).success, true);
-  assert.equal(bookingSchema.safeParse({ ...base, travelerDetails: { ...base.travelerDetails, mobile: "123" } }).success, false);
+  assert.equal(bookingSchema.safeParse({ ...base, travelerDetails: { ...base.travelerDetails, phone: "123" } }).success, false);
 });
 
 test("package itinerary accepts multiple structured items per day", () => {

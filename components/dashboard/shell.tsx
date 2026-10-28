@@ -40,7 +40,7 @@ export function DashboardShell({
 
   const SidebarContent = (
     <div className="flex h-full flex-col">
-      <Link href="/tenant" className="flex h-20 items-center px-5 font-bold text-lg">
+      <Link href="/" className="flex h-20 items-center px-5 font-bold text-lg">
           {brand.logoUrl ? <Image src={brand.logoUrl} alt={brand.name} width={192} height={56} unoptimized className="h-14 w-48 max-w-full object-contain object-left" /> : <span>{brand.name}</span>}
       </Link>
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
@@ -72,7 +72,7 @@ export function DashboardShell({
         <div className="sticky top-0 h-screen">{SidebarContent}</div>
       </aside>
 
-      {/* Mobile drawer */}
+      {/* Phone drawer */}
       {open ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div

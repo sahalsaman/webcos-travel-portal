@@ -12,7 +12,7 @@ export interface BookingConfirmation {
   travelerDetails: {
     name: string;
     email: string;
-    mobile: string;
+    phone: string;
     travellers: number;
     departureCity?: string;
     adults?: number;

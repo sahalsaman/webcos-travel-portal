@@ -38,6 +38,7 @@ const ItinerarySchema = new Schema(
 
 const TripSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     title: { type: String, required: true, trim: true },
     slug: {
       type: String,
@@ -82,6 +83,7 @@ const TripSchema = new Schema(
     permitDocuments: { type: [String], default: [] },
     permitFee: { type: Number, default: 0, min: 0 },
     reviewCount: { type: Number, default: 0 },
+    numberOfBookings: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

@@ -36,7 +36,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
         },
         $set: {
           name: data.travelerDetails.name,
-          mobile: data.travelerDetails.mobile,
+          phone: data.travelerDetails.phone,
         },
       },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },

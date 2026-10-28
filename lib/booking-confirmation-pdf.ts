@@ -153,7 +153,7 @@ function firstPage(booking: BookingConfirmation, brand: { name: string; siteUrl:
     line("LEAD TRAVELER", 64, 575, 9, false, TEAL),
     line(booking.travelerDetails.name, 64, 546, 16, false, INK),
     line(booking.travelerDetails.email, 64, 524, 8, false, INK),
-    line(booking.travelerDetails.mobile, 64, 508, 8, false, INK),
+    line(booking.travelerDetails.phone, 64, 508, 8, false, INK),
     line("PAYMENT SUMMARY", 314, 575, 9, false, TEAL),
     line(money(booking.totalAmount), 314, 540, 23, false, GREEN),
     line(`${money(booking.sellingPrice)} per traveler x ${booking.seats}`, 314, 523, 8, false, MUTED),

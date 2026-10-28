@@ -12,9 +12,9 @@ import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { CLIMATE_OPTIONS, COUNTRY_OPTIONS, PACKAGE_EXCLUSION_OPTIONS, PACKAGE_INCLUSION_OPTIONS, PACKAGE_SERVICES, PACKAGE_SERVICE_LABELS, PACKAGE_TYPES, TRIP_CATEGORIES, TRIP_STATUSES, tripThemeLabel, type PackageService, type PackageType, type TripCategory } from "@/lib/constants";
 import { resolveIncludedServices } from "@/components/trip/package-service-icons";
-import { emptyItineraryDay, ItineraryEditor, normalizeItineraryDay } from "@/components/tenant/itinerary-editor";
-import { SupplierDrawer } from "@/components/tenant/supplier-drawer";
-import { CloudinaryImageUrlsField } from "@/components/tenant/cloudinary-image-urls-field";
+import { emptyItineraryDay, ItineraryEditor, normalizeItineraryDay } from "@/components/itinerary-editor";
+import { SupplierDrawer } from "@/components/supplier-drawer";
+import { CloudinaryImageUrlsField } from "@/components/cloudinary-image-urls-field";
 import type { DestinationDTO, InventoryAssetDTO, ItineraryItem, SupplierDTO, TripDTO } from "@/types";
 
 function toDateInput(d?: string) {
@@ -237,7 +237,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message || "Save failed");
       toast.success(editing ? "Package updated" : "Package created");
-      router.push("/tenant/inventory/packages");
+      router.push("/inventory/packages");
       router.refresh();
     } catch (err) {
       toast.error((err as Error).message);

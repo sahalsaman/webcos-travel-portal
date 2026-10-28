@@ -59,13 +59,13 @@ export async function requireTenantPortalAccess() {
     .lean<{ portalPages?: TenantPortalPageKey[]; designation?: string }>();
 
   const accessPages = employee?.portalPages ?? [];
-  if (!employee || accessPages.length === 0) redirect("/tenant");
+  if (!employee || accessPages.length === 0) redirect("/");
 
   const pathname = (await headers()).get("x-portal-pathname") ?? "/";
   const currentPage = tenantPortalPageKeyForPath(pathname);
   if (!accessPages.includes(currentPage)) {
     const firstPage = TENANT_PORTAL_PAGES.find((page) => accessPages.includes(page.key));
-    redirect(firstPage?.href ?? "/tenant");
+    redirect(firstPage?.href ?? "/");
   }
 
   return { user, accessPages, designation: employee.designation };

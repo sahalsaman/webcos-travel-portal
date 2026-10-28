@@ -3,6 +3,7 @@ import { PAYMENT_STATUSES } from "@/lib/constants";
 
 const PaymentSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     booking: { type: Schema.Types.ObjectId, ref: "Booking", required: true, index: true },
     razorpayOrderId: { type: String, index: true },
     razorpayPaymentId: { type: String, index: true },

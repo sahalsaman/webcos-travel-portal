@@ -11,6 +11,8 @@ const credentialSchema = z.object({
   apikey: z.string().trim().max(500).default(""),
   secretKey: z.string().trim().max(500).default(""),
   url: z.string().trim().max(500).default(""),
+  webhookSecret: z.string().trim().max(500).default(""),
+  alertEmail: z.string().trim().email().optional().or(z.literal("")),
 });
 
 export async function GET() {

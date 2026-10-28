@@ -1,12 +1,11 @@
-import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import { configuredPlatformDatabase, connectDB } from "@/lib/db";
+import mongoose from "mongoose";
+import PlatformAdmin from "@/models/PlatformAdmin";
 export async function platformAdminModel() {
   await connectDB();
   const db = mongoose.connection.useDb(configuredPlatformDatabase(), { useCache: true });
-  return db.models.PlatformAdmin || db.model("PlatformAdmin", new Schema({
-    email: { type: String, required: true, unique: true }, name: String, password: { type: String, required: true },
-  }, { timestamps: true }));
+  return db.models.PlatformAdmin || db.model("PlatformAdmin", PlatformAdmin.schema);
 }
 export async function authorizeSuperAdmin(email: string, password: string) {
   const model = await platformAdminModel();

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         },
         $set: {
           name: data.name,
-          mobile: data.mobile,
+          phone: data.phone,
         },
       },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },

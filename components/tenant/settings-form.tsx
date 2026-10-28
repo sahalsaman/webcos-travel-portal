@@ -46,7 +46,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/tenant/settings", {
+      const res = await fetch("/api/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

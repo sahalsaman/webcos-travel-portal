@@ -3,10 +3,11 @@ import { TENANT_PORTAL_PAGE_KEYS, EMPLOYEE_STATUSES } from "@/lib/constants";
 
 const EmployeeSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     user: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-    mobile: { type: String, trim: true },
+    phone: { type: String, trim: true },
     designation: { type: String, required: true, trim: true },
     department: { type: String, default: "Operations", trim: true, index: true },
     status: { type: String, enum: EMPLOYEE_STATUSES, default: "active", index: true },

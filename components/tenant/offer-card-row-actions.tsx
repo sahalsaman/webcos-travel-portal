@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { OfferCardDrawer } from "@/components/tenant/offer-card-drawer";
+import { OfferCardDrawer } from "@/components/offer-card-drawer";
 import type { OfferCardDTO } from "@/types";
 
 export function OfferCardRowActions({ offer }: { offer: OfferCardDTO }) {

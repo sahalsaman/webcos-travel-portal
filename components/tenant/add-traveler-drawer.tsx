@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type TravelerField = "name" | "email" | "mobile";
+type TravelerField = "name" | "email" | "phone";
 type FieldErrors = Partial<Record<TravelerField, string>>;
 
 function RequiredLabel({ children }: { children: React.ReactNode }) {
@@ -36,7 +36,7 @@ export function AddTravelerDrawer() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [form, setForm] = useState({ name: "", email: "", mobile: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -52,13 +52,13 @@ export function AddTravelerDrawer() {
     const next: FieldErrors = {};
     if (form.name.trim().length < 2) next.name = "Enter traveler name";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = "Enter a valid email address";
-    if (!/^[6-9]\d{9}$/.test(form.mobile.trim())) next.mobile = "Enter a valid 10-digit mobile number";
+    if (!/^[6-9]\d{9}$/.test(form.phone.trim())) next.phone = "Enter a valid 10-digit phone number";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
   function resetForm() {
-    setForm({ name: "", email: "", mobile: "" });
+    setForm({ name: "", email: "", phone: "" });
     setErrors({});
   }
 
@@ -81,7 +81,7 @@ export function AddTravelerDrawer() {
         body: JSON.stringify({
           name: form.name.trim(),
           email: form.email.trim(),
-          mobile: form.mobile.trim(),
+          phone: form.phone.trim(),
         }),
       });
       const data = await res.json();
@@ -152,18 +152,18 @@ export function AddTravelerDrawer() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <RequiredLabel>Mobile</RequiredLabel>
+                  <RequiredLabel>Phone</RequiredLabel>
                   <Input
-                    value={form.mobile}
-                    onChange={(e) => set("mobile", e.target.value.replace(/\D/g, ""))}
-                    placeholder="10 digit mobile"
+                    value={form.phone}
+                    onChange={(e) => set("phone", e.target.value.replace(/\D/g, ""))}
+                    placeholder="10 digit phone"
                     required
                     maxLength={10}
                     minLength={10}
-                    aria-invalid={Boolean(errors.mobile)}
-                    className={errors.mobile ? "border-destructive" : undefined}
+                    aria-invalid={Boolean(errors.phone)}
+                    className={errors.phone ? "border-destructive" : undefined}
                   />
-                  <FieldError message={errors.mobile} />
+                  <FieldError message={errors.phone} />
                 </div>
               </div>
 

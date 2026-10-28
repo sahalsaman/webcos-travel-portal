@@ -258,7 +258,7 @@ export async function getTenantDestinationById(id: string) {
 
 export async function listTenantTravelers() {
   return safe(async () => {
-    const travelers = await (await tenantModel(User)).find({ role: "tenant_traveler" }).sort({ createdAt: -1 }).select("name email mobile image status createdAt").lean();
+    const travelers = await (await tenantModel(User)).find({ role: "tenant_traveler" }).sort({ createdAt: -1 }).select("name email phone image status createdAt").lean();
     const ids = travelers.map((traveler) => traveler._id);
     const bookingAgg = await (await tenantModel(Booking)).aggregate([
       { $match: { traveler: { $in: ids } } },
@@ -431,7 +431,7 @@ export async function listTenantQuotations() {
   return safe(async () => {
     const quotations = await (await tenantModel(Quotation)).find({}).sort({ createdAt: -1 })
       .populate({ path: "lead", model: "Lead", select: "leadNumber customerName" })
-      .populate({ path: "customer", model: "User", select: "name email mobile" })
+      .populate({ path: "customer", model: "User", select: "name email phone" })
       .populate({ path: "trip", model: "Trip", select: "title destination basePrice" })
       .lean();
     return serialize(quotations);
@@ -447,10 +447,10 @@ export async function listTenantLeads(campaignId?: string) {
 }
 
 export async function listTenantVisas() {
-  return safe(async () => serialize(await (await tenantModel(VisaApplication)).find({}).sort({ createdAt: -1 }).populate("lead", "leadNumber customerName").populate("customer", "name email mobile").lean()), []);
+  return safe(async () => serialize(await (await tenantModel(VisaApplication)).find({}).sort({ createdAt: -1 }).populate("lead", "leadNumber customerName").populate("customer", "name email phone").lean()), []);
 }
-export async function listTenantTickets() { return safe(async()=>serialize(await (await tenantModel(TicketTracking)).find({}).sort({departureAt:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email mobile").lean()),[]); }
-export async function listTenantHotelReservations() { return safe(async()=>serialize(await (await tenantModel(HotelReservation)).find({}).sort({checkIn:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email mobile").lean()),[]); }
+export async function listTenantTickets() { return safe(async()=>serialize(await (await tenantModel(TicketTracking)).find({}).sort({departureAt:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email phone").lean()),[]); }
+export async function listTenantHotelReservations() { return safe(async()=>serialize(await (await tenantModel(HotelReservation)).find({}).sort({checkIn:1,createdAt:-1}).populate("lead","leadNumber customerName").populate("customer","name email phone").lean()),[]); }
 
 export async function listTenantExpenses() { return safe(async () => serialize(await (await tenantModel(Expense)).find({}).sort({ expenseDate: -1, createdAt: -1 }).lean()), []); }
 export async function listTenantInvoices() { return safe(async () => serialize(await (await tenantModel(Invoice)).find({}).sort({ issueDate: -1, createdAt: -1 }).lean()), []); }

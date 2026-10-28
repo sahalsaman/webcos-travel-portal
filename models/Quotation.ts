@@ -13,6 +13,7 @@ const QuotationItemSchema = new Schema(
 
 const QuotationSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     quotationNumber: { type: String, required: true, unique: true, index: true },
     lead: { type: Schema.Types.ObjectId, ref: "Lead", default: null, index: true },
     customer: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },

@@ -5,7 +5,7 @@ import { Pencil, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { SupplierForm } from "@/components/tenant/supplier-form";
+import { SupplierForm } from "@/components/supplier-form";
 import type { SupplierDTO } from "@/types";
 
 export function SupplierDrawer({ supplier, defaultType, supplierOptions, requireSupplierSelection = false }: { supplier?: SupplierDTO; defaultType?: SupplierDTO["type"]; supplierOptions?: SupplierDTO[]; requireSupplierSelection?: boolean }) {

@@ -1,12 +1,20 @@
 import crypto from "node:crypto";
 import Razorpay from "razorpay";
-import { getBusiness } from "@/lib/business";
+import { getBusiness, getBusinessCredentials } from "@/lib/business";
 
 /** Credentials are configured per agency in the server's secret store, never in the website. */
 export async function paymentConfig() {
   const business = await getBusiness();
+  const integration = (await getBusinessCredentials(business)).find(
+    (credential) => credential.platform === "RAZORPAY_API",
+  );
   const all = JSON.parse(process.env.BUSINESS_PAYMENT_CREDENTIALS || "{}") as Record<string, { keyId?: string; keySecret?: string }>;
-  const credentials = all[business.slug] || {};
+  // Agency integrations are the canonical configuration. The environment map
+  // remains a backwards-compatible fallback for older deployments.
+  const credentials = {
+    keyId: integration?.apikey?.trim() || all[business.slug]?.keyId,
+    keySecret: integration?.secretKey?.trim() || all[business.slug]?.keySecret,
+  };
   return { ...credentials, configured: Boolean(credentials.keyId && credentials.keySecret) };
 }
 export async function getRazorpay() {

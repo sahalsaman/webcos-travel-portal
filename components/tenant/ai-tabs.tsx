@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  ["/tenant/ai", "AI Assistance"],
-  ["/tenant/ai/destinations", "Generate destinations"],
-  ["/tenant/ai/packages", "Generate packages"],
-  ["/tenant/ai/hotels", "Generate hotels"],
+  ["/ai", "AI Assistance"],
+  ["/ai/destinations", "Generate destinations"],
+  ["/ai/packages", "Generate packages"],
+  ["/ai/hotels", "Generate hotels"],
 ] as const;
 
 export function AiTabs() {

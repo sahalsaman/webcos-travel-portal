@@ -3,6 +3,7 @@ import { VISA_STATUSES } from "@/lib/constants";
 
 const VisaApplicationSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     lead: { type: Schema.Types.ObjectId, ref: "Lead", default: null, index: true },
     customer: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
     visaNumber: { type: String, required: true, unique: true, index: true },

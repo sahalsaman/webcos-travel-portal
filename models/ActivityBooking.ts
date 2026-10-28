@@ -2,12 +2,13 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 import { ACTIVITY_BOOKING_STATUSES, PAYMENT_STATUSES } from "@/lib/constants";
 
 const ActivityBookingSchema = new Schema({
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   bookingNumber: { type: String, required: true, unique: true, index: true },
   activity: { type: Schema.Types.ObjectId, ref: "Activity", required: true, index: true },
   traveler: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
   name: { type: String, required: true },
   email: { type: String, required: true, lowercase: true },
-  mobile: { type: String, required: true },
+  phone: { type: String, required: true },
   activityDate: { type: Date, required: true, index: true },
   timeSlot: { type: String, default: "" },
   adults: { type: Number, default: 1, min: 0 },

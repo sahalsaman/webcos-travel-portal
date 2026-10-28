@@ -6,13 +6,13 @@ import { BedDouble, CalendarCheck, FileText, Sparkles, Stamp, Tickets, UserRound
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { href: "/tenant/lms/bookings", label: "Bookings", icon: CalendarCheck },
-  { href: "/tenant/lms/activity-bookings", label: "Activity Bookings", icon: Sparkles },
-  { href: "/tenant/lms/leads", label: "Leads", icon: UserRoundSearch },
-  { href: "/tenant/lms/quotations", label: "Quotations", icon: FileText },
-  { href: "/tenant/lms/tickets", label: "Tickets", icon: Tickets },
-  { href: "/tenant/lms/hotels", label: "Hotel Reservations", icon: BedDouble },
-  { href: "/tenant/lms/visas", label: "Visa Tracking", icon: Stamp },
+  { href: "/lms/bookings", label: "Bookings", icon: CalendarCheck },
+  { href: "/lms/activity-bookings", label: "Activity Bookings", icon: Sparkles },
+  { href: "/lms/leads", label: "Leads", icon: UserRoundSearch },
+  { href: "/lms/quotations", label: "Quotations", icon: FileText },
+  { href: "/lms/tickets", label: "Tickets", icon: Tickets },
+  { href: "/lms/hotels", label: "Hotel Reservations", icon: BedDouble },
+  { href: "/lms/visas", label: "Visa Tracking", icon: Stamp },
 ];
 
 export function LmsNav() {

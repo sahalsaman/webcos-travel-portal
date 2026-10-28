@@ -32,7 +32,7 @@ export function QuotationSettingsForm({ settings }: { settings: QuotationSetting
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("/api/tenant/settings", {
+      const response = await fetch("/api/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

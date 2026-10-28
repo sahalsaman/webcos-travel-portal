@@ -3,6 +3,7 @@ import { ROLES } from "@/lib/constants";
 
 const UserSchema = new Schema(
   {
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     name: { type: String, required: true, trim: true },
     email: {
       type: String,
@@ -14,9 +15,9 @@ const UserSchema = new Schema(
     },
     // Hidden by default; explicitly .select('+password') when authenticating.
     password: { type: String, select: false },
-    mobile: { type: String, trim: true },
+    countryCode: { type: String, trim: true },
+    phone: { type: String, trim: true },
     role: { type: String, enum: ROLES, default: "tenant_traveler", index: true },
-    businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
     otp: {
       codeHash: { type: String, default: "" },
       attempts: { type: Number, default: 0 },

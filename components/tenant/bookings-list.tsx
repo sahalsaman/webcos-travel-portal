@@ -6,10 +6,10 @@ import {
   bookingTripStates,
   getBookingTripState,
   type BookingTripState,
-} from "@/components/tenant/booking-trip-state-filter";
-import { BookingRowActions } from "@/components/tenant/booking-row-actions";
-import { BookingStatusSelect } from "@/components/tenant/booking-status-select";
-import { EditBookingDrawer } from "@/components/tenant/edit-booking-drawer";
+} from "@/components/booking-trip-state-filter";
+import { BookingRowActions } from "@/components/booking-row-actions";
+import { BookingStatusSelect } from "@/components/booking-status-select";
+import { EditBookingDrawer } from "@/components/edit-booking-drawer";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +32,7 @@ export interface TenantBookingRow {
   };
   traveler?: { name: string; email: string };
   partner?: { businessName: string } | null;
-  travelerDetails: { name?: string; email?: string; mobile: string; travellers?: number; notes?: string };
+  travelerDetails: { name?: string; email?: string; phone: string; travellers?: number; notes?: string };
   seats: number;
   totalAmount: number;
   partnerEarnings: number;
@@ -85,7 +85,7 @@ export function TenantBookingsList({
       booking.traveler?.email,
       booking.travelerDetails?.name,
       booking.travelerDetails?.email,
-      booking.travelerDetails?.mobile,
+      booking.travelerDetails?.phone,
     ].some((value) => value?.toLocaleLowerCase().includes(normalizedQuery));
   }), [bookings, normalizedQuery, selectedPackage, visibleStates]);
 
@@ -130,7 +130,7 @@ export function TenantBookingsList({
                 <tr key={booking._id} className="border-b border-border/50 align-top hover:bg-secondary/40">
                   <td className="p-4"><p className="font-mono text-xs">{booking.bookingNumber}</p><p className="text-xs text-muted-foreground">{formatDate(booking.createdAt)}</p></td>
                   <td className="p-4">{booking.trip?.title ?? "—"}</td>
-                  <td className="p-4"><p className="font-medium">{booking.traveler?.name || booking.travelerDetails?.name}</p><p className="text-xs text-muted-foreground">{booking.travelerDetails?.mobile}</p></td>
+                  <td className="p-4"><p className="font-medium">{booking.traveler?.name || booking.travelerDetails?.name}</p><p className="text-xs text-muted-foreground">{booking.travelerDetails?.phone}</p></td>
                   <td className="p-4 text-muted-foreground">{booking.partner?.businessName ?? "Direct"}{booking.partner && booking.partnerEarnings ? <p className="text-xs">Comm: {formatINR(booking.partnerEarnings)}</p> : null}</td>
                   <td className="p-4">{booking.seats}</td>
                   <td className="p-4 font-medium">{formatINR(booking.totalAmount)}</td>

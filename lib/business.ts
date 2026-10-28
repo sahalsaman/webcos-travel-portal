@@ -1,49 +1,16 @@
 import { cache } from "react";
 import { headers } from "next/headers";
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import { configuredPlatformDatabase, connectDB } from "@/lib/db";
 import { getToken } from "next-auth/jwt";
-import { CREDENTIOL_PLATFORM } from "@/lib/constants";
-
-const businessSchema = new Schema({
-  name: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
-  databaseName: { type: String, required: true, unique: true },
-  hosts: { type: [String], required: true, unique: true },
-  siteUrl: { type: String, required: true },
-  address: { type: String, default: "" },
-  ownerName: { type: String, default: "", trim: true },
-  email: { type: String, default: "", trim: true, lowercase: true },
-  phone: { type: String, default: "", trim: true },
-  logoUrl: { type: String, default: "" },
-  primaryColor: { type: String, default: "#0060e6" },
-  credentials: [{
-    platform: { type: String, enum: CREDENTIOL_PLATFORM, required: true },
-    name: { type: String, trim: true, default: "" },
-    apikey: { type: String, trim: true, default: "" },
-    secretKey: { type: String, trim: true, default: "" },
-    url: { type: String, trim: true, default: "" },
-  }],
-  provisioned: { type: Boolean, default: false },
-  status: { type: String, enum: ["active", "suspended"], default: "active" },
-  subscription: {
-    plan: { type: String, default: "Starter" },
-    status: { type: String, enum: ["trial", "active", "past_due", "cancelled"], default: "trial" },
-    amount: { type: Number, default: 0, min: 0 },
-    setupFee: { type: Number, default: 0, min: 0 },
-    setupPaidAmount: { type: Number, default: 0, min: 0 },
-    setupPaidAt: { type: Date, default: null },
-    currency: { type: String, default: "INR" },
-    renewsAt: { type: Date, default: null },
-  },
-}, { timestamps: true });
+import Business from "@/models/Business";
 
 export interface BusinessRecord {
   _id: mongoose.Types.ObjectId;
   name: string; slug: string; databaseName: string; hosts: string[];
   siteUrl: string; address?: string; ownerName?: string; email?: string; phone?: string; logoUrl: string; primaryColor: string; status: string;
   subscription?: { plan: string; status: "trial" | "active" | "past_due" | "cancelled"; amount: number; setupFee?: number; setupPaidAmount?: number; setupPaidAt?: Date | null; currency: string; renewsAt?: Date | null };
-  credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "PAYMENT_GATEWAY" | "FLIGHT_API" | "GEMINI_AI"; name?: string; apikey?: string; secretKey?: string; url?: string }>;
+  credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "RAZORPAY_API" | "FLIGHT_API" | "GEMINI_AI"; name?: string; apikey?: string; secretKey?: string; url?: string; webhookSecret?: string; alertEmail?: string }>;
 }
 
 export type BusinessCredential = NonNullable<BusinessRecord["credentials"]>[number];
@@ -54,7 +21,7 @@ function brandLogoFor(business: BusinessRecord) {
 export async function businessModel() {
   await connectDB();
   const db = mongoose.connection.useDb(configuredPlatformDatabase(), { useCache: true });
-  return db.models.Business || db.model("Business", businessSchema);
+  return db.models.Business || db.model("Business", Business.schema);
 }
 export const getBusiness = cache(async (): Promise<BusinessRecord> => {
   const h = await headers();

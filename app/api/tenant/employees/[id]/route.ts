@@ -32,7 +32,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
       const update: Record<string, unknown> = {
         name: data.name ?? current.name,
         email: nextEmail,
-        mobile: data.mobile ?? current.mobile,
+        phone: data.phone ?? current.phone,
         role: "tenant_employee",
       };
       if (data.portalPassword) update.password = await bcrypt.hash(data.portalPassword, 10);

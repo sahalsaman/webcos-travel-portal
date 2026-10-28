@@ -3,7 +3,7 @@ import { ACTIVITY_TYPE_STATUSES } from "@/lib/constants";
 
 const ActivityTypeSchema = new Schema({
   name: { type: String, required: true, trim: true },
-  slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
+  businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
   description: { type: String, default: "" },
   image: { type: String, default: "" },
   status: { type: String, enum: ACTIVITY_TYPE_STATUSES, default: "active", index: true },

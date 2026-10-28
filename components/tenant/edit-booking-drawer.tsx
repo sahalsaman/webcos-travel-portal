@@ -19,13 +19,13 @@ type EditableBooking = {
   travelerDetails?: {
     name?: string;
     email?: string;
-    mobile?: string;
+    phone?: string;
     travellers?: number;
     notes?: string;
   };
 };
 
-type BookingField = "name" | "email" | "mobile" | "travellers" | "totalAmount";
+type BookingField = "name" | "email" | "phone" | "travellers" | "totalAmount";
 type FieldErrors = Partial<Record<BookingField, string>>;
 
 function RequiredLabel({ children }: { children: React.ReactNode }) {
@@ -57,7 +57,7 @@ export function EditBookingDrawer({ booking }: { booking: EditableBooking }) {
   const [form, setForm] = useState({
     name: booking.travelerDetails?.name || booking.traveler?.name || "",
     email: booking.travelerDetails?.email || booking.traveler?.email || "",
-    mobile: booking.travelerDetails?.mobile || "",
+    phone: booking.travelerDetails?.phone || "",
     travellers: booking.travelerDetails?.travellers || booking.seats || 1,
     totalAmount: booking.totalAmount,
     notes: booking.travelerDetails?.notes || "",
@@ -80,7 +80,7 @@ export function EditBookingDrawer({ booking }: { booking: EditableBooking }) {
     const totalAmount = Number(form.totalAmount);
     if (form.name.trim().length < 2) next.name = "Enter traveler name";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = "Enter a valid email address";
-    if (!/^[6-9]\d{9}$/.test(form.mobile.trim())) next.mobile = "Enter a valid 10-digit mobile number";
+    if (!/^[6-9]\d{9}$/.test(form.phone.trim())) next.phone = "Enter a valid 10-digit phone number";
     if (!Number.isInteger(travellers) || travellers < 1) next.travellers = "Enter at least 1 traveler";
     if (!Number.isFinite(totalAmount) || totalAmount < 0) next.totalAmount = "Enter a valid amount";
     setErrors(next);
@@ -108,7 +108,7 @@ export function EditBookingDrawer({ booking }: { booking: EditableBooking }) {
           travelerDetails: {
             name: form.name.trim(),
             email: form.email.trim(),
-            mobile: form.mobile.trim(),
+            phone: form.phone.trim(),
             travellers: Number(form.travellers),
             notes: form.notes.trim() || undefined,
           },
@@ -198,18 +198,18 @@ export function EditBookingDrawer({ booking }: { booking: EditableBooking }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <RequiredLabel>Mobile</RequiredLabel>
+                  <RequiredLabel>Phone</RequiredLabel>
                   <Input
-                    value={form.mobile}
-                    onChange={(e) => set("mobile", e.target.value.replace(/\D/g, ""))}
-                    placeholder="10 digit mobile"
+                    value={form.phone}
+                    onChange={(e) => set("phone", e.target.value.replace(/\D/g, ""))}
+                    placeholder="10 digit phone"
                     required
                     maxLength={10}
                     minLength={10}
-                    aria-invalid={Boolean(errors.mobile)}
-                    className={errors.mobile ? "border-destructive" : undefined}
+                    aria-invalid={Boolean(errors.phone)}
+                    className={errors.phone ? "border-destructive" : undefined}
                   />
-                  <FieldError message={errors.mobile} />
+                  <FieldError message={errors.phone} />
                 </div>
 
                 <div className="space-y-1.5">

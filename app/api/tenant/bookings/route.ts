@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         },
         $set: {
           name: body.travelerDetails.name,
-          mobile: body.travelerDetails.mobile,
+          phone: body.travelerDetails.phone,
         },
       },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },

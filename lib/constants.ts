@@ -69,17 +69,17 @@ export const HR_TASK_PRIORITIES = ["low", "medium", "high", "urgent"] as const;
 export const HR_TASK_STATUSES = ["todo", "in_progress", "blocked", "completed", "cancelled"] as const;
 
 export const TENANT_PORTAL_PAGES = [
-  { key: "dashboard", label: "Dashboard", href: "/tenant" },
-  { key: "ai", label: "AI Assistant", href: "/tenant/ai" },
-  { key: "lms", label: "Bookings & LMS", href: "/tenant/lms" },
-  { key: "hrm", label: "HRM", href: "/tenant/hrm" },
-  { key: "users", label: "Users", href: "/tenant/users" },
-  { key: "inventory", label: "Inventory", href: "/tenant/inventory" },
-  { key: "finance", label: "Finance", href: "/tenant/finance" },
-  { key: "reputation", label: "ORM", href: "/tenant/reputation" },
-  { key: "reports", label: "Reports", href: "/tenant/reports" },
-  { key: "campaigns", label: "Marketing Campaigns", href: "/tenant/campaigns" },
-  { key: "settings", label: "Settings", href: "/tenant/settings" },
+  { key: "dashboard", label: "Dashboard", href: "/" },
+  { key: "ai", label: "AI Assistant", href: "/ai" },
+  { key: "lms", label: "Bookings & LMS", href: "/lms" },
+  { key: "hrm", label: "HRM", href: "/hrm" },
+  { key: "users", label: "Users", href: "/users" },
+  { key: "inventory", label: "Inventory", href: "/inventory" },
+  { key: "finance", label: "Finance", href: "/finance" },
+  { key: "reputation", label: "ORM", href: "/reputation" },
+  { key: "reports", label: "Reports", href: "/reports" },
+  { key: "campaigns", label: "Marketing Campaigns", href: "/campaigns" },
+  { key: "settings", label: "Settings", href: "/settings" },
 ] as const;
 export type TenantPortalPageKey = (typeof TENANT_PORTAL_PAGES)[number]["key"];
 export const TENANT_PORTAL_PAGE_KEYS = TENANT_PORTAL_PAGES.map((page) => page.key) as [TenantPortalPageKey, ...TenantPortalPageKey[]];
@@ -322,7 +322,7 @@ export const DEFAULT_SETTINGS = {
 
 
 
-export const CREDENTIOL_PLATFORM = ["CLOUDINARY", "WHATSAPP_BUSINESS", "PAYMENT_GATEWAY", "FLIGHT_API", "GEMINI_AI"] as const;
+export const CREDENTIOL_PLATFORM = ["CLOUDINARY", "WHATSAPP_BUSINESS", "RAZORPAY_API", "FLIGHT_API", "GEMINI_AI"] as const;
 
 
 export const SUBSCRIPTION_PLANS = [{
