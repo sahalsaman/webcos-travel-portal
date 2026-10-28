@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const data = travelerRegisterSchema.parse(body);
     const otp = z.string().regex(/^\d{6}$/, "Enter the 6-digit WhatsApp code").parse(body.otp);
     const mobile = normaliseMobile(data.mobile);
-    if (!await verifyPhoneOtp(mobile, otp, false)) return fail("The WhatsApp code is invalid or has expired. Request a new code and try again.", 400);
+    if (!await verifyPhoneOtp(mobile, otp)) return fail("The WhatsApp code is invalid or has expired. Request a new code and try again.", 400);
     const business = await getBusiness();
     await connectDB();
     const email = data.email?.toLowerCase() || `${mobile.slice(1)}@phone.voibee.local`;
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       return fail("An account with this email already exists", 409);
     }
     const user = existing
-      ? await (await tenantModel(User)).findByIdAndUpdate(existing._id, { $set: { name: data.name, mobile, password: passwordHash } }, { returnDocument: "after" })
+      ? await (await tenantModel(User)).findByIdAndUpdate(existing._id, { $set: { name: data.name, email, mobile, password: passwordHash } }, { returnDocument: "after" })
       : await (await tenantModel(User)).create({ name: data.name, email, mobile, password: passwordHash, role: "tenant_traveler", businessId: business._id });
     await notifyAdminsAndEmployees({
       type: "registration",

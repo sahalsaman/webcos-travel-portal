@@ -60,12 +60,14 @@ export function SupplierForm({
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(editing ? `/api/suppliers/${supplier!._id}` : "/api/suppliers", {
+      const response = await fetch(editing ? `/api/tenant/suppliers/${supplier!._id}` : "/api/tenant/suppliers", {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, commissionRate: Number(form.commissionRate) }),
       });
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: { success?: boolean; message?: string } = {};
+      try { data = responseText ? JSON.parse(responseText) : {}; } catch { throw new Error("The supplier service returned an invalid response. Please try again."); }
       if (!response.ok || !data.success) throw new Error(data.message || "Unable to save supplier");
       toast.success(editing ? "Supplier updated" : "Supplier created");
       router.refresh();

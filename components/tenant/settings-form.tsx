@@ -7,9 +7,12 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { calculateCommission } from "@/lib/commission";
 import { formatINR } from "@/lib/utils";
+import { SUPPORTED_CURRENCIES } from "@/lib/country_currency";
+import { MoneyInput } from "@/components/currency/money-input";
 
 interface Settings {
   defaultCommission: number;
@@ -67,20 +70,26 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label className="mb-1.5 block">Default partner commission (₹)</Label>
-            <Input type="number" min={0} value={form.defaultCommission} onChange={(e) => set("defaultCommission", Number(e.target.value))} />
+            <Label className="mb-1.5 block">Default partner commission ({form.currency})</Label>
+            <MoneyInput min={0} value={form.defaultCommission} onChange={(e) => set("defaultCommission", Number(e.target.value))} />
           </div>
           <div>
-            <Label className="mb-1.5 block">Min withdrawal (₹)</Label>
-            <Input type="number" min={0} value={form.minWithdrawal} onChange={(e) => set("minWithdrawal", Number(e.target.value))} />
+            <Label className="mb-1.5 block">Min withdrawal ({form.currency})</Label>
+            <MoneyInput min={0} value={form.minWithdrawal} onChange={(e) => set("minWithdrawal", Number(e.target.value))} />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Business currency</Label>
+            <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
+              {SUPPORTED_CURRENCIES.map((currency) => <option key={currency.code} value={currency.code}>{currency.code} — {currency.label}</option>)}
+            </Select>
           </div>
           <div>
             <Label className="mb-1.5 block">Platform fee (% of commission)</Label>
             <Input type="number" min={0} max={100} value={form.platformFeePercent} onChange={(e) => set("platformFeePercent", Number(e.target.value))} />
           </div>
           <div>
-            <Label className="mb-1.5 block">Platform fee (flat ₹ / seat)</Label>
-            <Input type="number" min={0} value={form.platformFeeFlat} onChange={(e) => set("platformFeeFlat", Number(e.target.value))} />
+            <Label className="mb-1.5 block">Platform fee (flat {form.currency} / seat)</Label>
+            <MoneyInput min={0} value={form.platformFeeFlat} onChange={(e) => set("platformFeeFlat", Number(e.target.value))} />
           </div>
           <div className="sm:col-span-2">
             <Button type="submit" variant="gradient" disabled={loading}>

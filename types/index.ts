@@ -274,7 +274,8 @@ export interface InventoryAssetDTO {
   taxLabel?: string;
   taxPercentage?: number;
   facilities: string[];
-  rooms?: Array<{ _id?: string; name: string; description: string; category: string; capacity: number; numberOfRooms: number; price: number; currency: string; amenities: string[] }>;
+  rooms?: Array<{ _id?: string; description?: string; category: string; capacity: number; numberOfRooms: number; price: number; amenities: string[] }>;
+  additianalInclude?: Array<{ _id?: string; name: string; description: string; price: number }>;
   createdAt: string;
 }
 

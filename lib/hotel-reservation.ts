@@ -33,7 +33,7 @@ export async function prepareHotelReservation(input: ReservationInput, excludeId
   ]);
   const booked = totals[0]?.booked ?? 0;
   if (booked + input.rooms > room.numberOfRooms) {
-    throw fail(`Only ${Math.max(0, room.numberOfRooms - booked)} ${room.name} room(s) are available for these dates`, 422);
+    throw fail(`Only ${Math.max(0, room.numberOfRooms - booked)} ${room.category} room(s) are available for these dates`, 422);
   }
 
   const nights = Math.max(1, Math.ceil((new Date(input.checkOut).getTime() - new Date(input.checkIn).getTime()) / 86_400_000));
@@ -41,7 +41,7 @@ export async function prepareHotelReservation(input: ReservationInput, excludeId
     hotel: hotel._id,
     roomId: room._id,
     hotelName: hotel.name,
-    roomType: room.name,
+    roomType: room.category,
     amount: room.price * input.rooms * nights * (hotel.additionalTax ? 1 + (hotel.taxPercentage ?? 0) / 100 : 1),
   };
 }

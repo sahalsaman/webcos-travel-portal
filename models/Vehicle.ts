@@ -7,6 +7,9 @@ const VehicleSchema = new Schema({
   numberOfVehicle: { type: Number, default: 1, trim: true },
   description: { type: String, default: "", trim: true },
   facilities: { type: [String], default: [] },
+  passengerCapacity: { type: Number, default: 1 },
+  price: { type: Number, required: true },
+  amenities: { type: [String], default: [] },
 }, { timestamps: true });
 
 VehicleSchema.index({ supplier: 1, name: 1 });

@@ -307,10 +307,11 @@ export const inventoryAssetSchema = z.object({
   taxPercentage: z.number().min(0).max(100).default(0),
   facilities: z.array(z.string().trim().min(1)).default([]),
   rooms: z.array(z.object({
-    name: z.string().trim().min(2), description: z.string().trim().default(""), category: z.string().trim().default(""),
+    description: z.string().trim().default(""), category: z.string().trim().min(1),
     capacity: z.number().int().positive().default(1), numberOfRooms: z.number().int().positive().default(1),
-    price: z.number().nonnegative(), currency: z.string().trim().length(3).default("USD"), amenities: z.array(z.string().trim().min(1)).default([]),
+    price: z.number().nonnegative(), amenities: z.array(z.string().trim().min(1)).default([]),
   })).default([]),
+  additianalInclude: z.array(z.object({ name: z.string().trim().min(1), description: z.string().trim().default(""), price: z.number().nonnegative().default(0) })).default([]),
 }).superRefine((data, ctx) => { if (data.additionalTax && !data.taxLabel) ctx.addIssue({ code: "custom", path: ["taxLabel"], message: "Enter a tax label" }); });
 
 export const campaignSchema = z.object({

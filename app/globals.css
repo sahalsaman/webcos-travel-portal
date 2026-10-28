@@ -199,6 +199,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Native required controls get a consistent, accessible visual marker even
+   when a form uses a plain Label/Input pair instead of a bespoke field wrapper. */
+label:not(:has(.text-destructive)):has(input:required)::after,
+label:not(:has(.text-destructive)):has(textarea:required)::after,
+label:not(:has(.text-destructive)):has(select:required)::after,
+label:not(:has(.text-destructive)):has(+ input:required)::after,
+label:not(:has(.text-destructive)):has(+ textarea:required)::after,
+label:not(:has(.text-destructive)):has(+ select:required)::after {
+  margin-left: 0.2rem;
+  color: oklch(0.63 0.24 25);
+  content: "*";
+}
+
 /* Keep the AI package editor centered and use the same broad field layout as
    the manual package form on laptop and desktop screens. */
 div[role="dialog"][aria-label="Edit AI generated package"] {

@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { COUNTRY_OPTIONS, DESTINATION_STATUSES } from "@/lib/constants";
 import { CloudinaryImageUrlsField } from "@/components/tenant/cloudinary-image-urls-field";
 import type { DestinationDTO } from "@/types";
+import { CurrencyCode } from "@/components/currency/currency-code";
+import { MoneyInput } from "@/components/currency/money-input";
 
 function countryValue(country: string, countryCode: string) {
   return `${countryCode}|${country}`;
@@ -99,8 +101,8 @@ export function DestinationForm({ destination, onSaved, onCancel }: { destinatio
             </Select>
           </div>
           <div>
-            <Label className="mb-1.5 block">Base price</Label>
-            <Input type="number" min={0} value={form.basePrice} onChange={(e) => set("basePrice", Number(e.target.value))} />
+            <Label className="mb-1.5 block">Base price (<CurrencyCode />)</Label>
+            <MoneyInput min={0} value={form.basePrice} onChange={(e) => set("basePrice", Number(e.target.value))} />
           </div>
           <div>
             <Label className="mb-1.5 block">Status</Label>

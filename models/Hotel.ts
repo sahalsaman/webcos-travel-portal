@@ -11,15 +11,20 @@ const HotelSchema = new Schema({
   taxPercentage: { type: Number, default: 0, min: 0, max: 100 },
   facilities: { type: [String], default: [] },
   rooms: [{
-    name: { type: String, required: true, trim: true },
     description: { type: String, default: "", trim: true },
     category: { type: String, default: "", trim: true },
     capacity: { type: Number, default: 1 },
     numberOfRooms: { type: Number, default: 1 },
     price: { type: Number, required: true },
-    currency: { type: String, default: "USD" },
     amenities: { type: [String], default: [] },
   }],
+  additianalInclude:[
+    {
+      name: { type: String, default: "", trim: true },
+      description: { type: String, default: "", trim: true },
+      price: { type: Number, default: 0 },
+    }
+  ]
 }, { timestamps: true });
 
 HotelSchema.index({ supplier: 1, name: 1 });

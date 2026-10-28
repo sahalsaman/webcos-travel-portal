@@ -17,6 +17,12 @@ const UserSchema = new Schema(
     mobile: { type: String, trim: true },
     role: { type: String, enum: ROLES, default: "tenant_traveler", index: true },
     businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
+    otp: {
+      codeHash: { type: String, default: "" },
+      attempts: { type: Number, default: 0 },
+      consumedAt: { type: Date, default: null },
+      expiresAt: { type: Date, default: null },
+    },
     image: String,
     emailVerified: Date,
   },

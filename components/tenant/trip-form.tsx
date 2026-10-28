@@ -210,7 +210,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
       exclusions: lines(form.exclusions),
       holidayPackage: form.holidayPackage,
       supplierPackage: form.supplierPackage,
-      supplier: form.supplierPackage ? form.supplier : "",
+      supplier: form.supplier,
       visaRequired: form.visaRequired,
       visaNote: form.visaNote,
       visaDocuments: lines(form.visaDocuments),
@@ -378,7 +378,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
               Supplier package
             </label>
           </div>
-          {form.supplierPackage ? <div className="sm:col-span-3 flex flex-wrap items-end gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4"><div className="min-w-60 flex-1"><Label className="mb-1.5 block">Supplier <RequiredMark /></Label><Select required value={form.supplier} onChange={(event) => set("supplier", event.target.value)}><option value="">Select supplier</option>{suppliers.map((supplier) => <option key={supplier._id} value={supplier._id}>{supplier.companyName} · {supplier.phone}</option>)}</Select></div><SupplierDrawer supplierOptions={suppliers} /></div> : null}
+          <div className="sm:col-span-3 flex flex-wrap items-end gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4"><div className="min-w-60 flex-1"><Label className="mb-1.5 block">Supplier {form.supplierPackage ? <RequiredMark /> : <span className="text-muted-foreground">(optional)</span>}</Label><Select required={form.supplierPackage} value={form.supplier} onChange={(event) => set("supplier", event.target.value)}><option value="">Select supplier</option>{suppliers.map((supplier) => <option key={supplier._id} value={supplier._id}>{supplier.companyName} · {supplier.phone}</option>)}</Select></div><SupplierDrawer supplierOptions={suppliers} /></div>
           {showDateAndSeats ? (
             <>
               <div>

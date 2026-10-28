@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       ? "You are a concise travel-agency operations assistant. Answer the user's question with practical, accurate advice."
       : action === "destination"
         ? "Return ONLY JSON: {\"name\":\"\",\"country\":\"\",\"location\":\"\",\"description\":\"\"}. Create one complete destination record."
-        : "Return ONLY JSON: {\"name\":\"\",\"country\":\"\",\"location\":\"\",\"description\":\"\",\"rooms\":[{\"name\":\"\",\"category\":\"CP\",\"capacity\":2,\"numberOfRooms\":1,\"price\":0,\"currency\":\"INR\"}]}. Create one complete hotel record and room types.";
+        : "Return ONLY JSON: {\"name\":\"\",\"country\":\"\",\"location\":\"\",\"description\":\"\",\"rooms\":[{\"category\":\"CP\",\"capacity\":2,\"numberOfRooms\":1,\"price\":0}]}. Create one complete hotel record and room categories.";
     const model = process.env.GEMINI_MODEL?.trim() || "gemini-3.1-flash-lite";
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, signal: AbortSignal.timeout(60_000), body: JSON.stringify({ contents: [{ parts: [{ text: `${instruction}\nUser request: ${prompt.trim()}` }] }], generationConfig: { temperature: 0.3, ...(action === "chat" ? {} : { responseMimeType: "application/json" }) } }) });
     const raw = await response.text();

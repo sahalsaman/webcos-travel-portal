@@ -20,12 +20,14 @@ type CurrencyContextValue = {
 
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
 
-export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<CurrencyCode>(DEFAULT_CURRENCY);
+export function CurrencyProvider({ children, initialCurrency, amountsAreInCurrency = false }: { children: React.ReactNode; initialCurrency?: string; amountsAreInCurrency?: boolean }) {
+  const configuredCurrency = isCurrencyCode(initialCurrency) ? initialCurrency : DEFAULT_CURRENCY;
+  const [currency, setCurrencyState] = useState<CurrencyCode>(configuredCurrency);
   const [rates, setRates] = useState<CurrencyRates>(DEFAULT_CURRENCY_RATES);
 
   useEffect(() => {
     const restoreTimer = window.setTimeout(() => {
+      if (initialCurrency && isCurrencyCode(initialCurrency)) return;
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (isCurrencyCode(saved)) setCurrencyState(saved);
     }, 0);
@@ -45,7 +47,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       window.clearTimeout(restoreTimer);
       controller.abort();
     };
-  }, []);
+  }, [initialCurrency]);
 
   const setCurrency = useCallback((nextCurrency: CurrencyCode) => {
     setCurrencyState(nextCurrency);
@@ -55,9 +57,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<CurrencyContextValue>(() => ({
     currency,
     setCurrency,
-    formatCurrency: (amountInINR, options) =>
-      formatConvertedCurrency(amountInINR, currency, rates, options?.decimals),
-  }), [currency, rates, setCurrency]);
+    formatCurrency: (amountInINR, options) => amountsAreInCurrency
+      ? new Intl.NumberFormat("en", { style: "currency", currency, maximumFractionDigits: options?.decimals ? 2 : 0, minimumFractionDigits: 0 }).format(Number.isFinite(amountInINR) ? amountInINR : 0)
+      : formatConvertedCurrency(amountInINR, currency, rates, options?.decimals),
+  }), [amountsAreInCurrency, currency, rates, setCurrency]);
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
 }
