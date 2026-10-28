@@ -5,6 +5,7 @@ import "@/models";
 import Employee from "@/models/Employee";
 import Notification from "@/models/Notification";
 import User from "@/models/User";
+import { getBusiness } from "@/lib/business";
 
 interface NotificationInput {
   type: NotificationType;
@@ -16,14 +17,17 @@ interface NotificationInput {
 async function createForUsers(userIds: unknown[], input: NotificationInput) {
   const uniqueIds = [...new Set(userIds.filter(Boolean).map(String))];
   if (!uniqueIds.length) return;
-  await (await tenantModel(Notification)).insertMany(uniqueIds.map((user) => ({ user, channel: "in-app", ...input })));
+  const business = await getBusiness();
+  await (await tenantModel(Notification)).insertMany(uniqueIds.map((user) => ({ businessId: business._id, user, channel: "in-app", ...input })));
 }
 
 export async function notifyAdminsAndEmployees(input: NotificationInput, employeePage?: TenantPortalPageKey) {
   try {
     await connectDB();
     const [admins, employees] = await Promise.all([
-      (await tenantModel(User)).find({ role: "admin" }).select("_id").lean(),
+      // `tenant` is the agency owner role. Keep legacy `admin` support for
+      // older tenant databases during the role-name migration.
+      (await tenantModel(User)).find({ role: { $in: ["tenant", "admin"] } }).select("_id").lean(),
       (await tenantModel(Employee)).find({ status: "active", portalAccess: true, user: { $ne: null }, ...(employeePage ? { portalPages: employeePage } : {}) }).select("user").lean(),
     ]);
     await createForUsers([...admins.map((admin) => admin._id), ...employees.map((employee) => employee.user)], input);

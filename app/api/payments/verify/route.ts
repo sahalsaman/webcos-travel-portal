@@ -11,6 +11,7 @@ import PartnerTrip from "@/models/PartnerTrip";
 import Commission from "@/models/Commission";
 import Notification from "@/models/Notification";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { getBusiness } from "@/lib/business";
 
 export async function POST(request: Request) {
   try {
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
     if (!bookingId) return fail("Missing booking reference", 400);
 
     await connectDB();
+    const business = await getBusiness();
     const booking = await (await tenantModel(Booking)).findById(bookingId);
     if (!booking) return fail("Booking not found", 404);
 
@@ -94,6 +96,7 @@ export async function POST(request: Request) {
         { booking: booking._id },
         {
           $setOnInsert: {
+            businessId: business._id,
             booking: booking._id,
             partner: booking.partner,
             trip: booking.trip,
@@ -125,12 +128,19 @@ export async function POST(request: Request) {
 
     // Notifications (in-app) only apply to logged-in traveler bookings.
     if (booking.traveler) {
-      await (await tenantModel(Notification)).create({
-        user: booking.traveler,
-        type: "booking",
-        title: "Booking confirmed",
-        message: `Your booking ${booking.bookingNumber} for "${trip?.title ?? "your package"}" is confirmed.`,
-      });
+      // The payment result must not be downgraded to an error if an optional
+      // in-app notification cannot be saved.
+      try {
+        await (await tenantModel(Notification)).create({
+          businessId: business._id,
+          user: booking.traveler,
+          type: "booking",
+          title: "Booking confirmed",
+          message: `Your booking ${booking.bookingNumber} for "${trip?.title ?? "your package"}" is confirmed.`,
+        });
+      } catch (notificationError) {
+        console.error("[payments] traveler notification failed:", notificationError);
+      }
     }
 
     await notifyAdminsAndEmployees({

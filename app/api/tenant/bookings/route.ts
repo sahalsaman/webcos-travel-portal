@@ -9,12 +9,15 @@ import Payment from "@/models/Payment";
 import Trip from "@/models/Trip";
 import User from "@/models/User";
 import { isCustomDateTripCategory } from "@/lib/constants";
+import { getBusiness } from "@/lib/business";
+import { notifyAdminsAndEmployees } from "@/lib/notifications";
 
 export async function POST(request: Request) {
   try {
     await requireApiRole(["tenant", "tenant_employee"]);
     const body = adminManualBookingSchema.parse(await request.json());
     await connectDB();
+    const business = await getBusiness();
 
     const trip = await (await tenantModel(Trip)).findById(body.tripId);
     if (!trip || trip.status !== "active") return fail("This package is not available for booking", 404);
@@ -32,6 +35,7 @@ export async function POST(request: Request) {
         $setOnInsert: {
           email: travelerEmail,
           role: "tenant_traveler",
+          businessId: business._id,
         },
         $set: {
           name: body.travelerDetails.name,
@@ -56,6 +60,7 @@ export async function POST(request: Request) {
     let booking;
     try {
       booking = await (await tenantModel(Booking)).create({
+        businessId: business._id,
         bookingNumber,
         trip: trip._id,
         traveler: traveler._id,
@@ -84,6 +89,7 @@ export async function POST(request: Request) {
 
     if (["created", "paid", "failed", "refunded"].includes(body.paymentStatus)) {
       const payment = await (await tenantModel(Payment)).create({
+        businessId: business._id,
         booking: booking._id,
         amount: totalAmount,
         currency: "INR",
@@ -92,6 +98,10 @@ export async function POST(request: Request) {
       });
       booking.payment = payment._id;
       await booking.save();
+    }
+
+    if (body.status === "confirmed" || body.paymentStatus === "paid") {
+      await notifyAdminsAndEmployees({ type: "booking", title: "Booking confirmed", message: `${booking.bookingNumber} was confirmed.`, meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/lms/bookings" } }, "lms");
     }
 
     return ok({ id: String(booking._id), bookingNumber }, 201);

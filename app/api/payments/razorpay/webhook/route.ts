@@ -5,6 +5,7 @@ import { tenantModel } from "@/lib/tenant-db";
 import { connectDB } from "@/lib/db";
 import Booking from "@/models/Booking";
 import Payment from "@/models/Payment";
+import { notifyAdminsAndEmployees } from "@/lib/notifications";
 
 function signatureMatches(payload: string, signature: string | null, secret: string) {
   if (!signature || !secret) return false;
@@ -32,7 +33,8 @@ export async function POST(request: Request) {
       payment.status = "paid";
       payment.razorpayPaymentId = paymentEntity.id;
       await payment.save();
-      await BookingModel.updateOne({ _id: payment.booking, paymentStatus: { $ne: "paid" } }, { $set: { paymentStatus: "paid", status: "confirmed" } });
+      const confirmed = await BookingModel.findOneAndUpdate({ _id: payment.booking, paymentStatus: { $ne: "paid" } }, { $set: { paymentStatus: "paid", status: "confirmed" } }, { new: true });
+      if (confirmed) await notifyAdminsAndEmployees({ type: "payment", title: "Payment received", message: `${confirmed.bookingNumber} was paid successfully.`, meta: { bookingId: String(confirmed._id), bookingNumber: confirmed.bookingNumber, href: "/lms/bookings" } }, "lms");
     } else if (event.event === "payment.failed") {
       payment.status = "failed";
       payment.razorpayPaymentId = paymentEntity.id;

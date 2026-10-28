@@ -159,7 +159,7 @@ export function EditBookingDrawer({ booking }: { booking: EditableBooking }) {
             onClick={close}
             aria-label="Close booking edit form"
           />
-          <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-border bg-background shadow-2xl">
+          <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-border bg-background shadow-2xl text-left">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <div>
                 <h2 className="text-lg font-bold">Edit booking</h2>
