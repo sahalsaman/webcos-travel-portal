@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       type: "registration",
       title: "New traveler registered",
       message: `${data.name} created a traveler account.`,
-      meta: { userId: String(user?._id), href: "/users/customers" },
+      meta: { userId: String(user?._id), href: "/tenant/users/customers" },
     }, "users");
     return ok({ id: String(user._id), role: "tenant_traveler" }, 201);
   } catch (err) {

@@ -170,7 +170,7 @@ export async function POST(request: Request) {
       type: "booking",
       title: "New booking received",
       message: `${bookingNumber} · ${trip.title} · ${travelerDetails.name} · ${body.seats} traveler(s)`,
-      meta: { bookingId: String(booking._id), bookingNumber, href: "/lms/bookings" },
+      meta: { bookingId: String(booking._id), bookingNumber, href: "/tenant/lms/bookings" },
     }, "lms");
 
     // Offline bookings are stored immediately and remain unpaid until an admin

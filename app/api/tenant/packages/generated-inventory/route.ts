@@ -30,7 +30,7 @@ async function selfManagedSupplier(country: string, city: string) {
 export async function POST(request: Request) {
   try {
     await requireApiRole(["tenant", "tenant_employee"]);
-    const body = await request.json() as { kind?: Kind; name?: string; description?: string; location?: string; country?: string; supplierId?: string; image?: string };
+    const body = await request.json() as { kind?: Kind; name?: string; description?: string; location?: string; country?: string; supplierId?: string; image?: string; rooms?: Array<{ name?: string; category?: string; capacity?: number; numberOfRooms?: number; price?: number; currency?: string }> };
     const kind = body.kind;
     const name = body.name?.trim();
     const description = body.description?.trim() ?? "";
@@ -55,7 +55,8 @@ export async function POST(request: Request) {
       const Model = await tenantModel(kind === "hotel" ? Hotel : Vehicle);
       const existing = await Model.findOne({ supplier: supplier._id, name });
       if (existing) return ok({ id: String(existing._id), existing: true });
-      const item = await Model.create({ supplier: supplier._id, name, image, description, facilities: [] });
+      const rooms = kind === "hotel" ? (body.rooms ?? []).filter((room) => room.name).map((room) => ({ name: room.name!.trim(), category: room.category?.trim() || "CP", description: "", capacity: Math.max(1, Number(room.capacity) || 1), numberOfRooms: Math.max(1, Number(room.numberOfRooms) || 1), price: Math.max(0, Number(room.price) || 0), currency: room.currency?.trim() || "INR", amenities: [] })) : undefined;
+      const item = await Model.create({ supplier: supplier._id, name, image, description, facilities: [], ...(kind === "hotel" ? { rooms } : {}) });
       return ok({ id: String(item._id) }, 201);
     }
 

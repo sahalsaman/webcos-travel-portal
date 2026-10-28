@@ -54,7 +54,7 @@ export default async function TenantCampaignsPage() {
                       <p className="font-medium">{formatINR(campaign.budget)}</p>
                       <p className="text-xs text-muted-foreground">Spent {formatINR(campaign.spent)}</p>
                     </td>
-                    <td className="p-4"><Link href={`/lms/leads?campaign=${campaign._id}`} className="inline-flex items-center gap-1 font-medium text-primary hover:underline"><UsersRound className="size-4" />{campaign.leadCount ?? 0}</Link></td>
+                    <td className="p-4"><Link href={`/tenant/lms/leads?campaign=${campaign._id}`} className="inline-flex items-center gap-1 font-medium text-primary hover:underline"><UsersRound className="size-4" />{campaign.leadCount ?? 0}</Link></td>
                     <td className="p-4"><StatusBadge status={campaign.status} /></td>
                     <td className="p-4 text-right"><CampaignDrawer campaign={campaign} /></td>
                   </tr>

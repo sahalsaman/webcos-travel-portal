@@ -28,7 +28,7 @@ export function PackageRowActions({ id, title }: { id: string; title: string }) 
   }
 
   return <div className="flex justify-end gap-2">
-    <Button asChild variant="outline" size="sm"><Link href={`/inventory/packages/${id}/edit`}><Pencil className="size-3.5" /></Link></Button>
+    <Button asChild variant="outline" size="sm"><Link href={`/tenant/inventory/packages/${id}/edit`}><Pencil className="size-3.5" /></Link></Button>
     <Button type="button" variant="outline" size="sm" disabled={deleting} onClick={() => void deletePackage()} className="text-destructive hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-3.5" />{deleting ? "Deleting" : ""}</Button>
   </div>;
 }

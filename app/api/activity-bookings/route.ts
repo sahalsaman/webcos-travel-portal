@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       totalAmount: activity.basePrice * totalParticipants,
       bookingNumber,
     });
-    await notifyAdminsAndEmployees({ type: "booking", title: "New activity booking", message: `${bookingNumber} · ${activity.title} · ${data.name}`, meta: { activityBookingId: String(booking._id), href: "/lms/activity-bookings" } }, "lms");
+    await notifyAdminsAndEmployees({ type: "booking", title: "New activity booking", message: `${bookingNumber} · ${activity.title} · ${data.name}`, meta: { activityBookingId: String(booking._id), href: "/tenant/lms/activity-bookings" } }, "lms");
     return ok({ bookingNumber, id: String(booking._id) }, 201);
   } catch (error) { return handleError(error); }
 }

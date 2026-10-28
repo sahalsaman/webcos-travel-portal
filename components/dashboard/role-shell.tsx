@@ -17,6 +17,7 @@ import {
   Boxes,
   Star,
   BriefcaseBusiness,
+  Stars,
 } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/shell";
 import type { TenantPortalPageKey } from "@/lib/constants";
@@ -26,6 +27,7 @@ const NAVS: Record<string, { label: string; items: NavItem[] }> = {
     label: "Tenant portal",
     items: [
       { href: "/tenant", label: "Dashboard", icon: LayoutDashboard, accessKey: "dashboard" },
+      { href: "/tenant/ai", label: "AI Assistant", icon: Stars, accessKey: "ai" },
       { href: "/tenant/lms", label: "Bookings & LMS", icon: ContactRound, accessKey: "lms", children: [
         { href: "/tenant/lms/bookings", label: "Bookings", icon: CalendarCheck },
         { href: "/tenant/lms/activity-bookings", label: "Activity Bookings", icon: CalendarCheck },
@@ -67,25 +69,7 @@ const NAVS: Record<string, { label: string; items: NavItem[] }> = {
       { href: "/tenant/settings", label: "Settings", icon: Settings, accessKey: "settings" },
     ],
   },
-  tenant_partner: {
-    label: "Partner",
-    items: [
-      { href: "/partner", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/partner/browse", label: "Browse Packages", icon: Compass },
-      { href: "/partner/links", label: "My Links", icon: Link2 },
-      { href: "/partner/bookings", label: "Bookings", icon: CalendarCheck },
-      { href: "/partner/earnings", label: "Earnings", icon: Wallet },
-      { href: "/partner/profile", label: "Profile", icon: UserCircle },
-    ],
-  },
-  tenant_traveler: {
-    label: "Traveler",
-    items: [
-      { href: "/traveler", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/traveler/bookings", label: "My Bookings", icon: ShoppingBag },
-      { href: "/traveler/wishlist", label: "Wishlist", icon: Heart },
-    ],
-  },
+
 };
 
 export function RoleShell({

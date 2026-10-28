@@ -70,6 +70,7 @@ export const HR_TASK_STATUSES = ["todo", "in_progress", "blocked", "completed", 
 
 export const TENANT_PORTAL_PAGES = [
   { key: "dashboard", label: "Dashboard", href: "/tenant" },
+  { key: "ai", label: "AI Assistant", href: "/tenant/ai" },
   { key: "lms", label: "Bookings & LMS", href: "/tenant/lms" },
   { key: "hrm", label: "HRM", href: "/tenant/hrm" },
   { key: "users", label: "Users", href: "/tenant/users" },

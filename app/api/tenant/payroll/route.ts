@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       type: "payout",
       title: "Payroll generated",
       message: `Payroll for ${data.month} has been generated with net pay ₹${netPay.toLocaleString("en-IN")}.`,
-      meta: { payrollId: String(payroll._id), href: "/hrm/payroll" },
+      meta: { payrollId: String(payroll._id), href: "/tenant/hrm/payroll" },
     });
     return ok({ id: String(payroll._id) }, 201);
   } catch (err) {

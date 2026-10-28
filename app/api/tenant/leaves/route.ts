@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const data = leaveRequestSchema.parse(body);
     await connectDB();
     const record = await (await tenantModel(LeaveRequest)).create({ ...data, employee: data.employeeId, startDate: new Date(data.startDate), endDate: new Date(data.endDate) });
-    await notifyEmployee(data.employeeId, { type:"system", title:"Leave request recorded", message:`Your ${data.type} leave request for ${data.days} day(s) is ${data.status}.`, meta:{ leaveId:String(record._id), href:"/hrm/leaves" } });
+    await notifyEmployee(data.employeeId, { type:"system", title:"Leave request recorded", message:`Your ${data.type} leave request for ${data.days} day(s) is ${data.status}.`, meta:{ leaveId:String(record._id), href:"/tenant/hrm/leaves" } });
     return ok({ id:String(record._id) }, 201);
   } catch (error) { return handleError(error); }
 }
