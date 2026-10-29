@@ -4,19 +4,20 @@ import { FileText, Megaphone, PlugZap, Settings, UserRound } from "lucide-react"
 import { connectDB } from "@/lib/db";
 import { getSettings } from "@/models/Settings";
 import { serialize } from "@/lib/utils";
-import { SettingsForm } from "@/components/settings-form";
+import { SettingsForm } from "@/components/tenant/settings-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/dashboard/status-badge";
-import { OfferCardRowActions } from "@/components/offer-card-row-actions";
-import { OfferCardDrawer } from "@/components/offer-card-drawer";
-import { ProfileSettings } from "@/components/profile-settings";
+import { OfferCardRowActions } from "@/components/tenant/offer-card-row-actions";
+import { OfferCardDrawer } from "@/components/tenant/offer-card-drawer";
+import { ProfileSettings } from "@/components/tenant/profile-settings";
 import { DEFAULT_SETTINGS } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/session";
 import { listTenantOfferCards } from "@/lib/dashboard";
 import type { OfferCardDTO } from "@/types";
-import { QuotationSettingsForm } from "@/components/quotation-settings-form";
-import { IntegrationSettingsForm } from "@/components/integration-settings-form";
+import { QuotationSettingsForm } from "@/components/tenant/quotation-settings-form";
+import { IntegrationSettingsForm } from "@/components/tenant/integration-settings-form";
+import { BookingPdfSettingsForm } from "@/components/tenant/booking-pdf-settings-form";
 import { getBusiness, getBusinessCredentials } from "@/lib/business";
 
 const OFFER_FALLBACK = "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=200&q=60";
@@ -24,7 +25,8 @@ const OFFER_FALLBACK = "https://images.unsplash.com/photo-1476514525535-07fb3b4a
 const SETTINGS_SECTIONS = [
   { key: "profile", label: "Profile", icon: UserRound },
   { key: "platform", label: "Platform Configuration", icon: Settings },
-  { key: "quotation", label: "Quotation Setup", icon: FileText },
+  { key: "quotation", label: "Quotation Template", icon: FileText },
+  { key: "booking-pdf", label: "Booking PDF", icon: FileText },
   { key: "offers", label: "Banner Slides", icon: Megaphone },
   { key: "integrations", label: "Integrations", icon: PlugZap },
 ] as const;
@@ -96,6 +98,8 @@ export default async function TenantSettingsPage({
           quotationColor: settings.quotationColor,
         }} />
       ) : null}
+
+      {activeSection === "booking-pdf" ? <BookingPdfSettingsForm settings={{ bookingPdfTheme: settings.bookingPdfTheme, bookingPdfColor: settings.bookingPdfColor }} /> : null}
 
       {activeSection === "integrations" ? <IntegrationSettingsForm webhookUrl={new URL("/api/payments/razorpay/webhook", process.env.NEXT_PUBLIC_APP_URL || business?.siteUrl || "http://localhost:3001").toString()} credentials={integrations.map((credential) => ({ ...credential, name: credential.name ?? "", apikey: credential.apikey ?? "", secretKey: credential.secretKey ?? "", url: credential.url ?? "", webhookSecret: credential.webhookSecret ?? "", alertEmail: credential.alertEmail ?? "" }))} /> : null}
 

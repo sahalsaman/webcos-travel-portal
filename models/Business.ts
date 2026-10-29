@@ -6,7 +6,6 @@ import { CREDENTIOL_PLATFORM } from "@/lib/constants";
 const BusinessSchema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true, unique: true },
-  databaseName: { type: String, required: true, unique: true },
   hosts: { type: [String], required: true, unique: true },
   siteUrl: { type: String, required: true },
   address: { type: String, default: "" },
@@ -16,6 +15,7 @@ const BusinessSchema = new Schema({
   businessPhone: { type: String, default: "", trim: true },
   BusinessWhatsappCountryCode : { type: String, default: "", trim: true },
   businessWhatsapp : { type: String, default: "", trim: true },
+  currency: { type: String, default: "INR" },
   logoUrl: { type: String, default: "" },
   primaryColor: { type: String, default: "#0060e6" },
   credentials: [{
@@ -38,6 +38,8 @@ const BusinessSchema = new Schema({
     setupPaidAt: { type: Date, default: null },
     currency: { type: String, default: "INR" },
     renewsAt: { type: Date, default: null },
+    startedAt: { type: Date, default: null },
+    cancelledAt: { type: Date, default: null },
   },
 }, { timestamps: true });
 

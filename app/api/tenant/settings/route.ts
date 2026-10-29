@@ -33,6 +33,8 @@ export async function PATCH(request: Request) {
       "quotationOtherInformation",
       "quotationTheme",
       "quotationColor",
+      "bookingPdfTheme",
+      "bookingPdfColor",
     ] as const;
     const update: Record<string, unknown> = {};
     for (const k of allowed) {

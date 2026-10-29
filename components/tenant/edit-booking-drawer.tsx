@@ -132,7 +132,7 @@ export function EditBookingDrawer({ booking }: { booking: EditableBooking }) {
     if (!window.confirm(`Refund ${booking.bookingNumber}? This will cancel the booking and reverse inventory and commission.`)) return;
     setRefunding(true);
     try {
-      const res = await fetch(`/api/bookings/${booking._id}/refund`, { method: "POST" });
+      const res = await fetch(`/api/tenant/bookings/${booking._id}/refund`, { method: "POST" });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message || "Refund failed");
       toast.success(data.alreadyRefunded ? "Booking was already refunded" : "Booking refunded and cancelled");

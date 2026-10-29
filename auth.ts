@@ -12,6 +12,7 @@ import Partner from "@/models/Partner";
 import Employee from "@/models/Employee";
 import mongoose from "mongoose";
 import { businessModel } from "@/lib/business";
+import { configuredTenantDatabase } from "@/lib/db";
 import { headers } from "next/headers";
 import { normalisePhone, verifyPhoneOtp } from "@/lib/phone-otp";
 
@@ -55,10 +56,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           await connectDB();
           const registry = await businessModel();
           const businesses = await registry.find({ status: "active" }).lean();
+          const db = mongoose.connection.useDb(configuredTenantDatabase(), { useCache: true });
+          const users = db.models.User || db.model("User", User.schema);
           for (const candidate of businesses) {
-            const db = mongoose.connection.useDb(candidate.databaseName, { useCache: true });
-            const users = db.models.User || db.model("User", User.schema);
-            const candidateUser = await users.findOne({ email: parsed.data.email }).select("+password").lean<{ _id: unknown; name: string; email: string; password?: string; role: string; image?: string }>();
+            const candidateUser = await users.findOne({ email: parsed.data.email, businessId: candidate._id }).select("+password").lean<{ _id: unknown; name: string; email: string; password?: string; role: string; image?: string }>();
             if (!candidateUser?.password || !["tenant", "tenant_employee", "tenant_partner", "tenant_traveler"].includes(candidateUser.role)) continue;
             if (!await bcrypt.compare(parsed.data.password, candidateUser.password)) continue;
             if (siteLoginBlocked(candidateUser.role)) return null;

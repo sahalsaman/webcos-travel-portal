@@ -14,7 +14,7 @@ export function BookingRowActions({ id, bookingNumber }: { id: string; bookingNu
   async function shareBooking() {
     setSharing(true);
     try {
-      const response = await fetch(`/api/bookings/${id}/share`, { method: "POST" });
+      const response = await fetch(`/api/tenant/bookings/${id}/share`, { method: "POST" });
       const result = await response.json();
       if (!response.ok || !result.success) throw new Error(result.message || "Unable to create share link");
 

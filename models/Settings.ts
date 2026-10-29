@@ -18,6 +18,8 @@ const SettingsSchema = new Schema({
   quotationOtherInformation: { type: String, default: DEFAULT_SETTINGS.quotationOtherInformation, trim: true },
   quotationTheme: { type: String, default: DEFAULT_SETTINGS.quotationTheme, trim: true },
   quotationColor: { type: String, default: DEFAULT_SETTINGS.quotationColor, trim: true },
+  bookingPdfTheme: { type: String, default: DEFAULT_SETTINGS.bookingPdfTheme, trim: true },
+  bookingPdfColor: { type: String, default: DEFAULT_SETTINGS.bookingPdfColor, trim: true },
 }, { timestamps: true });
 
 export type SettingsDoc = InferSchemaType<typeof SettingsSchema> & { _id: string };

@@ -318,6 +318,8 @@ export const DEFAULT_SETTINGS = {
   quotationOtherInformation: "",
   quotationTheme: "classic",
   quotationColor: "#0f766e",
+  bookingPdfTheme: "classic",
+  bookingPdfColor: "#0060e6",
 };
 
 

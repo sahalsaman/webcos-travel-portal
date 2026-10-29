@@ -103,7 +103,7 @@ export function ManualBookingDrawer({ trips }: { trips: BookableTrip[] }) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/bookings", {
+      const res = await fetch("/api/tenant/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

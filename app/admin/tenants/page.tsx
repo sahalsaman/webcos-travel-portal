@@ -15,13 +15,15 @@ type Tenant = {
   siteUrl: string;
   status: "active" | "suspended";
   primaryColor?: string;
-  owner?: { name: string; email: string };
-  subscription?: { plan: string; amount: number; setupFee?: number; setupPaidAmount?: number };
+  owner?: { name: string; email: string; phone?: string; countryCode?: string };
+  currency?: string;
+  subscription?: { plan: string; amount: number; setupFee?: number; setupPaidAmount?: number; startedAt?: string };
   createdAt?: string;
 };
 
 const inputClassName = "mt-1 w-full rounded-lg border bg-background p-2.5";
 const date = (value?: string) => value ? new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" }).format(new Date(value)) : "—";
+const dateInput = (value?: string) => value ? new Date(value).toISOString().slice(0, 10) : "";
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
@@ -88,12 +90,16 @@ export default function TenantsPage() {
           siteUrl: form.get("siteUrl"),
           adminName: form.get("adminName"),
           adminEmail: form.get("adminEmail"),
+          adminPhoneCountryCode: form.get("adminPhoneCountryCode"),
+          adminPhone: form.get("adminPhone"),
+          currency: form.get("currency"),
           primaryColor: form.get("primaryColor"),
           status: form.get("status"),
           subscription: {
             plan: form.get("plan"),
             setupFee: Number(form.get("setupFee") || 0),
             setupPaidAmount: Number(form.get("setupPaidAmount") || 0),
+            startedAt: form.get("startedAt") || null,
           },
           ...(adminPassword || tenantNewPassword ? { adminPassword, tenantNewPassword } : {}),
         }),
@@ -170,12 +176,16 @@ function TenantForm({ mode, tenant, busy, onSubmit, onCancel }: { mode: "invite"
       <Field label="Portal host"><input required name="host" defaultValue={tenant?.hosts[0]} placeholder="portal.example.com" className={inputClassName} /></Field>
       <Field label="Tenant owner"><input required name="adminName" defaultValue={tenant?.owner?.name} className={inputClassName} /></Field>
       <Field label="Owner email"><input required name="adminEmail" type="email" defaultValue={tenant?.owner?.email} className={inputClassName} /></Field>
+      <Field label="Owner country code"><select name="adminPhoneCountryCode" defaultValue={tenant?.owner?.countryCode || "+91"} className={inputClassName}><option value="+91">+91 India</option><option value="+1">+1 USA / Canada</option><option value="+44">+44 United Kingdom</option><option value="+971">+971 UAE</option></select></Field>
+      <Field label="Owner phone"><input required name="adminPhone" type="tel" defaultValue={tenant?.owner?.phone} className={inputClassName} /></Field>
       {invite && <>
         <Field label="Temporary password"><input required name="adminPassword" type="password" minLength={12} className={inputClassName} /></Field>
       </>}
       <Field label="Subscription plan"><select name="plan" defaultValue={tenant?.subscription?.plan || "basic"} className={inputClassName}>{SUBSCRIPTION_PLANS.map((plan) => <option key={plan.plan} value={plan.plan}>{plan.label} — ₹{plan.price}/month</option>)}</select></Field>
+      <Field label="Business currency"><select name="currency" defaultValue={tenant?.currency || "INR"} className={inputClassName}><option value="INR">INR — Indian Rupee</option><option value="USD">USD — US Dollar</option><option value="AED">AED — UAE Dirham</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Pound Sterling</option></select></Field>
       <Field label="Setup amount"><input name="setupFee" type="number" min="0" defaultValue={tenant?.subscription?.setupFee ?? SUBSCRIPTION_PLANS[0].setupFee} className={inputClassName} /></Field>
       <Field label="Setup amount paid"><input name="setupPaidAmount" type="number" min="0" defaultValue={tenant?.subscription?.setupPaidAmount ?? 0} className={inputClassName} /></Field>
+      {!invite && <Field label="Subscription starts on"><input name="startedAt" type="date" defaultValue={dateInput(tenant?.subscription?.startedAt)} className={inputClassName} /></Field>}
       <Field label="Brand colour"><input name="primaryColor" type="color" defaultValue={tenant?.primaryColor || "#0060e6"} className="mt-1 block h-11 w-full rounded-lg border bg-background p-1" /></Field>
 
       {!invite && <>
@@ -199,7 +209,7 @@ function TenantForm({ mode, tenant, busy, onSubmit, onCancel }: { mode: "invite"
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <label className="text-sm font-medium">{label}{children}</label>;
+  return <label className="block text-sm font-medium"><span className="block">{label}</span>{children}</label>;
 }
 
 function Modal({ title, close, children }: { title: string; close: () => void; children: ReactNode }) {

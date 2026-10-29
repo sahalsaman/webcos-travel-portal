@@ -9,9 +9,11 @@ export function proxy(request: NextRequest) {
   // /api/tenant. Without this, Next returns its HTML 404 page and callers
   // attempting response.json() show the misleading "Unexpected token '<'".
   const legacyTenantApis = new Set([
-    "activities", "activity-types", "campaigns", "employees", "expenses",
-    "hr-tasks", "integrations", "invoices", "leaves", "offers", "partners",
-    "payroll", "performance", "profile", "quotations", "reputation", "travelers", "uploads", "visas",
+    "activities", "activity-types", "ai", "attendance", "business", "campaigns",
+    "employees", "expenses", "hotel-reservations", "hr-tasks", "integrations",
+    "inventory-assets", "invoices", "leads", "leaves", "offers", "partners",
+    "payroll", "performance", "profile", "quotations", "reputation", "settings",
+    "suppliers", "tickets", "travelers", "uploads", "visas",
   ]);
   const [, api, resource, ...rest] = request.nextUrl.pathname.split("/");
   if (api === "api" && resource && legacyTenantApis.has(resource)) {

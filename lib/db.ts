@@ -31,6 +31,12 @@ export function configuredPlatformDatabase() {
   return "TRAVELPORTAL_DEV";
 }
 
+/** Tenant operational records and platform registry share PLATFORM_DATABASE.
+ * Tenant data is isolated inside that database by mandatory businessId. */
+export function configuredTenantDatabase() {
+  return configuredPlatformDatabase();
+}
+
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
