@@ -11,6 +11,7 @@ import User from "@/models/User";
 import { isCustomDateTripCategory } from "@/lib/constants";
 import { getBusiness } from "@/lib/business";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { isFixedDepartureBookingClosed, syncFixedDepartureStatus } from "@/lib/fixed-departure-status";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +21,11 @@ export async function POST(request: Request) {
     const business = await getBusiness();
 
     const trip = await (await tenantModel(Trip)).findById(body.tripId);
-    if (!trip || trip.status !== "active") return fail("This package is not available for booking", 404);
+    if (!trip) return fail("This package is not available for booking", 404);
+    await syncFixedDepartureStatus(trip);
+    if (trip.status === "inactive") return fail("This package has ended and is no longer available", 404);
+    if (isFixedDepartureBookingClosed(trip)) return fail("Bookings are closed because this fixed departure has started", 409);
+    if (trip.status !== "active") return fail("This package is not available for booking", 404);
     if (trip.holidayPackage ?? isCustomDateTripCategory(trip.category)) {
       return fail("Custom-date bookings must be created through the customer booking flow", 400);
     }
@@ -100,9 +105,12 @@ export async function POST(request: Request) {
       await booking.save();
     }
 
-    if (body.status === "confirmed" || body.paymentStatus === "paid") {
-      await notifyAdminsAndEmployees({ type: "booking", title: "Booking confirmed", message: `${booking.bookingNumber} was confirmed.`, meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/lms/bookings" } }, "lms");
-    }
+    await notifyAdminsAndEmployees({
+      type: "booking",
+      title: body.status === "confirmed" || body.paymentStatus === "paid" ? "Booking confirmed" : "New manual booking",
+      message: `${booking.bookingNumber} for “${trip.title}” was created with status ${booking.status}.`,
+      meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status: booking.status, href: "/lms/bookings" },
+    }, "lms");
 
     return ok({ id: String(booking._id), bookingNumber }, 201);
   } catch (err) {

@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     const business = await getBusiness();
     const booking = await (await tenantModel(Booking)).findById(bookingId);
     if (!booking) return fail("Booking not found", 404);
+    const previousBookingStatus = booking.status;
 
     const payment = await (await tenantModel(Payment)).findById(booking.payment);
     const savedToken = typeof payment?.notes?.confirmationToken === "string"
@@ -149,6 +150,14 @@ export async function POST(request: Request) {
       message: `${booking.bookingNumber} was paid successfully for ${trip?.title ?? "a package"}.`,
       meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, href: "/finance/earnings" },
     }, "finance");
+    if (previousBookingStatus !== booking.status) {
+      await notifyAdminsAndEmployees({
+        type: "booking",
+        title: "Booking status changed",
+        message: `${booking.bookingNumber} changed from ${previousBookingStatus} to ${booking.status} after payment.`,
+        meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status: booking.status, href: "/lms/bookings" },
+      }, "lms");
+    }
 
     return ok({ bookingNumber: booking.bookingNumber });
   } catch (err) {

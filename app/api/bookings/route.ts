@@ -19,6 +19,7 @@ import { getSettings } from "@/models/Settings";
 import { isCustomDateTripCategory } from "@/lib/constants";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
 import { getBusiness } from "@/lib/business";
+import { isFixedDepartureBookingClosed, syncFixedDepartureStatus } from "@/lib/fixed-departure-status";
 
 export async function POST(request: Request) {
   try {
@@ -30,9 +31,13 @@ export async function POST(request: Request) {
     const business = await getBusiness();
 
     const trip = await (await tenantModel(Trip)).findById(body.tripId);
-    if (!trip || trip.status !== "active") {
+    if (!trip) {
       return fail("This package is not available for booking", 404);
     }
+    await syncFixedDepartureStatus(trip);
+    if (trip.status === "inactive") return fail("This package has ended and is no longer available", 404);
+    if (isFixedDepartureBookingClosed(trip)) return fail("Bookings are closed because this fixed departure has started", 409);
+    if (trip.status !== "active") return fail("This package is not available for booking", 404);
     for(const kind of ["visa","permit"] as const){const required=kind==="visa"?trip.visaRequired:trip.permitRequired;if(!required)continue;const answer=body.travelCompliance?.[kind];if(!answer)return fail(`${kind === "visa" ? "Visa" : "Permit"} information is required`,422);if(!answer.hasDocument){const wanted=(kind==="visa"?trip.visaDocuments:trip.permitDocuments)??[];const uploaded=new Set(answer.documents.map((document)=>document.label));if(wanted.some((label:string)=>!uploaded.has(label)))return fail(`Upload all required ${kind} documents`,422)}}
     const customDate = trip.holidayPackage ?? isCustomDateTripCategory(trip.category);
     if (!customDate && trip.availableSeats < body.seats) {

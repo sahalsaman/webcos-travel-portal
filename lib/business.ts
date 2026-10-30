@@ -11,7 +11,7 @@ export interface BusinessRecord {
   hosts: string[];
   siteUrl: string; address?: string; businessEmail?: string; businessPhoneCountryCode?: string; businessPhone?: string; BusinessWhatsappCountryCode?: string; businessWhatsapp?: string; currency?: string; logoUrl: string; primaryColor: string; status: string;
   subscription?: { plan: string; status: "trial" | "active" | "past_due" | "cancelled"; amount: number; setupFee?: number; setupPaidAmount?: number; setupPaidAt?: Date | null; startedAt?: Date | null; currency: string; renewsAt?: Date | null };
-  credentials?: Array<{ platform: "CLOUDINARY" | "WHATSAPP_BUSINESS" | "RAZORPAY_API" | "FLIGHT_API" | "GEMINI_AI"; name?: string; apikey?: string; secretKey?: string; url?: string; webhookSecret?: string; alertEmail?: string }>;
+  credentials?: Array<{ platform: "CLOUDINARY" | "WABIS_API" | "RAZORPAY_API" | "FLIGHT_API" | "GEMINI_AI" | "META_API"; name?: string; apikey?: string; secretKey?: string; url?: string; webhookSecret?: string; alertEmail?: string }>;
 }
 
 export type BusinessCredential = NonNullable<BusinessRecord["credentials"]>[number];

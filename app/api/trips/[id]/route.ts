@@ -8,6 +8,8 @@ import "@/models";
 import Booking from "@/models/Booking";
 import PartnerTrip from "@/models/PartnerTrip";
 import Trip from "@/models/Trip";
+import { dateDrivenTripStatus } from "@/lib/fixed-departure-status";
+import { notifyAdminsAndEmployees } from "@/lib/notifications";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -26,9 +28,29 @@ export async function PATCH(request: Request, { params }: Ctx) {
 
     const TripModel = await tenantModel(Trip);
     const previous = await TripModel.findById(id).lean();
+    if (!previous) return fail("Package not found", 404);
+    const nextStatus = (update.status as string | undefined) ?? previous.status;
+    const dateStatus = dateDrivenTripStatus({
+      ...previous,
+      ...update,
+      status: nextStatus,
+      startDate: (update.startDate as Date | undefined) ?? previous.startDate,
+      endDate: (update.endDate as Date | undefined) ?? previous.endDate,
+      holidayPackage: (update.holidayPackage as boolean | undefined) ?? previous.holidayPackage,
+    });
+    if (dateStatus) update.status = dateStatus;
+
     const trip = await TripModel.findByIdAndUpdate(id, update, { new: true }).lean();
     if (!trip) return fail("Package not found", 404);
-    if (previous) await removeUnusedCloudinaryImages(collectCloudinaryUrls(previous));
+    if (previous.status !== trip.status) {
+      await notifyAdminsAndEmployees({
+        type: "system",
+        title: "Package status changed",
+        message: `“${trip.title}” changed from ${previous.status} to ${trip.status}.`,
+        meta: { href: "/inventory/packages", packageId: String(trip._id), status: trip.status },
+      }, "inventory");
+    }
+    await removeUnusedCloudinaryImages(collectCloudinaryUrls(previous));
     return ok(trip);
   } catch (err) {
     if (err instanceof CloudinaryUploadError) return fail(err.message, 422);

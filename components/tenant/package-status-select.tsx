@@ -7,7 +7,7 @@ import { Select } from "@/components/ui/select";
 import { TRIP_STATUSES, type TripStatus } from "@/lib/constants";
 
 function statusLabel(status: TripStatus) {
-  return status === "soldout" ? "Sold out" : status.charAt(0).toUpperCase() + status.slice(1);
+  return status === "soldout" ? "Booking closed" : status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 export function PackageStatusSelect({ id, status }: { id: string; status: TripStatus }) {

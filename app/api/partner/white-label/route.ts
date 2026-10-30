@@ -9,6 +9,7 @@ import "@/models";
 import Partner from "@/models/Partner";
 import Trip from "@/models/Trip";
 import PartnerTrip from "@/models/PartnerTrip";
+import { syncFixedDepartureStatus } from "@/lib/fixed-departure-status";
 
 /** Partner: create or update a white-label listing for a package. */
 export async function POST(request: Request) {
@@ -21,9 +22,11 @@ export async function POST(request: Request) {
     if (!partner) return fail("Partner profile not found", 404);
 
     const trip = await (await tenantModel(Trip)).findById(tripId);
-    if (!trip || trip.status !== "active") {
+    if (!trip) {
       return fail("Package is not available for reselling", 404);
     }
+    await syncFixedDepartureStatus(trip);
+    if (trip.status !== "active") return fail("Package is not available for reselling", 404);
 
     const price = sellingPrice(trip.basePrice, commission);
     const pt = await (await tenantModel(PartnerTrip)).findOneAndUpdate(

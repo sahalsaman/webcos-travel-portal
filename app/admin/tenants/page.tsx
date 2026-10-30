@@ -120,7 +120,7 @@ export default function TenantsPage() {
       <header className="mb-6 flex items-end justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-primary">Tenants</p>
-          <h1 className="mt-1 text-3xl font-bold">Travel agency tenants</h1>
+          <h1 className="mt-1 text-3xl font-bold">Travels/Holidays agency tenants</h1>
           <p className="mt-2 text-sm text-muted-foreground">Manage agency portals, plans and owner access.</p>
         </div>
         <Button onClick={() => setInviteOpen(true)}><Plus />Invite tenant</Button>

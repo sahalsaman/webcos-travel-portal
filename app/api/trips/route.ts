@@ -8,6 +8,8 @@ import { COUNTRY_OPTIONS } from "@/lib/constants";
 import "@/models";
 import Trip from "@/models/Trip";
 import Destination from "@/models/Destination";
+import { dateDrivenTripStatus, syncFixedDepartureStatuses } from "@/lib/fixed-departure-status";
+import { notifyAdminsAndEmployees } from "@/lib/notifications";
 
 async function uniqueTripSlug(title: string) {
   const root = slugify(title) || "trip";
@@ -30,6 +32,7 @@ export async function GET(request: Request) {
   try {
     await requireApiRole(["tenant", "tenant_employee"]);
     await connectDB();
+    await syncFixedDepartureStatuses();
     const { searchParams } = new URL(request.url);
     const query: Record<string, unknown> = {};
     const status = searchParams.get("status");
@@ -55,14 +58,27 @@ export async function POST(request: Request) {
     await ensureTenantDestination(data);
 
     const slug = await uniqueTripSlug(data.title);
-    const trip = await (await tenantModel(Trip)).create({
+    const tripData = {
       ...data,
       supplier: data.supplier || null,
       slug,
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),
       availableSeats: data.availableSeats || data.totalSeats,
+    };
+    const scheduledStatus = dateDrivenTripStatus(tripData);
+    const trip = await (await tenantModel(Trip)).create({
+      ...tripData,
+      ...(scheduledStatus ? { status: scheduledStatus } : {}),
     });
+    if (scheduledStatus && scheduledStatus !== data.status) {
+      await notifyAdminsAndEmployees({
+        type: "system",
+        title: "Package status adjusted",
+        message: `“${trip.title}” was created as ${scheduledStatus} based on its travel dates.`,
+        meta: { href: "/inventory/packages", packageId: String(trip._id), status: scheduledStatus },
+      }, "inventory");
+    }
     return ok({ id: String(trip._id), slug }, 201);
   } catch (err) {
     if (err instanceof CloudinaryUploadError) return fail(err.message, 422);

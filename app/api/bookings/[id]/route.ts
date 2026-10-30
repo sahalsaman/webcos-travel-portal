@@ -7,6 +7,7 @@ import Booking from "@/models/Booking";
 import Trip from "@/models/Trip";
 import Partner from "@/models/Partner";
 import Commission from "@/models/Commission";
+import { notifyAdminsAndEmployees } from "@/lib/notifications";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -26,8 +27,18 @@ export async function PATCH(request: Request, { params }: Ctx) {
     }
 
     const wasActive = booking.status !== "cancelled";
+    const previousStatus = booking.status;
     booking.status = status;
     await booking.save();
+
+    if (previousStatus !== status) {
+      await notifyAdminsAndEmployees({
+        type: "booking",
+        title: "Booking status changed",
+        message: `${booking.bookingNumber} changed from ${previousStatus} to ${status}.`,
+        meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status, href: "/lms/bookings" },
+      }, "lms");
+    }
 
     // Cancelling a previously active booking: restore seats & reverse earnings.
     if (status === "cancelled" && wasActive) {

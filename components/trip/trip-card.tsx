@@ -26,7 +26,8 @@ export function TripCard({ trip, href, priceOverride, priceLabel, view = "grid" 
   const customDate = trip.holidayPackage ?? isCustomDateTripCategory(trip.category);
   const { label: duration } = tripDuration(trip.startDate, trip.endDate, trip.durationDays || trip.itinerary?.length);
   const price = priceOverride ?? trip.basePrice;
-  const soldOut = customDate ? false : trip.availableSeats <= 0;
+  const bookingClosed = !customDate && trip.status === "soldout";
+  const soldOut = customDate ? false : bookingClosed || trip.availableSeats <= 0;
 
   return (
     <Link
@@ -51,7 +52,7 @@ export function TripCard({ trip, href, priceOverride, priceLabel, view = "grid" 
         </div>
         {soldOut ? (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <Badge variant="destructive" className="text-sm">Sold Out</Badge>
+            <Badge variant="destructive" className="text-sm">{bookingClosed ? "Bookings Closed" : "Sold Out"}</Badge>
           </div>
         ) : null}
         <div className="absolute bottom-3 right-3">
@@ -78,7 +79,7 @@ export function TripCard({ trip, href, priceOverride, priceLabel, view = "grid" 
           {!customDate ? (
             <span className="flex items-center gap-1">
               <Users className="size-3.5" />
-              {soldOut ? "Waitlist" : `${trip.availableSeats} seats left`}
+              {bookingClosed ? "Bookings closed" : soldOut ? "Waitlist" : `${trip.availableSeats} seats left`}
             </span>
           ) : null}
         </div>

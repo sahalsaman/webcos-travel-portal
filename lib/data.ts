@@ -14,6 +14,7 @@ import User from "@/models/User";
 import Booking from "@/models/Booking";
 import Activity from "@/models/Activity";
 import ActivityType from "@/models/ActivityType";
+import { syncFixedDepartureStatuses } from "@/lib/fixed-departure-status";
 
 import type { TripDTO, PartnerDTO, ReviewDTO, DestinationDTO, OfferCardDTO, ActivityDTO, ActivityTypeDTO } from "@/types";
 
@@ -69,7 +70,7 @@ const getCachedDestinations = (async (countryCode: string) => {
 
     if (items.length > 0) return serialize(items) as DestinationDTO[];
 
-    const tripMatch: Record<string, unknown> = { status: "active" };
+    const tripMatch: Record<string, unknown> = { status: { $in: ["active", "soldout"] } };
     if (!isIndiaCountry(countryCode)) tripMatch.country = { $ne: "India" };
 
     const fromTrips = await (await tenantModel(Trip)).aggregate([
@@ -125,7 +126,8 @@ export async function getDestinationLanding(slug: string) {
       title: new RegExp(`^${destinationTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
     }).lean();
     const destinationName = destinationRecord?.title || slug.replaceAll("-", " ");
-    const trips = await (await tenantModel(Trip)).find({ status: "active", destination: new RegExp(`^${destinationName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") })
+    await syncFixedDepartureStatuses();
+    const trips = await (await tenantModel(Trip)).find({ status: { $in: ["active", "soldout"] }, destination: new RegExp(`^${destinationName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") })
       .sort({ featured: -1, rating: -1, createdAt: -1 })
       .lean();
     if (!destinationRecord && trips.length === 0) return null;
@@ -167,7 +169,7 @@ export interface TripFilters {
 }
 
 function buildTripQuery(filters: TripFilters, includeCategory = true) {
-  const query: Record<string, unknown> = { status: "active" };
+  const query: Record<string, unknown> = { status: { $in: ["active", "soldout"] } };
   if (filters.destination) query.destination = new RegExp(filters.destination, "i");
   if (filters.country) query.country = new RegExp(`^${filters.country}$`, "i");
   if (filters.categories?.length) {
@@ -204,6 +206,7 @@ function buildTripQuery(filters: TripFilters, includeCategory = true) {
 
 export async function getTripCategoryCounts(filters: TripFilters = {}) {
   return safe(async () => {
+    await syncFixedDepartureStatuses();
     const rows = await (await tenantModel(Trip)).aggregate<{ _id: string; count: number }>([
       { $match: buildTripQuery(filters, false) },
       { $group: { _id: "$category", count: { $sum: 1 } } },
@@ -236,6 +239,7 @@ export async function getTrips(filters: TripFilters = {}) {
 
   return safe(
     async () => {
+      await syncFixedDepartureStatuses();
       const query = buildTripQuery({ q, destination, country, category, categories, excludeCategories, startDate, endDate, minPrice, maxPrice });
 
       const sortMap: Record<string, Record<string, 1 | -1>> = {
@@ -268,13 +272,15 @@ export async function getTrips(filters: TripFilters = {}) {
 
 const getCachedFeaturedTrips = (async (limit: number) => {
   return safe(async () => {
-    const items = await (await tenantModel(Trip)).find({ status: "active", featured: true })
+    await syncFixedDepartureStatuses();
+    const publicStatuses = { $in: ["active", "soldout"] };
+    const items = await (await tenantModel(Trip)).find({ status: publicStatuses, featured: true })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
     // Fall back to newest active trips if nothing is flagged featured.
     if (items.length === 0) {
-      const recent = await (await tenantModel(Trip)).find({ status: "active" })
+      const recent = await (await tenantModel(Trip)).find({ status: publicStatuses })
         .sort({ createdAt: -1 })
         .limit(limit)
         .lean();
@@ -290,7 +296,8 @@ export async function getFeaturedTrips(limit = 6) {
 
 export async function getTripsByCategory(category: string, limit = 4) {
   return safe(async () => {
-    const items = await (await tenantModel(Trip)).find({ status: "active", category })
+    await syncFixedDepartureStatuses();
+    const items = await (await tenantModel(Trip)).find({ status: { $in: ["active", "soldout"] }, category })
       .sort({ startDate: 1 })
       .limit(limit)
       .lean();
@@ -312,8 +319,9 @@ export async function getDirectBookingHotels() {
 
 export async function getTripBySlug(slug: string) {
   return safe(async () => {
+    await syncFixedDepartureStatuses();
     const [TripModel, HotelModel, VehicleModel] = await Promise.all([tenantModel(Trip), tenantModel(Hotel), tenantModel(Vehicle)]);
-    const trip = await TripModel.findOne({ slug, status: "active" })
+    const trip = await TripModel.findOne({ slug, status: { $in: ["active", "soldout"] } })
       .populate({ path: "itinerary.hotels.hotel_id", model: HotelModel, select: "name image description facilities", strictPopulate: false })
       .populate({ path: "itinerary.transports.vehicle_id", model: VehicleModel, select: "name image description facilities", strictPopulate: false })
       .lean();
@@ -323,9 +331,10 @@ export async function getTripBySlug(slug: string) {
 
 export async function getRelatedTrips(tripId: string, destination: string, limit = 3) {
   return safe(async () => {
+    await syncFixedDepartureStatuses();
     const items = await (await tenantModel(Trip)).find({
       _id: { $ne: tripId },
-      status: "active",
+      status: { $in: ["active", "soldout"] },
       destination: new RegExp(`^${destination.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
     })
       .limit(limit)
@@ -362,7 +371,7 @@ export async function getWhiteLabelTrip(partnerSlug: string, tripSlug: string) {
       tripSlug,
       active: true,
     })
-      .populate({ path: "trip", model: "Trip", match: { status: "active" } })
+      .populate({ path: "trip", model: "Trip", match: { status: { $in: ["active", "soldout"] } } })
       .populate({
         path: "partner",
         model: "Partner",
@@ -396,7 +405,7 @@ export async function getPartnerStorefront(partnerSlug: string) {
       active: true,
     })
       .sort({ createdAt: -1 })
-      .populate({ path: "trip", model: "Trip", match: { status: "active" } })
+      .populate({ path: "trip", model: "Trip", match: { status: { $in: ["active", "soldout"] } } })
       .lean();
 
     return {
@@ -431,6 +440,7 @@ export async function trackPartnerTripClick(partnerSlug: string, tripSlug: strin
 export async function getHomeStats() {
   return safe(
     async () => {
+      await syncFixedDepartureStatuses();
       const [trips, partners, bookings, travelers] = await Promise.all([
         (await tenantModel(Trip)).countDocuments({ status: "active" }),
         (await tenantModel(Partner)).countDocuments({ status: "approved" }),

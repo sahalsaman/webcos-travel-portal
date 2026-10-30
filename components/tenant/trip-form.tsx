@@ -319,7 +319,7 @@ export function TripForm({ trip, destinations = [], suppliers = [], hotels = [],
           <div>
             <Label className="mb-1.5 block">Status</Label>
             <Select value={form.status} onChange={(e) => set("status", e.target.value as typeof form.status)}>
-              {TRIP_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {TRIP_STATUSES.map((s) => <option key={s} value={s}>{s === "soldout" ? "Booking closed" : s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
             </Select>
           </div>
           <div>

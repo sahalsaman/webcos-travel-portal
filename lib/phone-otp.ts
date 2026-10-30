@@ -20,7 +20,7 @@ function hashCode(phone: string, code: string) {
 
 async function sendWhatsAppOtp(phone: string, code: string) {
   const business = await getBusiness();
-  const credential = (business.credentials ?? []).find((item) => item.platform === "WHATSAPP_BUSINESS");
+  const credential = (business.credentials ?? []).find((item) => item.platform === "WABIS_API");
   const phoneNumberId = credential?.name?.trim(); const accessToken = credential?.apikey?.trim(); const templateName = credential?.secretKey?.trim(); const language = credential?.url?.trim() || "en_US";
   if (!phoneNumberId || !accessToken || !templateName) return { testMode: true };
   const response = await fetch(`https://graph.facebook.com/v22.0/${encodeURIComponent(phoneNumberId)}/messages`, { method: "POST", headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, body: JSON.stringify({ messaging_product: "whatsapp", to: phone.slice(1), type: "template", template: { name: templateName, language: { code: language }, components: [{ type: "body", parameters: [{ type: "text", text: code }] }] } }) });
@@ -34,7 +34,7 @@ export async function requestPhoneOtp(input: string, purpose: "login" | "registe
   let user = await Users.findOne({ phone: { $in: [phone, legacyIndianPhone].filter(Boolean) }, role: "tenant_traveler" });
   if (!user && purpose === "login") throw new Error("No account exists with this phone number. Please create an account first.");
   if (!user) user = await Users.create({ name: "Pending traveler", email: `${phone.slice(1)}@phone.voibee.local`, phone, role: "tenant_traveler", businessId: business._id });
-  const configured = (business.credentials ?? []).some((item) => item.platform === "WHATSAPP_BUSINESS" && item.name?.trim() && item.apikey?.trim() && item.secretKey?.trim());
+  const configured = (business.credentials ?? []).some((item) => item.platform === "WABIS_API" && item.name?.trim() && item.apikey?.trim() && item.secretKey?.trim());
   const deliveredCode = configured ? crypto.randomInt(100000, 1_000_000).toString() : "654321";
   const delivery = await sendWhatsAppOtp(phone, deliveredCode);
   user.otp = { codeHash: hashCode(phone, deliveredCode), attempts: 0, consumedAt: null, expiresAt: new Date(Date.now() + OTP_TTL_MS) };

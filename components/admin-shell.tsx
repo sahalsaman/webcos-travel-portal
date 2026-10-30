@@ -7,13 +7,14 @@ import { signOut } from "next-auth/react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Building2, CircleHelp, CreditCard, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { BookOpen, Building2, CircleHelp, CreditCard, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/tenants", label: "Tenants", icon: Building2 },
   { href: "/admin/invoices", label: "Invoices", icon: CreditCard },
   { href: "/admin/support", label: "Support tickets", icon: CircleHelp },
+  { href: "/docs", label: "Documentation", icon: BookOpen },
 ];
 
 export function AdminShell({ children, user }: { children: React.ReactNode; user: { name?: string | null; email?: string | null; image?: string | null } }) {

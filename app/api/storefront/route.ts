@@ -11,6 +11,7 @@ import Destination from "@/models/Destination";
 import Partner from "@/models/Partner";
 import PartnerTrip from "@/models/PartnerTrip";
 import { getBusiness } from "@/lib/business";
+import { syncFixedDepartureStatuses } from "@/lib/fixed-departure-status";
 import { readPublicCache, storefrontCacheKey, writePublicCache } from "@/lib/redis";
 
 const text = z.string().max(250);
@@ -56,6 +57,16 @@ const cachedPublicOperations = new Set([
   "getReviewsForTrip", "getPartnerBySlug", "getWhiteLabelTrip", "getPartnerStorefront",
   "getHomeStats", "getSitemapRecords",
 ]);
+const packageOperations = new Set([
+  "getDestinations", "getHomeDestinations", "getDestinationLanding", "getTrips", "getTripCategoryCounts", "getFeaturedTrips",
+  "getTripsByCategory", "getTripBySlug", "getRelatedTrips", "getWhiteLabelTrip",
+  "getPartnerStorefront", "getHomeStats", "getSitemapRecords",
+]);
+
+function agencyDateKey() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+}
+
 export async function POST(request: Request) {
   try {
     const { operation, args } = z.object({ operation: z.string(), args: z.array(z.unknown()).max(4).default([]).transform(values => values.map(value => value === null ? undefined : value)) }).parse(await request.json());
@@ -65,7 +76,9 @@ export async function POST(request: Request) {
       // Resolve the business before reading cache so suspended or unknown
       // agencies never receive a previously cached storefront response.
       const business = await getBusiness();
-      const cacheKey = storefrontCacheKey(business.slug, operation, args);
+      if (packageOperations.has(operation)) await syncFixedDepartureStatuses();
+      const cacheArgs = packageOperations.has(operation) ? [...args, { packageDate: agencyDateKey() }] : args;
+      const cacheKey = storefrontCacheKey(business.slug, operation, cacheArgs);
       const cached = await readPublicCache<unknown>(cacheKey);
       if (cached.hit) return ok(cached.value);
 

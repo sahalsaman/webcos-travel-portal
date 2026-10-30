@@ -33,8 +33,14 @@ export async function POST(request: Request) {
       payment.status = "paid";
       payment.razorpayPaymentId = paymentEntity.id;
       await payment.save();
+      const previousBooking = await BookingModel.findById(payment.booking).select("status bookingNumber").lean();
       const confirmed = await BookingModel.findOneAndUpdate({ _id: payment.booking, paymentStatus: { $ne: "paid" } }, { $set: { paymentStatus: "paid", status: "confirmed" } }, { new: true });
-      if (confirmed) await notifyAdminsAndEmployees({ type: "payment", title: "Payment received", message: `${confirmed.bookingNumber} was paid successfully.`, meta: { bookingId: String(confirmed._id), bookingNumber: confirmed.bookingNumber, href: "/lms/bookings" } }, "lms");
+      if (confirmed) {
+        await notifyAdminsAndEmployees({ type: "payment", title: "Payment received", message: `${confirmed.bookingNumber} was paid successfully.`, meta: { bookingId: String(confirmed._id), bookingNumber: confirmed.bookingNumber, href: "/finance/earnings" } }, "finance");
+        if (previousBooking?.status !== confirmed.status) {
+          await notifyAdminsAndEmployees({ type: "booking", title: "Booking status changed", message: `${confirmed.bookingNumber} changed from ${previousBooking?.status ?? "unknown"} to ${confirmed.status} after payment.`, meta: { bookingId: String(confirmed._id), bookingNumber: confirmed.bookingNumber, status: confirmed.status, href: "/lms/bookings" } }, "lms");
+        }
+      }
     } else if (event.event === "payment.failed") {
       payment.status = "failed";
       payment.razorpayPaymentId = paymentEntity.id;
