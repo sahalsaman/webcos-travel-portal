@@ -20,6 +20,7 @@ import { isCustomDateTripCategory } from "@/lib/constants";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
 import { getBusiness } from "@/lib/business";
 import { isFixedDepartureBookingClosed, syncFixedDepartureStatus } from "@/lib/fixed-departure-status";
+import { sendBookingWhatsApp } from "@/lib/wabis";
 
 export async function POST(request: Request) {
   try {
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
       return fail("This package is not available for booking", 404);
     }
     await syncFixedDepartureStatus(trip);
-    if (trip.status === "inactive") return fail("This package has ended and is no longer available", 404);
+    if (trip.status === "completed") return fail("This fixed departure has completed and is no longer available", 404);
     if (isFixedDepartureBookingClosed(trip)) return fail("Bookings are closed because this fixed departure has started", 409);
     if (trip.status !== "active") return fail("This package is not available for booking", 404);
     for(const kind of ["visa","permit"] as const){const required=kind==="visa"?trip.visaRequired:trip.permitRequired;if(!required)continue;const answer=body.travelCompliance?.[kind];if(!answer)return fail(`${kind === "visa" ? "Visa" : "Permit"} information is required`,422);if(!answer.hasDocument){const wanted=(kind==="visa"?trip.visaDocuments:trip.permitDocuments)??[];const uploaded=new Set(answer.documents.map((document)=>document.label));if(wanted.some((label:string)=>!uploaded.has(label)))return fail(`Upload all required ${kind} documents`,422)}}
@@ -181,6 +182,7 @@ export async function POST(request: Request) {
       message: `${bookingNumber} · ${trip.title} · ${travelerDetails.name} · ${body.seats} traveler(s)`,
       meta: { bookingId: String(booking._id), bookingNumber, href: "/lms/bookings" },
     }, "lms");
+    await sendBookingWhatsApp({ phone: travelerDetails.phone, travelerName: travelerDetails.name, bookingNumber, tripTitle: trip.destination || trip.title, bookingStatus: booking.status, travelStartDate });
 
     // Offline bookings are stored immediately and remain unpaid until an admin
     // records an advance or full payment.

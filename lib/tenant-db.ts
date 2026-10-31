@@ -27,9 +27,11 @@ export async function tenantModel<T extends Model<unknown>>(template: T): Promis
     const business = await getBusiness();
     this.pipeline().unshift({ $match: { businessId: business._id } });
   });
-  schema.pre("validate", function stampBusiness(this: { get(path: string): unknown; set(path: string, value: unknown): void }, next: (error?: Error) => void) {
-    if (!this.get("businessId")) getBusiness().then((business) => { this.set("businessId", business._id); next(); }).catch(next);
-    else next();
+  schema.pre("validate", async function stampBusiness(this: { get(path: string): unknown; set(path: string, value: unknown): void }) {
+    if (!this.get("businessId")) {
+      const business = await getBusiness();
+      this.set("businessId", business._id);
+    }
   });
   return connection.model(modelName, schema) as T;
 }

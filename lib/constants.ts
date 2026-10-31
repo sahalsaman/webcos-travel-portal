@@ -16,7 +16,7 @@ export type PartnerType = (typeof PARTNER_TYPES)[number];
 export const PARTNER_STATUSES = ["pending", "approved", "suspended"] as const;
 export type PartnerStatus = (typeof PARTNER_STATUSES)[number];
 
-export const TRIP_STATUSES = ["draft", "active", "inactive", "soldout"] as const;
+export const TRIP_STATUSES = ["draft", "active", "started", "completed", "inactive", "soldout"] as const;
 export const CLIMATE_OPTIONS = ["Tropical", "Warm", "Cool", "Cold", "Rainy / Monsoon", "Dry", "Moderate"] as const;
 export type Climate = (typeof CLIMATE_OPTIONS)[number];
 export const DESTINATION_STATUSES = ["active", "inactive"] as const;

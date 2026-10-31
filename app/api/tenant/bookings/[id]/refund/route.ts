@@ -10,6 +10,7 @@ import Partner from "@/models/Partner";
 import Payment from "@/models/Payment";
 import Trip from "@/models/Trip";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { sendBookingWhatsApp } from "@/lib/wabis";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -75,6 +76,8 @@ export async function POST(_request: Request, { params }: Ctx) {
       message: `${booking.bookingNumber} was refunded and cancelled.`,
       meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status: "cancelled", href: "/lms/bookings" },
     }, "lms");
+    const packageTrip = await (await tenantModel(Trip)).findById(booking.trip).select("title").lean();
+    await sendBookingWhatsApp({ phone: booking.travelerDetails.phone, travelerName: booking.travelerDetails.name, bookingNumber: booking.bookingNumber, tripTitle: packageTrip?.title ?? "your package", bookingStatus: "cancelled", travelStartDate: booking.travelStartDate });
 
     return ok({ refundId, alreadyRefunded: false });
   } catch (error) {

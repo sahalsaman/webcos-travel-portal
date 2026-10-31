@@ -13,6 +13,13 @@ const credentialSchema = z.object({
   url: z.string().trim().max(500).default(""),
   webhookSecret: z.string().trim().max(500).default(""),
   alertEmail: z.string().trim().email().optional().or(z.literal("")),
+  languageCode: z.string().trim().max(20).default("en"),
+  templates: z.object({
+    otp: z.string().trim().max(160).default(""),
+    booking: z.string().trim().max(160).default(""),
+    reminder: z.string().trim().max(160).default(""),
+    experience: z.string().trim().max(160).default(""),
+  }).default({ otp: "", booking: "", reminder: "", experience: "" }),
 });
 
 export async function GET() {

@@ -5,7 +5,9 @@ import { tenantModel } from "@/lib/tenant-db";
 import { connectDB } from "@/lib/db";
 import Booking from "@/models/Booking";
 import Payment from "@/models/Payment";
+import Trip from "@/models/Trip";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { sendBookingWhatsApp } from "@/lib/wabis";
 
 function signatureMatches(payload: string, signature: string | null, secret: string) {
   if (!signature || !secret) return false;
@@ -39,6 +41,8 @@ export async function POST(request: Request) {
         await notifyAdminsAndEmployees({ type: "payment", title: "Payment received", message: `${confirmed.bookingNumber} was paid successfully.`, meta: { bookingId: String(confirmed._id), bookingNumber: confirmed.bookingNumber, href: "/finance/earnings" } }, "finance");
         if (previousBooking?.status !== confirmed.status) {
           await notifyAdminsAndEmployees({ type: "booking", title: "Booking status changed", message: `${confirmed.bookingNumber} changed from ${previousBooking?.status ?? "unknown"} to ${confirmed.status} after payment.`, meta: { bookingId: String(confirmed._id), bookingNumber: confirmed.bookingNumber, status: confirmed.status, href: "/lms/bookings" } }, "lms");
+          const trip = await (await tenantModel(Trip)).findById(confirmed.trip).select("title").lean();
+          await sendBookingWhatsApp({ phone: confirmed.travelerDetails.phone, travelerName: confirmed.travelerDetails.name, bookingNumber: confirmed.bookingNumber, tripTitle: trip?.title ?? "your package", bookingStatus: confirmed.status, travelStartDate: confirmed.travelStartDate });
         }
       }
     } else if (event.event === "payment.failed") {

@@ -5,7 +5,9 @@ import { getBusiness } from "@/lib/business";
 import Trip from "@/models/Trip";
 
 const AGENCY_TIME_ZONE = "Asia/Kolkata";
-const MANAGED_STATUSES = ["active", "soldout"] as const;
+// `soldout` and `inactive` are kept here only so packages created before the
+// fixed-departure lifecycle can move to the new `started` and `completed` states.
+const MANAGED_STATUSES = ["active", "started", "soldout", "inactive"] as const;
 
 type FixedDepartureTrip = {
   _id?: unknown;
@@ -41,13 +43,13 @@ export function isFixedDepartureBookingClosed(trip: FixedDepartureTrip, now = ne
   return Boolean(start && start <= agencyTodayKey(now));
 }
 
-export function dateDrivenTripStatus(trip: FixedDepartureTrip, now = new Date()): "inactive" | "soldout" | undefined {
+export function dateDrivenTripStatus(trip: FixedDepartureTrip, now = new Date()): "completed" | "started" | undefined {
   if (trip.holidayPackage !== false || !MANAGED_STATUSES.includes(trip.status as (typeof MANAGED_STATUSES)[number])) return undefined;
   const start = dateKey(trip.startDate);
   const end = dateKey(trip.endDate);
   const today = agencyTodayKey(now);
-  if (end && end < today) return "inactive";
-  if (trip.status === "active" && start && start <= today) return "soldout";
+  if (end && end < today) return "completed";
+  if (["active", "soldout"].includes(trip.status ?? "") && start && start <= today) return "started";
   return undefined;
 }
 
@@ -70,7 +72,7 @@ async function reconcileTripStatus(trip: FixedDepartureTrip, businessId: unknown
   if (result.modifiedCount === 1) {
     trip.status = nextStatus;
     const title = trip.title || "Untitled package";
-    const label = nextStatus === "inactive" ? "expired and unpublished" : "closed for new bookings";
+    const label = nextStatus === "completed" ? "completed and unpublished" : "started and closed for new bookings";
     await notifyAdminsAndEmployees({
       type: "system",
       title: "Fixed departure status updated",
@@ -105,7 +107,7 @@ export async function syncFixedDepartureStatuses(now = new Date()) {
         status: { $in: MANAGED_STATUSES },
         $or: [
           { endDate: { $lt: todayStart } },
-          { status: "active", startDate: { $lt: tomorrow } },
+          { status: { $in: ["active", "soldout"] }, startDate: { $lt: tomorrow } },
         ],
       })
       .select("_id title holidayPackage status startDate endDate")

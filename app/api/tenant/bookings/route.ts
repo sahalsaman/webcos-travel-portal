@@ -12,6 +12,7 @@ import { isCustomDateTripCategory } from "@/lib/constants";
 import { getBusiness } from "@/lib/business";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
 import { isFixedDepartureBookingClosed, syncFixedDepartureStatus } from "@/lib/fixed-departure-status";
+import { sendBookingWhatsApp } from "@/lib/wabis";
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     const trip = await (await tenantModel(Trip)).findById(body.tripId);
     if (!trip) return fail("This package is not available for booking", 404);
     await syncFixedDepartureStatus(trip);
-    if (trip.status === "inactive") return fail("This package has ended and is no longer available", 404);
+    if (trip.status === "completed") return fail("This fixed departure has completed and is no longer available", 404);
     if (isFixedDepartureBookingClosed(trip)) return fail("Bookings are closed because this fixed departure has started", 409);
     if (trip.status !== "active") return fail("This package is not available for booking", 404);
     if (trip.holidayPackage ?? isCustomDateTripCategory(trip.category)) {
@@ -111,6 +112,7 @@ export async function POST(request: Request) {
       message: `${booking.bookingNumber} for “${trip.title}” was created with status ${booking.status}.`,
       meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status: booking.status, href: "/lms/bookings" },
     }, "lms");
+    await sendBookingWhatsApp({ phone: booking.travelerDetails.phone, travelerName: booking.travelerDetails.name, bookingNumber: booking.bookingNumber, tripTitle: trip.destination || trip.title, bookingStatus: booking.status, travelStartDate: booking.travelStartDate });
 
     return ok({ id: String(booking._id), bookingNumber }, 201);
   } catch (err) {

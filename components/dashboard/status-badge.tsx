@@ -5,6 +5,7 @@ type Variant = "default" | "accent" | "secondary" | "success" | "warning" | "des
 const MAP: Record<string, Variant> = {
   active: "success",
   inactive: "secondary",
+  started: "accent",
   // bookings
   pending: "warning",
   advanced: "accent",

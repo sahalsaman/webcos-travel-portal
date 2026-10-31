@@ -10,8 +10,46 @@ import PartnerTrip from "@/models/PartnerTrip";
 import Trip from "@/models/Trip";
 import { dateDrivenTripStatus } from "@/lib/fixed-departure-status";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { slugify } from "@/lib/utils";
 
 type Ctx = { params: Promise<{ id: string }> };
+
+async function duplicateSlug(sourceSlug: string) {
+  const root = `${slugify(sourceSlug) || "package"}-copy`;
+  let slug = root;
+  let suffix = 2;
+  const TripModel = await tenantModel(Trip);
+  while (await TripModel.exists({ slug })) slug = `${root}-${suffix++}`;
+  return slug;
+}
+
+/** Admin: duplicate a package as an unpublished draft. */
+export async function POST(_request: Request, { params }: Ctx) {
+  try {
+    await requireApiRole(["tenant", "tenant_employee"]);
+    const { id } = await params;
+    await connectDB();
+    const TripModel = await tenantModel(Trip);
+    const source = await TripModel.findById(id).lean<Record<string, unknown>>();
+    if (!source) return fail("Package not found", 404);
+
+    const { _id, businessId, slug: sourceSlug, title, createdAt, updatedAt, __v, numberOfBookings, reviewCount, ...packageData } = source;
+    const slug = await duplicateSlug(String(sourceSlug));
+    const copy = await TripModel.create({
+      ...packageData,
+      title: `${String(title)} (Copy)`,
+      slug,
+      status: "draft",
+      featured: false,
+      availableSeats: Number(packageData.totalSeats ?? packageData.availableSeats ?? 0),
+      numberOfBookings: 0,
+      reviewCount: 0,
+    });
+    return ok({ id: String(copy._id), slug }, 201);
+  } catch (err) {
+    return handleError(err);
+  }
+}
 
 /** Admin: update a trip. */
 export async function PATCH(request: Request, { params }: Ctx) {

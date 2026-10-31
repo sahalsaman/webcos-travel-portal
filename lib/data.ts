@@ -70,7 +70,7 @@ const getCachedDestinations = (async (countryCode: string) => {
 
     if (items.length > 0) return serialize(items) as DestinationDTO[];
 
-    const tripMatch: Record<string, unknown> = { status: { $in: ["active", "soldout"] } };
+    const tripMatch: Record<string, unknown> = { status: { $in: ["active", "started", "soldout"] } };
     if (!isIndiaCountry(countryCode)) tripMatch.country = { $ne: "India" };
 
     const fromTrips = await (await tenantModel(Trip)).aggregate([
@@ -127,7 +127,7 @@ export async function getDestinationLanding(slug: string) {
     }).lean();
     const destinationName = destinationRecord?.title || slug.replaceAll("-", " ");
     await syncFixedDepartureStatuses();
-    const trips = await (await tenantModel(Trip)).find({ status: { $in: ["active", "soldout"] }, destination: new RegExp(`^${destinationName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") })
+    const trips = await (await tenantModel(Trip)).find({ status: { $in: ["active", "started", "soldout"] }, destination: new RegExp(`^${destinationName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") })
       .sort({ featured: -1, rating: -1, createdAt: -1 })
       .lean();
     if (!destinationRecord && trips.length === 0) return null;
@@ -169,7 +169,7 @@ export interface TripFilters {
 }
 
 function buildTripQuery(filters: TripFilters, includeCategory = true) {
-  const query: Record<string, unknown> = { status: { $in: ["active", "soldout"] } };
+  const query: Record<string, unknown> = { status: { $in: ["active", "started", "soldout"] } };
   if (filters.destination) query.destination = new RegExp(filters.destination, "i");
   if (filters.country) query.country = new RegExp(`^${filters.country}$`, "i");
   if (filters.categories?.length) {
@@ -273,7 +273,7 @@ export async function getTrips(filters: TripFilters = {}) {
 const getCachedFeaturedTrips = (async (limit: number) => {
   return safe(async () => {
     await syncFixedDepartureStatuses();
-    const publicStatuses = { $in: ["active", "soldout"] };
+    const publicStatuses = { $in: ["active", "started", "soldout"] };
     const items = await (await tenantModel(Trip)).find({ status: publicStatuses, featured: true })
       .sort({ createdAt: -1 })
       .limit(limit)
@@ -297,7 +297,7 @@ export async function getFeaturedTrips(limit = 6) {
 export async function getTripsByCategory(category: string, limit = 4) {
   return safe(async () => {
     await syncFixedDepartureStatuses();
-    const items = await (await tenantModel(Trip)).find({ status: { $in: ["active", "soldout"] }, category })
+    const items = await (await tenantModel(Trip)).find({ status: { $in: ["active", "started", "soldout"] }, category })
       .sort({ startDate: 1 })
       .limit(limit)
       .lean();
@@ -321,7 +321,7 @@ export async function getTripBySlug(slug: string) {
   return safe(async () => {
     await syncFixedDepartureStatuses();
     const [TripModel, HotelModel, VehicleModel] = await Promise.all([tenantModel(Trip), tenantModel(Hotel), tenantModel(Vehicle)]);
-    const trip = await TripModel.findOne({ slug, status: { $in: ["active", "soldout"] } })
+    const trip = await TripModel.findOne({ slug, status: { $in: ["active", "started", "soldout"] } })
       .populate({ path: "itinerary.hotels.hotel_id", model: HotelModel, select: "name image description facilities", strictPopulate: false })
       .populate({ path: "itinerary.transports.vehicle_id", model: VehicleModel, select: "name image description facilities", strictPopulate: false })
       .lean();
@@ -334,7 +334,7 @@ export async function getRelatedTrips(tripId: string, destination: string, limit
     await syncFixedDepartureStatuses();
     const items = await (await tenantModel(Trip)).find({
       _id: { $ne: tripId },
-      status: { $in: ["active", "soldout"] },
+      status: { $in: ["active", "started", "soldout"] },
       destination: new RegExp(`^${destination.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
     })
       .limit(limit)
@@ -371,7 +371,7 @@ export async function getWhiteLabelTrip(partnerSlug: string, tripSlug: string) {
       tripSlug,
       active: true,
     })
-      .populate({ path: "trip", model: "Trip", match: { status: { $in: ["active", "soldout"] } } })
+      .populate({ path: "trip", model: "Trip", match: { status: { $in: ["active", "started", "soldout"] } } })
       .populate({
         path: "partner",
         model: "Partner",
@@ -405,7 +405,7 @@ export async function getPartnerStorefront(partnerSlug: string) {
       active: true,
     })
       .sort({ createdAt: -1 })
-      .populate({ path: "trip", model: "Trip", match: { status: { $in: ["active", "soldout"] } } })
+      .populate({ path: "trip", model: "Trip", match: { status: { $in: ["active", "started", "soldout"] } } })
       .lean();
 
     return {

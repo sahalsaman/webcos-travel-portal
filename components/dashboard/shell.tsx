@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -33,7 +33,13 @@ export function DashboardShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(() => nav.find((item) => item.children?.length && (pathname === item.href || pathname.startsWith(`${item.href}/`)))?.href ?? null);
   const brand = useBusinessBrand();
+
+  useEffect(() => {
+    const activeGroup = nav.find((item) => item.children?.length && (pathname === item.href || pathname.startsWith(`${item.href}/`)));
+    if (activeGroup) setExpandedGroup(activeGroup.href);
+  }, [nav, pathname]);
 
   const isActive = (item: NavItem) =>
     pathname === item.href || (!item.exact && item.href !== nav[0]?.href && pathname.startsWith(item.href)) || Boolean(item.children?.some(isActive));
@@ -45,7 +51,7 @@ export function DashboardShell({
       </Link>
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
         {nav.map((item) => (
-          item.children?.length ? <NavigationGroup key={item.href} item={item} pathname={pathname} onNavigate={() => setOpen(false)} /> : <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors", isActive(item) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}><item.icon className="size-5" />{item.label}</Link>
+          item.children?.length ? <NavigationGroup key={item.href} item={item} pathname={pathname} open={expandedGroup === item.href} onToggle={() => setExpandedGroup((current) => current === item.href ? null : item.href)} onNavigate={() => setOpen(false)} /> : <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors", isActive(item) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}><item.icon className="size-5" />{item.label}</Link>
         ))}
       </nav>
       <div className="border-t border-border p-3">
@@ -115,11 +121,8 @@ export function DashboardShell({
   );
 }
 
-function NavigationGroup({ item, pathname, onNavigate }: { item: NavItem; pathname: string; onNavigate: () => void }) {
+function NavigationGroup({ item, pathname, open, onToggle, onNavigate }: { item: NavItem; pathname: string; open: boolean; onToggle: () => void; onNavigate: () => void }) {
   const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-  const [expanded, setExpanded] = useState(active);
-  // Start expanded for the active module, but always honour a user's collapse choice.
-  const open = expanded;
 
-  return <div className="space-y-1"><button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={open} className={cn("flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition-colors", active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}><item.icon className="size-5" /><span className="flex-1">{item.label}</span><ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} /></button>{open ? <div className="ml-6 space-y-1 border-l border-primary/20 py-1 pl-4">{item.children?.map((child) => { const childActive = pathname === child.href || (!child.exact && pathname.startsWith(`${child.href}/`)); return <Link key={child.href} href={child.href} onClick={onNavigate} className={cn("block rounded-md px-3 py-2 text-sm transition-colors", childActive ? "bg-primary/10 font-semibold text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}>{child.label}</Link>; })}</div> : null}</div>;
+  return <div className="space-y-1"><button type="button" onClick={onToggle} aria-expanded={open} className={cn("flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition-colors", active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}><item.icon className="size-5" /><span className="flex-1">{item.label}</span><ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} /></button>{open ? <div className="ml-6 space-y-1 border-l border-primary/20 py-1 pl-4">{item.children?.map((child) => { const childActive = pathname === child.href || (!child.exact && pathname.startsWith(`${child.href}/`)); return <Link key={child.href} href={child.href} onClick={onNavigate} className={cn("block rounded-md px-3 py-2 text-sm transition-colors", childActive ? "bg-primary/10 font-semibold text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}>{child.label}</Link>; })}</div> : null}</div>;
 }

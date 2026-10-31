@@ -26,6 +26,13 @@ const BusinessSchema = new Schema({
     url: { type: String, trim: true, default: "" },
     webhookSecret: { type: String, trim: true, default: "" },
     alertEmail: { type: String, trim: true, lowercase: true, default: "" },
+    languageCode: { type: String, trim: true, default: "en" },
+    templates: {
+      otp: { type: String, trim: true, default: "" },
+      booking: { type: String, trim: true, default: "" },
+      reminder: { type: String, trim: true, default: "" },
+      experience: { type: String, trim: true, default: "" },
+    },
   }],
   provisioned: { type: Boolean, default: false },
   status: { type: String, enum: ["active", "suspended"], default: "active" },

@@ -11,6 +11,7 @@ import PartnerTrip from "@/models/PartnerTrip";
 import Commission from "@/models/Commission";
 import Notification from "@/models/Notification";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { sendBookingWhatsApp } from "@/lib/wabis";
 import { getBusiness } from "@/lib/business";
 
 export async function POST(request: Request) {
@@ -157,6 +158,7 @@ export async function POST(request: Request) {
         message: `${booking.bookingNumber} changed from ${previousBookingStatus} to ${booking.status} after payment.`,
         meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status: booking.status, href: "/lms/bookings" },
       }, "lms");
+      await sendBookingWhatsApp({ phone: booking.travelerDetails.phone, travelerName: booking.travelerDetails.name, bookingNumber: booking.bookingNumber, tripTitle: trip?.title ?? "your package", bookingStatus: booking.status, travelStartDate: booking.travelStartDate });
     }
 
     return ok({ bookingNumber: booking.bookingNumber });

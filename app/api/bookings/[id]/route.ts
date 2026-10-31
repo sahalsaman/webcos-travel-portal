@@ -8,6 +8,7 @@ import Trip from "@/models/Trip";
 import Partner from "@/models/Partner";
 import Commission from "@/models/Commission";
 import { notifyAdminsAndEmployees } from "@/lib/notifications";
+import { sendBookingWhatsApp } from "@/lib/wabis";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -38,6 +39,8 @@ export async function PATCH(request: Request, { params }: Ctx) {
         message: `${booking.bookingNumber} changed from ${previousStatus} to ${status}.`,
         meta: { bookingId: String(booking._id), bookingNumber: booking.bookingNumber, status, href: "/lms/bookings" },
       }, "lms");
+      const trip = await (await tenantModel(Trip)).findById(booking.trip).select("title").lean();
+      await sendBookingWhatsApp({ phone: booking.travelerDetails.phone, travelerName: booking.travelerDetails.name, bookingNumber: booking.bookingNumber, tripTitle: trip?.title ?? "your package", bookingStatus: status, travelStartDate: booking.travelStartDate });
     }
 
     // Cancelling a previously active booking: restore seats & reverse earnings.
