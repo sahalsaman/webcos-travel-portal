@@ -65,6 +65,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (siteLoginBlocked(candidateUser.role)) return null;
             return { id: String(candidateUser._id), businessId: String(candidate._id), name: candidateUser.name, email: candidateUser.email, image: candidateUser.image, role: candidateUser.role };
           }
+          // Recover accounts created before businessId was enforced, or when
+          // the request host is unavailable during local development.
+          const legacyUser = await users.findOne({ email: parsed.data.email })
+            .select("+password")
+            .lean<{ _id: unknown; name: string; email: string; password?: string; role: string; image?: string; businessId?: unknown }>();
+          if (legacyUser?.password && ["tenant", "tenant_employee", "tenant_partner", "tenant_traveler"].includes(legacyUser.role) && await bcrypt.compare(parsed.data.password, legacyUser.password)) {
+            const businessId = legacyUser.businessId || businesses[0]?._id;
+            if (businessId && !siteLoginBlocked(legacyUser.role)) return { id: String(legacyUser._id), businessId: String(businessId), name: legacyUser.name, email: legacyUser.email, image: legacyUser.image, role: legacyUser.role };
+          }
           return null;
         }
         await connectDB();

@@ -17,9 +17,10 @@ const credentialSchema = z.object({
   templates: z.object({
     otp: z.string().trim().max(160).default(""),
     booking: z.string().trim().max(160).default(""),
+    hotelBooking: z.string().trim().max(160).default(""),
     reminder: z.string().trim().max(160).default(""),
     experience: z.string().trim().max(160).default(""),
-  }).default({ otp: "", booking: "", reminder: "", experience: "" }),
+  }).default({ otp: "", booking: "", hotelBooking: "", reminder: "", experience: "" }),
 });
 
 export async function GET() {

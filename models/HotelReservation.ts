@@ -3,6 +3,9 @@ import { HOTEL_RESERVATION_STATUSES } from "@/lib/constants";
 
 const HotelReservationSchema = new Schema({
   businessId: { type: Schema.Types.ObjectId, ref: "Business", required: true },
+  paymentStatus: { type: String, enum: ["created", "paid", "failed", "refunded"], default: "created", index: true },
+  payment: { type: Schema.Types.ObjectId, ref: "Payment", default: null },
+  confirmationToken: { type: String, default: "" },
   lead: { type: Schema.Types.ObjectId, ref: "Lead", default: null, index: true },
   customer: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
   hotel: { type: Schema.Types.ObjectId, ref: "Hotel", default: null, index: true },

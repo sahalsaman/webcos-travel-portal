@@ -212,6 +212,15 @@ label:not(:has(.text-destructive)):has(+ select:required)::after {
   content: "*";
 }
 
+/* Keep required markers attached to their field label instead of wrapping
+   onto a separate line in narrow drawer/grid columns. */
+label:has(.text-destructive),
+label:has(+ input:required),
+label:has(+ textarea:required),
+label:has(+ select:required) {
+  white-space: nowrap;
+}
+
 /* Keep the AI package editor centered and use the same broad field layout as
    the manual package form on laptop and desktop screens. */
 div[role="dialog"][aria-label="Edit AI generated package"] {

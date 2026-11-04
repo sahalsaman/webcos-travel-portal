@@ -10,16 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 
 type Platform = "CLOUDINARY" | "WABIS_API" | "RAZORPAY_API" | "FLIGHT_API" | "GEMINI_AI" | "META_API";
-type WabisTemplates = { otp: string; booking: string; reminder: string; experience: string };
+type WabisTemplates = { otp: string; booking: string; hotelBooking: string; reminder: string; experience: string };
 type Credential = { platform: Platform; name: string; apikey: string; secretKey: string; url: string; webhookSecret: string; alertEmail: string; languageCode: string; templates: WabisTemplates };
 type InputCredential = Omit<Partial<Credential>, "templates"> & { platform: Platform; templates?: Partial<WabisTemplates> };
 
-const blankTemplates: WabisTemplates = { otp: "", booking: "", reminder: "", experience: "" };
+const blankTemplates: WabisTemplates = { otp: "", booking: "", hotelBooking: "", reminder: "", experience: "" };
 const blank: Credential = { platform: "CLOUDINARY", name: "", apikey: "", secretKey: "", url: "", webhookSecret: "", alertEmail: "", languageCode: "en", templates: blankTemplates };
 const names: Record<Platform, string> = { CLOUDINARY: "Cloudinary", WABIS_API: "Wabis API", RAZORPAY_API: "Razorpay API", FLIGHT_API: "Flight API", GEMINI_AI: "Gemini AI", META_API: "Meta API" };
 const templateLabels: Array<[keyof WabisTemplates, string, string]> = [
   ["otp", "OTP verification", "Code is sent as the first body variable."],
   ["booking", "Booking template", "Used for pending, confirmed, completed and every booking status change. It uses seven message variables."],
+  ["hotelBooking", "Room booking confirmation", "Sent after a direct room booking request is created. It uses eight message variables."],
   ["reminder", "Reminder template", "Used for 2-day, tomorrow, today, and payment reminders."],
   ["experience", "After-trip experience", "For feedback after the trip completes."],
 ];
@@ -54,6 +55,20 @@ const templateFormats: Record<
       },
     ],
     preview: "Header: 🌴 Your Trip Booking Update!\n\nHi {{1}}! 👋\n\nYour trip booking to *{{2}}* with Voibee Holidays is *{{3}}*! ✈️\n\n📅 *Travel Date:* {{4}}\n🔖 *Booking ID:* {{5}}\n\n{{6}}\n\n🔗 *View Your Booking:*\n{{7}}\n\nThank you for choosing Voibee Holidays! 💚\n\nFooter: Voibee Holidays | Explore. Experience. Enjoy.",
+  },
+
+  hotelBooking: {
+    variables: [
+      { variable: "{{1}} Traveller name", sample: "Ananya" },
+      { variable: "{{2}} Hotel / Property", sample: "Cozy Stay" },
+      { variable: "{{3}} Location", sample: "Kakkanad, Kochi" },
+      { variable: "{{4}} Check-in", sample: "11 Jan 2026" },
+      { variable: "{{5}} Check-out", sample: "12 Jan 2026" },
+      { variable: "{{6}} Room details", sample: "Deluxe AC · 1 room" },
+      { variable: "{{7}} Booking ID", sample: "VORM-023834" },
+      { variable: "{{8}} Booking link", sample: "https://voibee.com/hotels/demo" },
+    ],
+    preview: "Hi {{1}}! 👋\n\nGreat news! Your room booking with *Voibee Holidays* is confirmed! 🎉\n\n🏨 *Hotel / Property:* {{2}}\n📍 *Location:* {{3}}\n📅 *Check-in:* {{4}}\n📅 *Check-out:* {{5}}\n🛏️ *Room Details:* {{6}}\n🔖 *Booking ID:* {{7}}\n\nEverything is set for your comfortable stay!\n\n🔗 *View Your Booking:*\n{{8}}\n\nWishing you a wonderful and relaxing stay! 💚\n\n*Voibee Holidays | Explore. Experience. Enjoy.*",
   },
 
   reminder: {

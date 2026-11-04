@@ -30,6 +30,7 @@ const BusinessSchema = new Schema({
     templates: {
       otp: { type: String, trim: true, default: "" },
       booking: { type: String, trim: true, default: "" },
+      hotelBooking: { type: String, trim: true, default: "" },
       reminder: { type: String, trim: true, default: "" },
       experience: { type: String, trim: true, default: "" },
     },

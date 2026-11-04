@@ -3,6 +3,7 @@ import { getBusiness, getBusinessCredentials } from "@/lib/business";
 export const WABIS_TEMPLATE_KEYS = [
   "otp",
   "booking",
+  "hotelBooking",
   "reminder",
   "experience",
 ] as const;
@@ -77,6 +78,18 @@ export async function sendBookingWhatsApp(input: { phone: string; travelerName: 
     return await sendWabisTemplate({ to: input.phone, template: "booking", variables: [input.travelerName, input.tripTitle, formattedStatus, travelDate, input.bookingNumber, update, bookingUrl] });
   } catch (error) {
     console.error("[wabis] booking message failed:", error instanceof Error ? error.message : error);
+    return { sent: false, skipped: false };
+  }
+}
+
+export async function sendHotelBookingWhatsApp(input: { phone: string; travelerName: string; hotelName: string; location: string; checkIn: Date | string; checkOut: Date | string; roomDetails: string; bookingNumber: string; hotelId: string }) {
+  try {
+    const business = await getBusiness();
+    const formatDate = (value: Date | string) => new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+    const bookingUrl = new URL(`/hotels/${input.hotelId}`, business.siteUrl).toString();
+    return await sendWabisTemplate({ to: input.phone, template: "hotelBooking", variables: [input.travelerName, input.hotelName, input.location, formatDate(input.checkIn), formatDate(input.checkOut), input.roomDetails, input.bookingNumber, bookingUrl] });
+  } catch (error) {
+    console.error("[wabis] hotel booking message failed:", error instanceof Error ? error.message : error);
     return { sent: false, skipped: false };
   }
 }
